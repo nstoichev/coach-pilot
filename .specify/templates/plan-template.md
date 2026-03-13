@@ -1,101 +1,221 @@
 # Implementation Plan: [FEATURE]
 
-**Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
+**Branch**: `[###-feature-name]`  
+**Date**: [DATE]  
+**Spec**: `/specs/[###-feature-name]/spec.md`  
+
 **Input**: Feature specification from `/specs/[###-feature-name]/spec.md`
 
-**Note**: This template is filled in by the `/speckit.plan` command. See `.specify/templates/plan-template.md` for the execution workflow.
+---
 
 ## Summary
 
-[Extract from feature spec: primary requirement + technical approach from research]
+Short technical explanation of how the feature will be implemented.
+
+Include:
+
+- what part of the system it affects
+- which domain entities it interacts with
+- whether it modifies Workout / Segment / Exercise logic
+- whether it requires new algorithms or UI components
+
+---
 
 ## Technical Context
 
-**Language/Version**: TypeScript 5.x + React 19.x  
-**Primary Dependencies**: Vite, React, React DOM, optionally Supabase client  
-**Storage**: Initially local state / mock data; database integration optional for MVP  
-**Testing**: Unit tests for core logic recommended; UI tests optional  
-**Target Platform**: Web browser (desktop + mobile)  
-**Project Type**: Web application (frontend-only MVP)  
-**Performance Goals**: Smooth interactions for mid-range devices; minimal re-renders  
-**Constraints**: No sensitive data handling required at MVP stage  
-**Scale/Scope**: Early development; single user/session prototype
+Language: TypeScript 5.x  
+Framework: React 19  
+Build Tool: Vite  
+
+Primary Dependencies:
+
+- React
+- React DOM
+- Optional Supabase client
+
+Storage Strategy:
+
+Phase 1 (MVP):
+
+- Local state
+- Mock exercise database
+
+Phase 2:
+
+- Supabase + PostgreSQL integration
+
+Target Platform:
+
+- Modern web browsers
+- Desktop first
+- Mobile supported
+
+Performance Goals:
+
+- UI updates <200ms
+- Workout builder interactions must feel instantaneous
+
+Constraints:
+
+- No authentication required in MVP
+- Single-user local prototype acceptable
+
+---
 
 ## Constitution Check
 
-*Minimal gates: code follows clear modular React + TypeScript patterns; basic usability in browser.*
+Verify that the implementation respects the project constitution.
 
-[Gates determined based on constitution file]
+**Checklist**:
+
+- **Domain integrity**: Feature does not break the core Workout → Segment → Exercise model
+- **Logic separation**: Business logic is not placed inside React components
+- **Modularity**: Feature can evolve independently from other systems
+- **Deterministic behavior**: Algorithms (timer generation, fatigue calculation, etc.) are predictable and testable
+
+If any rule is violated, explain why.
+
+---
+
+## Architecture Approach
+
+Explain **how the feature fits into the system architecture**.
+
+Typical architecture layers:
+
+- **Domain layer**: Types, core logic, pure functions
+- **Application layer**: Feature logic, data transformations
+- **UI layer**: React components, hooks, presentation logic
+
+Example flow:
+
+User action
+↓
+React component
+↓
+Feature hook
+↓
+Domain logic
+↓
+Updated workout state
+
+---
 
 ## Project Structure
 
-### Documentation (this feature)
+## Documentation (feature)
 
-```text
 specs/[###-feature]/
-├── plan.md              # This file (/speckit.plan command output)
-├── research.md          # Phase 0 output (/speckit.plan command)
-├── data-model.md        # Phase 1 output (/speckit.plan command)
-├── quickstart.md        # Phase 1 output (/speckit.plan command)
-├── contracts/           # Phase 1 output (/speckit.plan command)
-└── tasks.md             # Phase 2 output (/speckit.tasks command - NOT created by /speckit.plan)
+├── plan.md
+├── research.md
+├── data-model.md
+├── quickstart.md
+├── contracts/
+└── tasks.md
+
+---
+
+## Source Code
+
 ```
-
-### Source Code (repository root)
-<!--
-  ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
-  for this feature. Delete unused options and expand the chosen structure with
-  real paths (e.g., apps/admin, packages/something). The delivered plan must
-  not include Option labels.
--->
-
-```text
-# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
 src/
-├── models/
-├── services/
-├── cli/
-└── lib/
 
-tests/
-├── contract/
-├── integration/
-└── unit/
+domain/
+├── exercise/
+├── workout/
+├── segment/
+└── equipment/
 
-# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
-backend/
-├── src/
-│   ├── models/
-│   ├── services/
-│   └── api/
-└── tests/
+features/
+├── workout-builder/
+├── exercise-library/
+├── timer-engine/
+└── fatigue-engine/
 
-frontend/
-├── src/
-│   ├── components/
-│   ├── pages/
-│   ├── services/
-│   └── types/
-└── tests/
-    ├── unit/
-    └── integration/
+components/
+├── workout/
+├── segments/
+└── exercises/
 
-# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
-api/
-└── [same as backend above]
+hooks/
+├── useWorkoutBuilder
+├── useTimer
+└── useEquipment
 
-ios/ or android/
-└── [platform-specific structure: feature modules, UI flows, platform tests]
+utils/
+
+types/
 ```
 
-**Structure Decision**: [Document the selected structure and reference the real
-directories captured above]
+
+Explanation:
+
+domain  
+Core entities and algorithms.
+
+features  
+Feature-specific logic.
+
+components  
+React UI components.
+
+hooks  
+Reusable stateful logic.
+
+types  
+Shared TypeScript definitions.
+
+---
+
+## Data Model Impact
+
+Describe whether this feature:
+
+- introduces new domain entities
+- modifies existing entities
+- adds relationships
+
+Example:
+
+Workout
+segments: Segment[]
+
+Segment
+type
+duration
+exercises
+
+Exercise
+name
+equipment
+muscle group
+
+---
+
+## Testing Strategy
+
+Focus on **domain logic tests**.
+
+Priority test areas:
+
+- workout transformations
+- timer generation
+- equipment aggregation
+- fatigue calculations
+
+UI tests optional.
+
+Example:
+
+tests/unit
+tests/integration
+
+---
 
 ## Complexity Tracking
 
-> **Fill ONLY if Constitution Check has violations that must be justified**
+> **Fill ONLY if the feature introduces unusual complexity.**
 
-| Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|-------------------------------------|
-| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
-| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |
+| Decision | Why Needed | Simpler Alternative Rejected |
+|----------|-------------|------------------------------|
+| Example: custom timer engine | Workout segments require complex timing | Simple countdown timer insufficient |
