@@ -1,5 +1,6 @@
 import type { Exercise } from '../types/exercise.ts'
 import {
+  EXERCISE_METRICS,
   TRAINING_TYPES,
   type ValidationError,
   type ValidationResult,
@@ -55,6 +56,23 @@ export const validateExercise = (exercise: Exercise): ValidationResult<Exercise>
     errors.push({
       field: 'workingWeight.value',
       message: 'Working weight must be greater than zero.',
+    })
+  }
+
+  if (exercise.prescription.mode === 'metric' && exercise.prescription.metricOptions.length === 0) {
+    errors.push({
+      field: 'prescription.metricOptions',
+      message: 'Metric-based exercises must define at least one metric option.',
+    })
+  }
+
+  if (
+    exercise.prescription.mode === 'metric' &&
+    exercise.prescription.metricOptions.some((metric) => !EXERCISE_METRICS.includes(metric))
+  ) {
+    errors.push({
+      field: 'prescription.metricOptions',
+      message: 'Exercise metric options contain an unsupported value.',
     })
   }
 
@@ -177,18 +195,50 @@ export const validateAssignedExercise = (
 ): ValidationResult<AssignedExercise> => {
   const errors: ValidationError[] = []
 
-  if (assignedExercise.sets !== undefined && assignedExercise.sets <= 0) {
-    errors.push({
-      field: 'sets',
-      message: 'Sets must be greater than zero when provided.',
-    })
+  if (assignedExercise.exercise.prescription.mode === 'sets-reps') {
+    if (assignedExercise.sets !== undefined && assignedExercise.sets <= 0) {
+      errors.push({
+        field: 'sets',
+        message: 'Sets must be greater than zero when provided.',
+      })
+    }
+
+    if (
+      assignedExercise.repetitions !== undefined &&
+      assignedExercise.repetitions <= 0
+    ) {
+      errors.push({
+        field: 'repetitions',
+        message: 'Repetitions must be greater than zero when provided.',
+      })
+    }
   }
 
-  if (assignedExercise.repetitions !== undefined && assignedExercise.repetitions <= 0) {
-    errors.push({
-      field: 'repetitions',
-      message: 'Repetitions must be greater than zero when provided.',
-    })
+  if (assignedExercise.exercise.prescription.mode === 'metric') {
+    if (!assignedExercise.metricTarget) {
+      errors.push({
+        field: 'metricTarget',
+        message: 'Select a metric and value for metric-based exercises.',
+      })
+    } else {
+      if (
+        !assignedExercise.exercise.prescription.metricOptions.includes(
+          assignedExercise.metricTarget.type,
+        )
+      ) {
+        errors.push({
+          field: 'metricTarget.type',
+          message: 'Selected metric is not supported for this exercise.',
+        })
+      }
+
+      if (assignedExercise.metricTarget.value <= 0) {
+        errors.push({
+          field: 'metricTarget.value',
+          message: 'Metric value must be greater than zero.',
+        })
+      }
+    }
   }
 
   return buildResult(assignedExercise, errors)

@@ -79,11 +79,11 @@ Checkpoint: The domain model, validation rules, and shared state are in place an
 
 # Phase 3 — User Story 1 (P1) 🎯 MVP
 
-Goal: Implement the minimum usable Workout Builder for creating workouts, adding segments, assigning exercises through search, setting optional sets/reps, and reordering or removing items.
+Goal: Implement the minimum usable Workout Builder for creating workouts, adding segments, assigning exercises through search, setting optional sets/reps or metric targets, and reordering or removing items.
 
 Independent Test:
 
-Create a workout with at least two segments, search and assign existing exercises to each segment, optionally define sets/reps, reorder segments and exercises, and confirm the resulting structure remains valid in the UI.
+Create a workout with at least two segments, search and assign existing exercises to each segment, define either optional sets/reps or metric targets depending on the exercise, reorder segments and exercises, and confirm the resulting structure remains valid in the UI.
 
 Tasks:
 

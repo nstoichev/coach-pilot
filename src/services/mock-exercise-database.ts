@@ -5,6 +5,9 @@ export const mockExerciseDatabase: Exercise[] = [
     id: 'exercise-front-squat',
     name: 'Front Squat',
     type: ['strength', 'crossfit'],
+    prescription: {
+      mode: 'sets-reps',
+    },
     equipment: ['barbell', 'rack'],
     muscles: {
       primary: ['quadriceps', 'glutes'],
@@ -19,6 +22,9 @@ export const mockExerciseDatabase: Exercise[] = [
     id: 'exercise-burpee-over-bar',
     name: 'Burpee Over Bar',
     type: ['crossfit'],
+    prescription: {
+      mode: 'sets-reps',
+    },
     equipment: ['barbell'],
     muscles: {
       primary: ['chest', 'shoulders'],
@@ -33,6 +39,9 @@ export const mockExerciseDatabase: Exercise[] = [
     id: 'exercise-kettlebell-swing',
     name: 'Kettlebell Swing',
     type: ['crossfit', 'strength'],
+    prescription: {
+      mode: 'sets-reps',
+    },
     equipment: ['kettlebell'],
     muscles: {
       primary: ['hamstrings', 'glutes'],
@@ -41,6 +50,20 @@ export const mockExerciseDatabase: Exercise[] = [
     workingWeight: {
       mode: 'weight',
       value: 24,
+    },
+  },
+  {
+    id: 'exercise-row',
+    name: 'Row',
+    type: ['crossfit'],
+    prescription: {
+      mode: 'metric',
+      metricOptions: ['calories', 'distance', 'speed'],
+    },
+    equipment: ['rower'],
+    muscles: {
+      primary: ['back', 'legs'],
+      stabilizing: ['core'],
     },
   },
 ]

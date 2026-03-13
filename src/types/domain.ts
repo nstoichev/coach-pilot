@@ -4,6 +4,24 @@ export type TrainingType = (typeof TRAINING_TYPES)[number]
 
 export type ExerciseType = TrainingType[]
 
+export const EXERCISE_METRICS = ['calories', 'distance', 'speed', 'time'] as const
+
+export type ExerciseMetric = (typeof EXERCISE_METRICS)[number]
+
+export type ExercisePrescription =
+  | {
+      mode: 'sets-reps'
+    }
+  | {
+      mode: 'metric'
+      metricOptions: ExerciseMetric[]
+    }
+
+export type MetricTarget = {
+  type: ExerciseMetric
+  value: number
+}
+
 export const SEGMENT_TYPES = ['emom', 'amrap', 'forTime', 'strength'] as const
 
 export type SegmentType = (typeof SEGMENT_TYPES)[number]

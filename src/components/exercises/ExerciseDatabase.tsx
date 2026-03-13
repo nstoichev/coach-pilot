@@ -9,6 +9,9 @@ const createDraftExercise = (): Exercise => ({
   id: `exercise-${crypto.randomUUID()}`,
   name: '',
   type: [],
+  prescription: {
+    mode: 'sets-reps',
+  },
   equipment: [],
   muscles: {
     primary: [],

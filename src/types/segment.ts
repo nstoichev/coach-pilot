@@ -1,3 +1,4 @@
+import type { MetricTarget } from './domain.ts'
 import type { Exercise } from './exercise.ts'
 import type { SegmentType } from './domain.ts'
 
@@ -7,6 +8,7 @@ export type AssignedExercise = {
   exercise: Exercise
   sets?: number
   repetitions?: number
+  metricTarget?: MetricTarget
 }
 
 export type Segment = {

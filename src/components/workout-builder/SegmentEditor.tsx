@@ -1,3 +1,4 @@
+import type { ExerciseMetric } from '../../types/domain.ts'
 import type { Exercise } from '../../types/exercise.ts'
 import type { AssignedExercise, Segment } from '../../types/segment.ts'
 import { SegmentExercisePicker } from './SegmentExercisePicker.tsx'
@@ -75,67 +76,129 @@ export const SegmentEditor = ({
         <p className="muted-text">No exercises assigned yet.</p>
       ) : (
         <ul className="exercise-list">
-          {segment.exercises.map((assignedExercise, index) => (
-            <li
-              key={`${segment.id}-${assignedExercise.id}-${index}`}
-              className="exercise-list-item exercise-list-item-detailed"
-            >
-              <div>
-                <strong>{assignedExercise.exercise.name}</strong>
-                <p>{assignedExercise.exercise.type.join(', ')}</p>
-              </div>
+          {segment.exercises.map((assignedExercise, index) => {
+            const metricOptions =
+              assignedExercise.exercise.prescription.mode === 'metric'
+                ? assignedExercise.exercise.prescription.metricOptions
+                : []
 
-              <div className="prescription-grid">
-                <label className="field">
-                  <span>Sets</span>
-                  <input
-                    min={1}
-                    type="number"
-                    value={assignedExercise.sets ?? ''}
-                    onChange={(event) =>
-                      onUpdateAssignedExercise({
-                        ...assignedExercise,
-                        sets:
-                          event.target.value === '' ? undefined : Number(event.target.value),
-                      })
-                    }
-                  />
-                </label>
+            return (
+              <li
+                key={`${segment.id}-${assignedExercise.id}-${index}`}
+                className="exercise-list-item exercise-list-item-detailed"
+              >
+                <div>
+                  <strong>{assignedExercise.exercise.name}</strong>
+                  <p>{assignedExercise.exercise.type.join(', ')}</p>
+                </div>
 
-                <label className="field">
-                  <span>Reps</span>
-                  <input
-                    min={1}
-                    type="number"
-                    value={assignedExercise.repetitions ?? ''}
-                    onChange={(event) =>
-                      onUpdateAssignedExercise({
-                        ...assignedExercise,
-                        repetitions:
-                          event.target.value === '' ? undefined : Number(event.target.value),
-                      })
-                    }
-                  />
-                </label>
-              </div>
+                {assignedExercise.exercise.prescription.mode === 'sets-reps' ? (
+                  <div className="prescription-grid">
+                    <label className="field">
+                      <span>Sets</span>
+                      <input
+                        min={1}
+                        type="number"
+                        value={assignedExercise.sets ?? ''}
+                        onChange={(event) =>
+                          onUpdateAssignedExercise({
+                            ...assignedExercise,
+                            sets:
+                              event.target.value === '' ? undefined : Number(event.target.value),
+                            metricTarget: undefined,
+                          })
+                        }
+                      />
+                    </label>
 
-              <div className="inline-actions">
-                <button type="button" onClick={() => onMoveExerciseUp(index)}>
-                  Up
-                </button>
-                <button type="button" onClick={() => onMoveExerciseDown(index)}>
-                  Down
-                </button>
-                <button
-                  type="button"
-                  className="danger-button"
-                  onClick={() => onRemoveExercise(index)}
-                >
-                  Remove
-                </button>
-              </div>
-            </li>
-          ))}
+                    <label className="field">
+                      <span>Reps</span>
+                      <input
+                        min={1}
+                        type="number"
+                        value={assignedExercise.repetitions ?? ''}
+                        onChange={(event) =>
+                          onUpdateAssignedExercise({
+                            ...assignedExercise,
+                            repetitions:
+                              event.target.value === '' ? undefined : Number(event.target.value),
+                            metricTarget: undefined,
+                          })
+                        }
+                      />
+                    </label>
+                  </div>
+                ) : (
+                  <div className="prescription-grid prescription-grid-metric">
+                    <label className="field">
+                      <span>Measure</span>
+                      <select
+                        value={assignedExercise.metricTarget?.type ?? ''}
+                        onChange={(event) =>
+                          onUpdateAssignedExercise({
+                            ...assignedExercise,
+                            sets: undefined,
+                            repetitions: undefined,
+                            metricTarget: event.target.value
+                              ? {
+                                  type: event.target.value as ExerciseMetric,
+                                  value: assignedExercise.metricTarget?.value ?? 0,
+                                }
+                              : undefined,
+                          })
+                        }
+                      >
+                        <option value="">Select measure</option>
+                        {metricOptions.map((metric) => (
+                          <option key={metric} value={metric}>
+                            {metric}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+
+                    <label className="field">
+                      <span>Value</span>
+                      <input
+                        min={1}
+                        type="number"
+                        value={assignedExercise.metricTarget?.value ?? ''}
+                        onChange={(event) =>
+                          onUpdateAssignedExercise({
+                            ...assignedExercise,
+                            sets: undefined,
+                            repetitions: undefined,
+                            metricTarget: {
+                              type:
+                                assignedExercise.metricTarget?.type ?? metricOptions[0] ?? 'distance',
+                              value:
+                                event.target.value === '' ? 0 : Number(event.target.value),
+                            },
+                          })
+                        }
+                      />
+                    </label>
+                  </div>
+                )}
+
+                <div className="inline-actions">
+                  <button type="button" onClick={() => onMoveExerciseUp(index)}>
+                    Up
+                  </button>
+                  <button type="button" onClick={() => onMoveExerciseDown(index)}>
+                    Down
+                  </button>
+                  <button
+                    type="button"
+                    className="danger-button"
+                    onClick={() => onRemoveExercise(index)}
+                  >
+                    Remove
+                  </button>
+                </div>
+              </li>
+            )
+          })}
         </ul>
       )}
     </div>

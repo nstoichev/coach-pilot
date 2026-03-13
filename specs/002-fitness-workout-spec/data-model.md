@@ -18,6 +18,7 @@ This feature centers on a reusable Workout -> Segment -> Assigned Exercise -> Ex
 - `equipment`: optional list of equipment names or refs
 - `muscles`: optional primary and stabilizing muscle groups
 - `workingWeight`: optional workload descriptor
+- `prescription`: assignment style for the exercise (`sets-reps` or metric-based)
 
 ### Supporting Structures
 
@@ -26,6 +27,7 @@ This feature centers on a reusable Workout -> Segment -> Assigned Exercise -> Ex
 - `muscles.stabilizing`: list of stabilizing muscle groups
 - `workingWeight.mode`: `weight` or `repMax`
 - `workingWeight.value`: numeric value tied to the selected mode
+- metric-based exercises can expose metric options such as `calories`, `distance`, `speed`, or `time`
 
 ### Validation Rules
 
@@ -54,6 +56,8 @@ This feature centers on a reusable Workout -> Segment -> Assigned Exercise -> Ex
 - `exercise`: embedded exercise snapshot/reference used by the UI
 - `sets`: optional numeric set count
 - `repetitions`: optional numeric rep count
+- `metricTarget.type`: optional metric kind for metric-based exercises
+- `metricTarget.value`: optional numeric metric value
 
 ### Optional Future-Ready Fields
 
@@ -68,6 +72,7 @@ This feature centers on a reusable Workout -> Segment -> Assigned Exercise -> Ex
 - `exercises` may be empty during editing but should be validated before a final save if the workflow requires non-empty segments
 - `sets`, when provided, must be greater than zero
 - `repetitions`, when provided, must be greater than zero
+- metric-based exercises must use a supported metric target instead of sets/repetitions
 - exercise ordering must be stable after insert, remove, and reorder actions
 
 ---
@@ -163,6 +168,7 @@ This state is application-level state, not part of the persisted domain record i
 - remove -> segment deleted and draft revalidated
 - assign exercise via search -> exercise assignment inserted into the selected segment
 - update assigned sets/reps -> assignment updated without changing the underlying source exercise
+- update assigned metric target -> metric-based assignment updated without changing the underlying source exercise
 
 ### Workout transitions
 
@@ -178,7 +184,7 @@ The example EMOM workout in `spec.md` demonstrates the intended nested structure
 
 - workout metadata at top level
 - ordered segments
-- per-segment exercise assignments with optional sets/repetitions
+- per-segment exercise assignments with optional sets/repetitions or metric targets
 - future-ready timing metadata
 
 The implementation may internally normalize some references, but the domain contract exposed to the application must remain compatible with the specification.
