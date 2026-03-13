@@ -1,18 +1,14 @@
 type WorkoutDetailsFormProps = {
   workoutName: string
-  restBetweenSegments?: number
   segmentCount: number
   onWorkoutNameChange: (name: string) => void
-  onRestBetweenSegmentsChange: (minutes?: number) => void
   onAddSegment: () => void
 }
 
 export const WorkoutDetailsForm = ({
   workoutName,
-  restBetweenSegments,
   segmentCount,
   onWorkoutNameChange,
-  onRestBetweenSegmentsChange,
   onAddSegment,
 }: WorkoutDetailsFormProps) => (
   <section className="panel">
@@ -33,20 +29,6 @@ export const WorkoutDetailsForm = ({
           value={workoutName}
           onChange={(event) => onWorkoutNameChange(event.target.value)}
           placeholder="Lower Body Strength"
-        />
-      </label>
-
-      <label className="field">
-        <span>Rest Between Segments (minutes)</span>
-        <input
-          min={0}
-          type="number"
-          value={restBetweenSegments ?? ''}
-          onChange={(event) => {
-            const value = event.target.value
-            onRestBetweenSegmentsChange(value === '' ? undefined : Number(value))
-          }}
-          placeholder="Optional"
         />
       </label>
     </div>

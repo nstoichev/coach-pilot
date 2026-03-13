@@ -1,5 +1,6 @@
 export * from './SegmentEditor.tsx'
 export * from './SegmentExercisePicker.tsx'
 export * from './SegmentList.tsx'
+export * from './SegmentTypeModal.tsx'
 export * from './WorkoutBuilder.tsx'
 export * from './WorkoutDetailsForm.tsx'

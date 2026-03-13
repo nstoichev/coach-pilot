@@ -2,6 +2,7 @@ import { createContext, useContext, type Dispatch } from 'react'
 import { mockExerciseDatabase } from '../services/mock-exercise-database.ts'
 import {
   assignExerciseToSegment,
+  getGeneratedSegmentName,
   removeExerciseFromSegment,
   reorderSegmentExercises,
   reorderSegments,
@@ -17,6 +18,7 @@ import type { ValidationError } from '../types/domain.ts'
 import type { Exercise } from '../types/exercise.ts'
 import type { AssignedExercise, Segment } from '../types/segment.ts'
 import type { Workout } from '../types/workout.ts'
+import type { SegmentType } from '../types/domain.ts'
 
 export type WorkoutBuilderState = {
   exercises: Exercise[]
@@ -29,7 +31,6 @@ export type WorkoutBuilderState = {
 
 export type WorkoutBuilderAction =
   | { type: 'set_workout_name'; payload: string }
-  | { type: 'set_rest_between_segments'; payload?: number }
   | { type: 'add_segment'; payload?: Segment }
   | { type: 'update_segment'; payload: Segment }
   | { type: 'remove_segment'; payload: string }
@@ -65,9 +66,52 @@ const createId = (prefix: string) => `${prefix}-${crypto.randomUUID()}`
 
 export const createEmptySegment = (): Segment => ({
   id: createId('segment'),
-  name: 'New Segment',
+  name: 'Custom',
   exercises: [],
+  segmentType: 'custom',
 })
+
+export const createSegmentTemplate = (segmentType: SegmentType): Segment => {
+  const baseSegment = {
+    id: createId('segment'),
+    exercises: [],
+    segmentType,
+  }
+
+  switch (segmentType) {
+    case 'emom': {
+      const seg = {
+        ...baseSegment,
+        name: 'EMOM',
+        intervalSeconds: 60,
+        rounds: 10,
+      }
+      return { ...seg, name: getGeneratedSegmentName(seg) }
+    }
+    case 'amrap': {
+      const seg = {
+        ...baseSegment,
+        name: 'AMRAP',
+        durationSeconds: 600,
+      }
+      return { ...seg, name: getGeneratedSegmentName(seg) }
+    }
+    case 'forTime': {
+      const seg = {
+        ...baseSegment,
+        name: 'For Time',
+        timeCapSeconds: 900,
+      }
+      return { ...seg, name: getGeneratedSegmentName(seg) }
+    }
+    case 'custom':
+    default:
+      return {
+        ...baseSegment,
+        name: 'Custom',
+      }
+  }
+}
 
 export const createEmptyWorkout = (): Workout => ({
   id: createId('workout'),
@@ -103,15 +147,6 @@ export const workoutBuilderReducer = (
         workoutDraft: {
           ...state.workoutDraft,
           name: action.payload,
-        },
-      })
-
-    case 'set_rest_between_segments':
-      return withValidation({
-        ...state,
-        workoutDraft: {
-          ...state.workoutDraft,
-          restBetweenSegments: action.payload,
         },
       })
 
@@ -310,10 +345,13 @@ export const useWorkoutBuilder = () => {
     actions: {
       setWorkoutName: (name: string) =>
         dispatch({ type: 'set_workout_name', payload: name }),
-      setRestBetweenSegments: (minutes?: number) =>
-        dispatch({ type: 'set_rest_between_segments', payload: minutes }),
       addSegment: () => {
-        const segment = createEmptySegment()
+        const segment = createSegmentTemplate('custom')
+        dispatch({ type: 'add_segment', payload: segment })
+        dispatch({ type: 'select_segment', payload: segment.id })
+      },
+      addSegmentByType: (segmentType: SegmentType) => {
+        const segment = createSegmentTemplate(segmentType)
         dispatch({ type: 'add_segment', payload: segment })
         dispatch({ type: 'select_segment', payload: segment.id })
       },

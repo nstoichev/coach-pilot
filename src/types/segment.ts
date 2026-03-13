@@ -8,6 +8,7 @@ export type AssignedExercise = {
   exercise: Exercise
   sets?: number
   repetitions?: number
+  isMaxRepetitions?: boolean
   metricTarget?: MetricTarget
 }
 
@@ -15,7 +16,10 @@ export type Segment = {
   id: string
   name: string
   exercises: AssignedExercise[]
-  segmentType?: SegmentType
-  duration?: number
+  segmentType: SegmentType
+  durationSeconds?: number
+  intervalSeconds?: number
+  rounds?: number
+  timeCapSeconds?: number
   restInterval?: number
 }

@@ -179,11 +179,11 @@ Planned entity impact:
 
 Workout
 - owns ordered `segments`
-- stores workout-level metadata such as `name` and optional `restBetweenSegments`
+- stores workout-level metadata such as `name`
 
 Segment
 - belongs to one Workout draft
-- stores `name`, optional segment metadata, and ordered exercise references or embedded exercise snapshots depending on state shape
+- stores `name`, segment-specific timing and rest metadata, and ordered exercise references or embedded exercise snapshots depending on state shape
 
 Exercise
 - acts as the reusable source-of-truth record

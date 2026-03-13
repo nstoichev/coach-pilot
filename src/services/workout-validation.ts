@@ -90,12 +90,66 @@ export const validateSegment = (segment: Segment): ValidationResult<Segment> => 
     errors.push({ field: 'name', message: 'Segment name is required.' })
   }
 
-  if (segment.duration !== undefined && segment.duration < 0) {
-    errors.push({ field: 'duration', message: 'Segment duration cannot be negative.' })
-  }
-
   if (segment.restInterval !== undefined && segment.restInterval < 0) {
     errors.push({ field: 'restInterval', message: 'Segment rest interval cannot be negative.' })
+  }
+
+  if (segment.durationSeconds !== undefined && segment.durationSeconds <= 0) {
+    errors.push({
+      field: 'durationSeconds',
+      message: 'Segment duration must be greater than zero.',
+    })
+  }
+
+  if (segment.intervalSeconds !== undefined && segment.intervalSeconds <= 0) {
+    errors.push({
+      field: 'intervalSeconds',
+      message: 'Segment interval must be greater than zero.',
+    })
+  }
+
+  if (segment.rounds !== undefined && segment.rounds <= 0) {
+    errors.push({
+      field: 'rounds',
+      message: 'Segment rounds must be greater than zero.',
+    })
+  }
+
+  if (segment.timeCapSeconds !== undefined && segment.timeCapSeconds <= 0) {
+    errors.push({
+      field: 'timeCapSeconds',
+      message: 'Time cap must be greater than zero.',
+    })
+  }
+
+  if (segment.segmentType === 'emom') {
+    if (!segment.intervalSeconds) {
+      errors.push({
+        field: 'intervalSeconds',
+        message: 'EMOM segments require an interval.',
+      })
+    }
+
+    if (!segment.rounds) {
+      errors.push({
+        field: 'rounds',
+        message: 'EMOM segments require a set count.',
+      })
+    }
+  }
+
+  if (segment.segmentType === 'amrap' && !segment.durationSeconds) {
+    errors.push({
+      field: 'durationSeconds',
+      message: 'AMRAP segments require a duration.',
+    })
+  }
+
+  if (segment.segmentType === 'forTime' && !segment.timeCapSeconds) {
+    errors.push({
+      field: 'timeCapSeconds',
+      message: 'For Time segments require a time cap.',
+    })
   }
 
   segment.exercises.forEach((assignedExercise, index) => {
@@ -107,10 +161,10 @@ export const validateSegment = (segment: Segment): ValidationResult<Segment> => 
       })
     })
 
-    if (assignedExercise.sets !== undefined && assignedExercise.sets <= 0) {
+    if (assignedExercise.sets !== undefined && assignedExercise.sets < 0) {
       errors.push({
         field: `exercises.${index}.sets`,
-        message: 'Sets must be greater than zero when provided.',
+        message: 'Sets cannot be negative.',
       })
     }
 
@@ -138,13 +192,6 @@ export const validateWorkout = (
 
   if (!hasText(workout.name)) {
     errors.push({ field: 'name', message: 'Workout name is required.' })
-  }
-
-  if (workout.restBetweenSegments !== undefined && workout.restBetweenSegments < 0) {
-    errors.push({
-      field: 'restBetweenSegments',
-      message: 'Rest between segments cannot be negative.',
-    })
   }
 
   workout.segments.forEach((segment, segmentIndex) => {
@@ -196,20 +243,21 @@ export const validateAssignedExercise = (
   const errors: ValidationError[] = []
 
   if (assignedExercise.exercise.prescription.mode === 'sets-reps') {
-    if (assignedExercise.sets !== undefined && assignedExercise.sets <= 0) {
+    if (assignedExercise.sets !== undefined && assignedExercise.sets < 0) {
       errors.push({
         field: 'sets',
-        message: 'Sets must be greater than zero when provided.',
+        message: 'Sets cannot be negative.',
       })
     }
 
     if (
       assignedExercise.repetitions !== undefined &&
-      assignedExercise.repetitions <= 0
+      assignedExercise.repetitions <= 0 &&
+      !assignedExercise.isMaxRepetitions
     ) {
       errors.push({
         field: 'repetitions',
-        message: 'Repetitions must be greater than zero when provided.',
+        message: 'Repetitions must be greater than zero when provided unless using max reps.',
       })
     }
   }

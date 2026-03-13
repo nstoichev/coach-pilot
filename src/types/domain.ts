@@ -20,9 +20,10 @@ export type ExercisePrescription =
 export type MetricTarget = {
   type: ExerciseMetric
   value: number
+  isMax?: boolean
 }
 
-export const SEGMENT_TYPES = ['emom', 'amrap', 'forTime', 'strength'] as const
+export const SEGMENT_TYPES = ['custom', 'emom', 'amrap', 'forTime'] as const
 
 export type SegmentType = (typeof SEGMENT_TYPES)[number]
 

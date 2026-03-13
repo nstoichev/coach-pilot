@@ -33,10 +33,12 @@ As a coach or trainee, I can create a workout, add multiple segments, and add ex
 
 **Acceptance Scenarios**:
 
-1. **Given** an empty workout builder, **When** the user creates a workout and adds segments, **Then** each segment appears in order and can be named.
+1. **Given** an empty workout builder, **When** the user clicks add segment, **Then** the user must first choose a segment template such as Custom, EMOM, AMRAP, or For Time before the segment is added.
 2. **Given** a segment exists, **When** the user focuses the exercise search field, **Then** the first 10 available exercises are shown and can be filtered by typing.
 3. **Given** a segment exists, **When** the user selects a search result, **Then** the exercise is added to that segment and the user can define either optional sets/repetitions or metric targets depending on the exercise type.
-4. **Given** a workout has segments and exercises, **When** the user reorders items, **Then** the new order is preserved and reflected immediately.
+4. **Given** the user selects an EMOM segment template, **When** the segment is created, **Then** it starts with default parameters of interval `1:00` and sets `10`, and the total measurable time is shown.
+5. **Given** a measurable segment type such as EMOM, AMRAP, or For Time, **When** the user edits its timing parameters, **Then** the UI updates the total segment time when it can be calculated.
+6. **Given** a workout has segments and exercises, **When** the user reorders items, **Then** the new order is preserved and reflected immediately.
 
 ---
 
@@ -92,13 +94,23 @@ As a product team member, I can define placeholder capabilities for the Fatigue 
 - **FR-004**: System MUST keep the workout structure consistent (ordered segments, ordered exercises per segment, no broken references).
 - **FR-005**: System MUST expose the data so other systems can consume it (e.g. Timer Generator, Fatigue System, equipment calculator).
 - **FR-006**: System MUST model exercises with identity, name, type (strength, crossfit, mobility, or combinations), and optional equipment, muscle targets (primary and stabilizing), and working-weight or rep-max information.
-- **FR-007**: System MUST model segments with identity, name, and an ordered list of assigned exercises, where each assignment can store either optional sets/repetitions or metric targets depending on the exercise type.
-- **FR-008**: System MUST model workouts with identity, name, ordered segments, and optional rest-between-segments (e.g. in minutes).
+- **FR-007**: System MUST model segments with identity, name, an explicit segment type (`custom`, `emom`, `amrap`, or `forTime`), and an ordered list of assigned exercises, where each assignment can store either optional sets/repetitions or metric targets depending on the exercise type.
+- **FR-008**: System MUST model workouts with identity, name, and ordered segments, while segment-level rest remains configurable per segment.
 - **FR-009**: Users MUST be able to search exercises from within the segment flow; focusing the search field MUST show the first 10 available exercises and typing MUST filter the available exercise list.
 - **FR-010**: Exercise records MUST remain the single source of truth for workout-building flows, even when surfaced through a lightweight search-first UX backed by a mock database in phase 1.
 - **FR-011**: System MUST allow strength-style assigned exercises inside a segment to store optional sets and optional repetitions without requiring those values for time-based or duration-based scenarios.
 - **FR-012**: System MUST allow metric-style exercises (for example row, bike, or run) to store metric targets such as calories, distance, speed, or similar measures instead of sets/repetitions.
-- **FR-013**: System MUST support extension points so the Timer Generator, Fatigue System, and workout auto-generation can be added later without reworking core workout data.
+- **FR-013**: System MUST open a modal or equivalent selection step before creating a segment so the user can choose the segment template instead of immediately creating a blank segment.
+- **FR-014**: System MUST apply default parameters for predefined segment templates. At minimum, EMOM MUST default to interval `1:00` and sets `10`; other mock templates MUST provide sensible starter values.
+- **FR-015**: System MUST support segment-type-specific parameters such as EMOM interval and sets, AMRAP duration, For Time time cap, and per-segment rest configuration.
+- **FR-015a**: For predefined segment types (EMOM, AMRAP, For Time), the segment name MUST be generated from the specifications: no user-editable name input. Only Custom segments MUST show a "Segment name" label and editable name field. The segment header MUST show the type badge on the left and action buttons (Move Up, Move Down, Remove) on the right; for predefined types the generated name (e.g. "EMOM 10", "E2:30Om 10", "AMRAP 10:30", "For Time") is displayed next to the badge.
+- **FR-016**: System MUST display the total measurable time for segment types whose timing can be derived or explicitly defined, and this summary should appear at the bottom of the segment editor.
+- **FR-017**: System MUST provide the EMOM interval through a constrained range control capped at `10:00` with `0:15` steps; the EMOM segment rounds (sets) control MUST appear below the interval and use a range from 1 to 50 with step 1 and default 10.
+- **FR-018**: System MUST provide AMRAP duration through a range slider from 1 to 30 minutes in 30 second steps, and For Time time cap through a range slider from 1 to 60 minutes in 30 second steps.
+- **FR-019**: System MUST provide per-segment rest through a range control from 0 to 10 minutes in 15 second steps.
+- **FR-020**: For each assigned exercise in a segment, the UI MUST show the exercise title and action buttons (reorder, remove) on top, with all prescription options (sets, reps, or measure + value) stacked below.
+- **FR-021**: Assigned-exercise sets MUST use a range slider from 0 to 10, step 1; reps MUST use a range slider from 1 to 50, step 1. Metric type (calories, distance, speed, time) MUST be chosen via custom-styled radio buttons; metric value MUST use a range slider with type-specific min, max, and step (e.g. calories 0–500 step 5, distance in m, time in seconds with 15 s steps). For calories and distance only, a \"Max\" toggle MUST be available next to the metric value label; when enabled, the metric target is interpreted as \"max\" effort until the segment time ends and the value slider is hidden. For all sets-reps exercises, a \"Max reps\" toggle MUST be available next to the reps label; when enabled, the reps slider is hidden and the assignment is interpreted as \"max reps until the segment time ends\".
+- **FR-022**: System MUST support extension points so the Timer Generator, Fatigue System, and workout auto-generation can be added later without reworking core workout data.
 
 ### Assumptions
 
@@ -117,7 +129,7 @@ Represents a physical movement. Attributes may include: name; type (strength, co
 
 ### Segment
 
-Represents a block of a workout. Examples: AMRAP, EMOM, For Time, Strength Sets. Attributes may include: segment type; duration; rest interval; ordered list of assigned exercises.
+Represents a block of a workout. Examples: Custom, AMRAP, EMOM, and For Time. Attributes may include: segment type; interval; sets or rounds; duration or time cap; rest interval; ordered list of assigned exercises; and derived total measurable time shown in the segment editor.
 
 ### Assigned Exercise
 
@@ -125,7 +137,7 @@ Represents an exercise placed into a segment. Attributes may include: linked exe
 
 ### Workout
 
-Represents a complete training session. Attributes may include: ordered segments; total duration; optional rest between segments; required equipment (derived); generated timers (later phase).
+Represents a complete training session. Attributes may include: ordered segments; total duration; required equipment (derived); generated timers (later phase).
 
 ### Equipment
 
@@ -155,11 +167,14 @@ The following illustrates the domain structure. Implementations will follow the 
 {
   "id": "wod-1001",
   "name": "EMOM Engine Builder",
-  "restBetweenSegments": 2,
   "segments": [
     {
       "id": "seg-1",
       "name": "EMOM 12 - Lower Body Push",
+      "segmentType": "emom",
+      "intervalSeconds": 60,
+      "rounds": 10,
+      "restInterval": 2,
       "exercises": [
         {
           "id": "assigned-1",

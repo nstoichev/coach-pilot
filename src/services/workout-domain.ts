@@ -103,3 +103,87 @@ export const replaceSegment = (workout: Workout, updatedSegment: Segment): Worko
     segment.id === updatedSegment.id ? updatedSegment : segment,
   ),
 })
+
+export const getSegmentEstimatedDurationSeconds = (
+  segment: Segment,
+): number | undefined => {
+  switch (segment.segmentType) {
+    case 'emom':
+      return segment.intervalSeconds && segment.rounds
+        ? segment.intervalSeconds * segment.rounds
+        : undefined
+    case 'amrap':
+      return segment.durationSeconds
+    case 'forTime':
+      return segment.timeCapSeconds
+    default:
+      return undefined
+  }
+}
+
+/** Generated display name for predefined segment types; custom segments use their stored name. */
+export const getGeneratedSegmentName = (segment: Segment): string => {
+  switch (segment.segmentType) {
+    case 'emom': {
+      const interval = segment.intervalSeconds ?? 60
+      const rounds = segment.rounds ?? 10
+      if (interval === 60) {
+        return `EMOM ${rounds}`
+      }
+      return `E${formatSecondsAsClock(interval)}Om ${rounds}`
+    }
+    case 'amrap': {
+      const duration = segment.durationSeconds ?? 600
+      return `AMRAP ${formatSecondsAsClock(duration)}`
+    }
+    case 'forTime':
+      return 'For Time'
+    case 'custom':
+    default:
+      return segment.name
+  }
+}
+
+export const formatSecondsAsClock = (totalSeconds?: number): string => {
+  if (!totalSeconds || totalSeconds <= 0) {
+    return 'Not set'
+  }
+
+  const minutes = Math.floor(totalSeconds / 60)
+  const seconds = totalSeconds % 60
+
+  return `${minutes}:${seconds.toString().padStart(2, '0')}`
+}
+
+export const parseClockInput = (value: string): number | undefined => {
+  const trimmedValue = value.trim()
+
+  if (!trimmedValue) {
+    return undefined
+  }
+
+  if (/^\d+$/.test(trimmedValue)) {
+    return Number(trimmedValue)
+  }
+
+  const [minutesPart, secondsPart] = trimmedValue.split(':')
+
+  if (!minutesPart || secondsPart === undefined) {
+    return undefined
+  }
+
+  const minutes = Number(minutesPart)
+  const seconds = Number(secondsPart)
+
+  if (
+    Number.isNaN(minutes) ||
+    Number.isNaN(seconds) ||
+    minutes < 0 ||
+    seconds < 0 ||
+    seconds >= 60
+  ) {
+    return undefined
+  }
+
+  return minutes * 60 + seconds
+}

@@ -4,5 +4,4 @@ export type Workout = {
   id: string
   name: string
   segments: Segment[]
-  restBetweenSegments?: number
 }

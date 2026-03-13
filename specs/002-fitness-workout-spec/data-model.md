@@ -46,7 +46,8 @@ This feature centers on a reusable Workout -> Segment -> Assigned Exercise -> Ex
 ### Core Fields
 
 - `id`: unique string identifier
-- `name`: display name for the segment
+- `name`: display name; for predefined types (emom, amrap, forTime) this is generated from parameters (e.g. "EMOM 10", "E2:30Om 10", "AMRAP 10:30", "For Time"); only `custom` segments have a user-editable name
+- `segmentType`: segment template (`custom`, `emom`, `amrap`, `forTime`)
 - `exercises`: ordered list of exercise assignments
 
 ### Exercise Assignment Fields
@@ -56,24 +57,37 @@ This feature centers on a reusable Workout -> Segment -> Assigned Exercise -> Ex
 - `exercise`: embedded exercise snapshot/reference used by the UI
 - `sets`: optional numeric set count
 - `repetitions`: optional numeric rep count
+- `isMaxRepetitions`: optional flag indicating reps are \"max\" until the end of the segment time
 - `metricTarget.type`: optional metric kind for metric-based exercises
 - `metricTarget.value`: optional numeric metric value
+- `metricTarget.isMax`: optional flag indicating that this is a \"max\" effort target (e.g. max calories or max distance until the end of the segment time)
 
-### Optional Future-Ready Fields
+### Type-Specific Fields
 
-- `segmentType`: optional category such as `emom`, `amrap`, `forTime`, `strength`
-- `duration`: optional numeric duration metadata
-- `restInterval`: optional rest metadata
+- `intervalSeconds`: optional timing interval for EMOM-style segments
+- `rounds`: optional set or round count for EMOM-style segments
+- `durationSeconds`: optional fixed duration for AMRAP-style segments; UI range slider 1–30 min in 30 s steps
+- `timeCapSeconds`: optional cap for For Time-style segments; UI range slider 1–60 min in 30 s steps
+- `restInterval`: optional per-segment rest value (minutes); UI uses a range slider 0–10 min in 15 s steps
 
 ### Validation Rules
 
 - `id` is required and unique within its parent workout
 - `name` is required
+- `segmentType` is required and must be one of the supported templates
 - `exercises` may be empty during editing but should be validated before a final save if the workflow requires non-empty segments
-- `sets`, when provided, must be greater than zero
-- `repetitions`, when provided, must be greater than zero
-- metric-based exercises must use a supported metric target instead of sets/repetitions
+- `sets`, when provided, must be non-negative (0–10 in current UI range slider)
+- `repetitions`, when provided, must be greater than zero (1–50 in current UI range slider) unless `isMaxRepetitions` is true
+- metric-based exercises must use a supported metric target; metric value uses type-specific range sliders (e.g. calories 0–500 step 5, distance 0–10000 m step 100, time 0–60 min in 15 s steps). For calories and distance, `metricTarget.isMax` may be true, indicating \"max\" effort until the segment time ends, in which case the value slider is hidden.
+- assigned-exercise list item layout: exercise title and actions on top; sets, reps, or measure + value (with optional Max toggle) stacked below
+- EMOM segments require `intervalSeconds` and `rounds`
+- EMOM interval editing is constrained to 15-second steps with a maximum of 10 minutes in the current UI
+- EMOM sets (rounds) are edited via a range control from 1 to 50, step 1, default 10; the sets control is displayed below the interval in the segment editor
+- AMRAP segments require `durationSeconds`; duration is edited via range slider 1–30 min, 30 s steps
+- For Time segments require `timeCapSeconds`; time cap is edited via range slider 1–60 min, 30 s steps
+- `restInterval`, when present, must be zero or greater
 - exercise ordering must be stable after insert, remove, and reorder actions
+- generated name rules: EMOM with 1:00 interval → "EMOM {rounds}"; EMOM with other interval → "E{mm:ss}Om {rounds}"; AMRAP → "AMRAP {duration mm:ss}"; For Time → "For Time" (no dynamic time in title)
 
 ---
 
@@ -86,14 +100,12 @@ This feature centers on a reusable Workout -> Segment -> Assigned Exercise -> Ex
 - `id`: unique string identifier
 - `name`: display name for the workout
 - `segments`: ordered list of segments
-- `restBetweenSegments`: optional workout-level rest value in minutes
 
 ### Validation Rules
 
 - `id` is required
 - `name` is required
 - `segments` order must be preserved
-- `restBetweenSegments`, when present, must be zero or greater
 - workouts cannot contain broken references to missing exercises
 
 ---
@@ -163,8 +175,11 @@ This state is application-level state, not part of the persisted domain record i
 ### Segment transitions
 
 - add -> inserted into workout order
+- add via template modal -> inserted with default values for the selected segment type
 - rename -> reflected immediately in the workout draft
 - reorder -> new order persisted in draft state
+- update segment timing -> total measurable time updates for predefined segment types
+- update segment rest -> rest is stored on that segment instead of globally on the workout
 - remove -> segment deleted and draft revalidated
 - assign exercise via search -> exercise assignment inserted into the selected segment
 - update assigned sets/reps -> assignment updated without changing the underlying source exercise

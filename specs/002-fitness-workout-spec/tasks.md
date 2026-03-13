@@ -79,19 +79,19 @@ Checkpoint: The domain model, validation rules, and shared state are in place an
 
 # Phase 3 — User Story 1 (P1) 🎯 MVP
 
-Goal: Implement the minimum usable Workout Builder for creating workouts, adding segments, assigning exercises through search, setting optional sets/reps or metric targets, and reordering or removing items.
+Goal: Implement the minimum usable Workout Builder for creating workouts, adding predefined segment types through a selection modal, assigning exercises through search, setting optional sets/reps or metric targets, and reordering or removing items.
 
 Independent Test:
 
-Create a workout with at least two segments, search and assign existing exercises to each segment, define either optional sets/reps or metric targets depending on the exercise, reorder segments and exercises, and confirm the resulting structure remains valid in the UI.
+Create a workout with at least two segments, add one through the segment-type modal as EMOM and confirm it starts with interval `1:00` and sets `10`, adjust the interval with the slider up to `10:00` in `0:15` steps, adjust sets with the range slider (1–50, default 10) below the interval, set per-segment rest with the 0–10 min slider, search and assign existing exercises to each segment, define either optional sets/reps or metric targets depending on the exercise, update measurable segment timing, and confirm reordering remains valid in the UI.
 
 Tasks:
 
 - [x] T013 [P] [US1] Create the workout builder container in `src/components/workout-builder/WorkoutBuilder.tsx`
-- [x] T014 [P] [US1] Create the workout details form in `src/components/workout-builder/WorkoutDetailsForm.tsx`
+- [x] T014 [P] [US1] Create the workout details form and segment-type modal entry point in `src/components/workout-builder/WorkoutDetailsForm.tsx`
 - [x] T015 [P] [US1] Create the segment list UI in `src/components/workout-builder/SegmentList.tsx`
-- [x] T016 [P] [US1] Create the segment editor UI in `src/components/workout-builder/SegmentEditor.tsx`
-- [x] T017 [US1] Implement workout and segment actions in `src/store/workout-builder-context.tsx`
+- [x] T016 [P] [US1] Create the segment editor UI with type-specific timing controls (EMOM interval and sets range sliders, sets below interval), per-segment rest slider, and footer total-time display in `src/components/workout-builder/SegmentEditor.tsx`
+- [x] T017 [US1] Implement workout and segment actions with predefined segment defaults in `src/store/workout-builder-store.ts`
 - [x] T018 [US1] Create the segment exercise search picker and empty-state flow in `src/components/workout-builder/SegmentExercisePicker.tsx`
 - [x] T019 [US1] Replace the starter app with the Workout Builder shell in `src/App.tsx`
 
@@ -147,10 +147,10 @@ Purpose: Finish presentation, documentation, and shared exports needed across th
 
 Tasks:
 
-- [ ] T032 [P] Update the main application layout and builder styles in `src/App.css`
+- [x] T032 [P] Update the main application layout and builder styles in `src/App.css`
 - [ ] T033 [P] Update global styling defaults for the Coach Pilot shell in `src/index.css`
 - [ ] T034 [P] Document architecture, data flow, and extension guidance in `README.md`
-- [ ] T035 Update workout builder exports in `src/components/workout-builder/index.ts`
+- [x] T035 Update workout builder exports in `src/components/workout-builder/index.ts`
 - [ ] T036 Update shared service exports in `src/services/index.ts`
 
 Checkpoint: The feature is documented, styled, and ready for implementation review.

@@ -1,17 +1,18 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useWorkoutBuilder } from '../../store/index.ts'
 import { SegmentList } from './SegmentList.tsx'
+import { SegmentTypeModal } from './SegmentTypeModal.tsx'
 import { WorkoutDetailsForm } from './WorkoutDetailsForm.tsx'
 
 export const WorkoutBuilder = () => {
   const { state, actions } = useWorkoutBuilder()
+  const [isSegmentTypeModalOpen, setIsSegmentTypeModalOpen] = useState(false)
 
   const workoutErrors = useMemo(
     () =>
       state.validationErrors.filter(
         (error) =>
           error.field === 'name' ||
-          error.field === 'restBetweenSegments' ||
           error.field.startsWith('segments.'),
       ),
     [state.validationErrors],
@@ -30,11 +31,18 @@ export const WorkoutBuilder = () => {
 
       <WorkoutDetailsForm
         workoutName={state.workoutDraft.name}
-        restBetweenSegments={state.workoutDraft.restBetweenSegments}
         segmentCount={state.workoutDraft.segments.length}
         onWorkoutNameChange={actions.setWorkoutName}
-        onRestBetweenSegmentsChange={actions.setRestBetweenSegments}
-        onAddSegment={actions.addSegment}
+        onAddSegment={() => setIsSegmentTypeModalOpen(true)}
+      />
+
+      <SegmentTypeModal
+        isOpen={isSegmentTypeModalOpen}
+        onClose={() => setIsSegmentTypeModalOpen(false)}
+        onSelectSegmentType={(segmentType) => {
+          actions.addSegmentByType(segmentType)
+          setIsSegmentTypeModalOpen(false)
+        }}
       />
 
       <SegmentList
