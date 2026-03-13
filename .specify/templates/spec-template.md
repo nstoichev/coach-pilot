@@ -5,178 +5,111 @@
 **Status**: Draft  
 **Input**: User description: "$ARGUMENTS"
 
----
-
-## Feature Overview
-
-Brief description of the feature and its purpose in the Coach Pilot system.
-
-Explain:
-
-- what problem it solves
-- how it interacts with workouts, segments, or exercises
-- what part of the app it belongs to (Workout Builder, Exercise Database, Timer, Fatigue Engine)
-
----
-
 ## User Scenarios & Testing *(mandatory)*
 
-User stories must represent **independent user journeys** that provide value even if implemented alone.
+<!--
+  IMPORTANT: User stories should be PRIORITIZED as user journeys ordered by importance.
+  Each user story/journey must be INDEPENDENTLY TESTABLE - meaning if you implement just ONE of them,
+  you should still have a viable MVP (Minimum Viable Product) that delivers value.
+  
+  Assign priorities (P1, P2, P3, etc.) to each story, where P1 is the most critical.
+  Think of each story as a standalone slice of functionality that can be:
+  - Developed independently
+  - Tested independently
+  - Deployed independently
+  - Demonstrated to users independently
+-->
 
-Stories should be ordered by priority.
+### User Story 1 - [Brief Title] (Priority: P1)
 
----
+[Describe this user journey in plain language]
 
-### User Story 1 — [Title] (Priority: P1)
+**Why this priority**: [Explain the value and why it has this priority level]
 
-Describe the primary user journey in simple terms.
-
-Example structure: *"As a user, I want to [action] so that I can [benefit]."*
-
-**Why this priority**: Explain why this is the most important capability.
-
-**Independent Test**: Describe how this feature can be tested in isolation.
-
-**Acceptance Scenarios**:
-
-1. **Given** [initial state], **When** [user action], **Then** [expected outcome]
-2. **Given** [initial state], **When** [user action], **Then** [expected outcome]
-
----
-
-### User Story 2 — [Title] (Priority: P2)
-
-Describe the secondary capability.
-
-**Why this priority**: [Explain]
-
-**Independent Test**: [Describe]
+**Independent Test**: [Describe how this can be tested independently - e.g., "Can be fully tested by [specific action] and delivers [specific value]"]
 
 **Acceptance Scenarios**:
 
----
-
-### User Story 3 — [Title] (Priority: P3)
-
-Describe a lower priority scenario.
+1. **Given** [initial state], **When** [action], **Then** [expected outcome]
+2. **Given** [initial state], **When** [action], **Then** [expected outcome]
 
 ---
 
-## Edge Cases
+### User Story 2 - [Brief Title] (Priority: P2)
 
-List unusual situations the system must handle.
+[Describe this user journey in plain language]
 
-Examples relevant to this project:
+**Why this priority**: [Explain the value and why it has this priority level]
 
-- Segment has zero exercises
-- Exercise requires equipment not present in gym
-- Timer generation fails due to incompatible segment type
-- Duplicate exercises inside a segment
-- Extremely long workouts
+**Independent Test**: [Describe how this can be tested independently]
+
+**Acceptance Scenarios**:
+
+1. **Given** [initial state], **When** [action], **Then** [expected outcome]
 
 ---
+
+### User Story 3 - [Brief Title] (Priority: P3)
+
+[Describe this user journey in plain language]
+
+**Why this priority**: [Explain the value and why it has this priority level]
+
+**Independent Test**: [Describe how this can be tested independently]
+
+**Acceptance Scenarios**:
+
+1. **Given** [initial state], **When** [action], **Then** [expected outcome]
+
+---
+
+[Add more user stories as needed, each with an assigned priority]
+
+### Edge Cases
+
+<!--
+  ACTION REQUIRED: The content in this section represents placeholders.
+  Fill them out with the right edge cases.
+-->
+
+- What happens when [boundary condition]?
+- How does system handle [error scenario]?
 
 ## Requirements *(mandatory)*
 
+<!--
+  ACTION REQUIRED: The content in this section represents placeholders.
+  Fill them out with the right functional requirements.
+-->
+
 ### Functional Requirements
 
-FR-001  
-System MUST allow creation of this feature through the UI.
+- **FR-001**: System MUST [specific capability, e.g., "allow users to create accounts"]
+- **FR-002**: System MUST [specific capability, e.g., "validate email addresses"]  
+- **FR-003**: Users MUST be able to [key interaction, e.g., "reset their password"]
+- **FR-004**: System MUST [data requirement, e.g., "persist user preferences"]
+- **FR-005**: System MUST [behavior, e.g., "log all security events"]
 
-FR-002  
-System MUST store the resulting data in the domain model.
+*Example of marking unclear requirements:*
 
-FR-003  
-System MUST validate user input before saving.
+- **FR-006**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]
+- **FR-007**: System MUST retain user data for [NEEDS CLARIFICATION: retention period not specified]
 
-FR-004  
-System MUST keep the workout structure consistent.
+### Key Entities *(include if feature involves data)*
 
-FR-005  
-System MUST expose the data so other systems can consume it
-(example: timer generator, fatigue engine, equipment calculator).
-
----
-
-## Domain Entities
-
-Define only **conceptual entities**, not implementation details.
-
-Example format:
-
-### Exercise
-
-Represents a physical movement.
-
-Attributes may include:
-
-- name
-- type (strength, conditioning, mobility)
-- movement pattern
-- involved muscles
-- required equipment
-
----
-
-### Segment
-
-Represents a block of a workout.
-
-Examples:
-
-- AMRAP
-- EMOM
-- For Time
-- Strength Sets
-
-Attributes may include:
-
-- segment type
-- duration
-- rest interval
-- exercises
-
----
-
-### Workout
-
-Represents a complete training session.
-
-Attributes may include:
-
-- ordered segments
-- total duration
-- required equipment
-- generated timers
-
----
-
-## Non-Functional Requirements
-
-**Performance**:
-
-- UI interactions should feel instantaneous (<200ms)
-
-**Scalability**: Data model must support hundreds of exercises.
-
-**Maintainability**:
-
-- Business logic should not live inside UI components
-
----
+- **[Entity 1]**: [What it represents, key attributes without implementation]
+- **[Entity 2]**: [What it represents, relationships to other entities]
 
 ## Success Criteria *(mandatory)*
 
-Measurable outcomes for the feature.
+<!--
+  ACTION REQUIRED: Define measurable success criteria.
+  These must be technology-agnostic and measurable.
+-->
 
-SC-001  
-User can complete the primary workflow without errors.
+### Measurable Outcomes
 
-SC-002  
-Feature integrates with existing workout data model.
-
-SC-003  
-Feature does not break timer generation.
-
-SC-004  
-Feature works with at least 10 different exercises in testing.
+- **SC-001**: [Measurable metric, e.g., "Users can complete account creation in under 2 minutes"]
+- **SC-002**: [Measurable metric, e.g., "System handles 1000 concurrent users without degradation"]
+- **SC-003**: [User satisfaction metric, e.g., "90% of users successfully complete primary task on first attempt"]
+- **SC-004**: [Business metric, e.g., "Reduce support tickets related to [X] by 50%"]

@@ -1,0 +1,368 @@
+import { createContext, useContext, type Dispatch } from 'react'
+import { mockExerciseDatabase } from '../services/mock-exercise-database.ts'
+import {
+  assignExerciseToSegment,
+  removeExerciseFromSegment,
+  reorderSegmentExercises,
+  reorderSegments,
+  replaceSegment,
+  updateAssignedExercise,
+} from '../services/workout-domain.ts'
+import {
+  findExerciseValidationErrors,
+  getExerciseDeleteGuardMessage,
+  validateWorkout,
+} from '../services/workout-validation.ts'
+import type { ValidationError } from '../types/domain.ts'
+import type { Exercise } from '../types/exercise.ts'
+import type { AssignedExercise, Segment } from '../types/segment.ts'
+import type { Workout } from '../types/workout.ts'
+
+export type WorkoutBuilderState = {
+  exercises: Exercise[]
+  workoutDraft: Workout
+  validationErrors: ValidationError[]
+  deleteGuardMessage?: string
+  selectedSegmentId?: string
+  selectedExerciseId?: string
+}
+
+export type WorkoutBuilderAction =
+  | { type: 'set_workout_name'; payload: string }
+  | { type: 'set_rest_between_segments'; payload?: number }
+  | { type: 'add_segment'; payload?: Segment }
+  | { type: 'update_segment'; payload: Segment }
+  | { type: 'remove_segment'; payload: string }
+  | { type: 'reorder_segments'; payload: { fromIndex: number; toIndex: number } }
+  | { type: 'add_exercise'; payload: Exercise }
+  | { type: 'update_exercise'; payload: Exercise }
+  | { type: 'remove_exercise'; payload: string }
+  | {
+      type: 'assign_exercise_to_segment'
+      payload: { segmentId: string; exerciseId: string }
+    }
+  | {
+      type: 'remove_exercise_from_segment'
+      payload: { segmentId: string; exerciseIndex: number }
+    }
+  | {
+      type: 'update_assigned_exercise'
+      payload: { segmentId: string; assignedExercise: AssignedExercise }
+    }
+  | {
+      type: 'reorder_segment_exercises'
+      payload: { segmentId: string; fromIndex: number; toIndex: number }
+    }
+  | { type: 'select_segment'; payload?: string }
+  | { type: 'select_exercise'; payload?: string }
+
+export type WorkoutBuilderContextValue = {
+  state: WorkoutBuilderState
+  dispatch: Dispatch<WorkoutBuilderAction>
+}
+
+const createId = (prefix: string) => `${prefix}-${crypto.randomUUID()}`
+
+export const createEmptySegment = (): Segment => ({
+  id: createId('segment'),
+  name: 'New Segment',
+  exercises: [],
+})
+
+export const createEmptyWorkout = (): Workout => ({
+  id: createId('workout'),
+  name: 'New Workout',
+  segments: [],
+})
+
+export const initialWorkoutBuilderState: WorkoutBuilderState = {
+  exercises: mockExerciseDatabase,
+  workoutDraft: createEmptyWorkout(),
+  validationErrors: [],
+}
+
+export const withValidation = (state: WorkoutBuilderState): WorkoutBuilderState => {
+  const exerciseErrors = findExerciseValidationErrors(state.exercises)
+  const workoutResult = validateWorkout(state.workoutDraft, state.exercises)
+
+  return {
+    ...state,
+    deleteGuardMessage: undefined,
+    validationErrors: [...exerciseErrors, ...workoutResult.errors],
+  }
+}
+
+export const workoutBuilderReducer = (
+  state: WorkoutBuilderState,
+  action: WorkoutBuilderAction,
+): WorkoutBuilderState => {
+  switch (action.type) {
+    case 'set_workout_name':
+      return withValidation({
+        ...state,
+        workoutDraft: {
+          ...state.workoutDraft,
+          name: action.payload,
+        },
+      })
+
+    case 'set_rest_between_segments':
+      return withValidation({
+        ...state,
+        workoutDraft: {
+          ...state.workoutDraft,
+          restBetweenSegments: action.payload,
+        },
+      })
+
+    case 'add_segment':
+      return withValidation({
+        ...state,
+        workoutDraft: {
+          ...state.workoutDraft,
+          segments: [...state.workoutDraft.segments, action.payload ?? createEmptySegment()],
+        },
+      })
+
+    case 'update_segment':
+      return withValidation({
+        ...state,
+        workoutDraft: replaceSegment(state.workoutDraft, action.payload),
+      })
+
+    case 'remove_segment':
+      return withValidation({
+        ...state,
+        selectedSegmentId:
+          state.selectedSegmentId === action.payload ? undefined : state.selectedSegmentId,
+        workoutDraft: {
+          ...state.workoutDraft,
+          segments: state.workoutDraft.segments.filter((segment) => segment.id !== action.payload),
+        },
+      })
+
+    case 'reorder_segments':
+      return withValidation({
+        ...state,
+        workoutDraft: reorderSegments(
+          state.workoutDraft,
+          action.payload.fromIndex,
+          action.payload.toIndex,
+        ),
+      })
+
+    case 'add_exercise':
+      return withValidation({
+        ...state,
+        exercises: [...state.exercises, action.payload],
+      })
+
+    case 'update_exercise':
+      return withValidation({
+        ...state,
+        exercises: state.exercises.map((exercise) =>
+          exercise.id === action.payload.id ? action.payload : exercise,
+        ),
+        workoutDraft: {
+          ...state.workoutDraft,
+          segments: state.workoutDraft.segments.map((segment) => ({
+            ...segment,
+            exercises: segment.exercises.map((assignedExercise) =>
+              assignedExercise.exerciseId === action.payload.id
+                ? {
+                    ...assignedExercise,
+                    exercise: action.payload,
+                  }
+                : assignedExercise,
+            ),
+          })),
+        },
+      })
+
+    case 'remove_exercise':
+      if (getExerciseDeleteGuardMessage(state.workoutDraft, action.payload)) {
+        return {
+          ...state,
+          deleteGuardMessage: getExerciseDeleteGuardMessage(state.workoutDraft, action.payload) ?? undefined,
+        }
+      }
+
+      return withValidation({
+        ...state,
+        deleteGuardMessage: undefined,
+        selectedExerciseId:
+          state.selectedExerciseId === action.payload ? undefined : state.selectedExerciseId,
+        exercises: state.exercises.filter((exercise) => exercise.id !== action.payload),
+      })
+
+    case 'assign_exercise_to_segment': {
+      const updatedSegment = state.workoutDraft.segments.find(
+        (segment) => segment.id === action.payload.segmentId,
+      )
+
+      if (!updatedSegment) {
+        return state
+      }
+
+      return withValidation({
+        ...state,
+        workoutDraft: replaceSegment(
+          state.workoutDraft,
+          assignExerciseToSegment(updatedSegment, action.payload.exerciseId, state.exercises),
+        ),
+      })
+    }
+
+    case 'remove_exercise_from_segment': {
+      const updatedSegment = state.workoutDraft.segments.find(
+        (segment) => segment.id === action.payload.segmentId,
+      )
+
+      if (!updatedSegment) {
+        return state
+      }
+
+      return withValidation({
+        ...state,
+        workoutDraft: replaceSegment(
+          state.workoutDraft,
+          removeExerciseFromSegment(updatedSegment, action.payload.exerciseIndex),
+        ),
+      })
+    }
+
+    case 'update_assigned_exercise': {
+      const updatedSegment = state.workoutDraft.segments.find(
+        (segment) => segment.id === action.payload.segmentId,
+      )
+
+      if (!updatedSegment) {
+        return state
+      }
+
+      return withValidation({
+        ...state,
+        workoutDraft: replaceSegment(
+          state.workoutDraft,
+          updateAssignedExercise(updatedSegment, action.payload.assignedExercise),
+        ),
+      })
+    }
+
+    case 'reorder_segment_exercises': {
+      const updatedSegment = state.workoutDraft.segments.find(
+        (segment) => segment.id === action.payload.segmentId,
+      )
+
+      if (!updatedSegment) {
+        return state
+      }
+
+      return withValidation({
+        ...state,
+        workoutDraft: replaceSegment(
+          state.workoutDraft,
+          reorderSegmentExercises(
+            updatedSegment,
+            action.payload.fromIndex,
+            action.payload.toIndex,
+          ),
+        ),
+      })
+    }
+
+    case 'select_segment':
+      return {
+        ...state,
+        deleteGuardMessage: undefined,
+        selectedSegmentId: action.payload,
+      }
+
+    case 'select_exercise':
+      return {
+        ...state,
+        deleteGuardMessage: undefined,
+        selectedExerciseId: action.payload,
+      }
+
+    default:
+      return state
+  }
+}
+
+export const WorkoutBuilderContext = createContext<WorkoutBuilderContextValue | null>(null)
+
+export const useWorkoutBuilderContext = () => {
+  const context = useContext(WorkoutBuilderContext)
+
+  if (!context) {
+    throw new Error('useWorkoutBuilderContext must be used within WorkoutBuilderProvider.')
+  }
+
+  return context
+}
+
+export const useWorkoutBuilder = () => {
+  const { state, dispatch } = useWorkoutBuilderContext()
+
+  return {
+    state,
+    actions: {
+      setWorkoutName: (name: string) =>
+        dispatch({ type: 'set_workout_name', payload: name }),
+      setRestBetweenSegments: (minutes?: number) =>
+        dispatch({ type: 'set_rest_between_segments', payload: minutes }),
+      addSegment: () => {
+        const segment = createEmptySegment()
+        dispatch({ type: 'add_segment', payload: segment })
+        dispatch({ type: 'select_segment', payload: segment.id })
+      },
+      updateSegment: (segment: Segment) =>
+        dispatch({ type: 'update_segment', payload: segment }),
+      removeSegment: (segmentId: string) =>
+        dispatch({ type: 'remove_segment', payload: segmentId }),
+      reorderSegments: (fromIndex: number, toIndex: number) =>
+        dispatch({
+          type: 'reorder_segments',
+          payload: { fromIndex, toIndex },
+        }),
+      assignExerciseToSegment: (segmentId: string, exerciseId: string) =>
+        dispatch({
+          type: 'assign_exercise_to_segment',
+          payload: { segmentId, exerciseId },
+        }),
+      removeExerciseFromSegment: (segmentId: string, exerciseIndex: number) =>
+        dispatch({
+          type: 'remove_exercise_from_segment',
+          payload: { segmentId, exerciseIndex },
+        }),
+      updateAssignedExercise: (
+        segmentId: string,
+        assignedExercise: AssignedExercise,
+      ) =>
+        dispatch({
+          type: 'update_assigned_exercise',
+          payload: { segmentId, assignedExercise },
+        }),
+      reorderSegmentExercises: (
+        segmentId: string,
+        fromIndex: number,
+        toIndex: number,
+      ) =>
+        dispatch({
+          type: 'reorder_segment_exercises',
+          payload: { segmentId, fromIndex, toIndex },
+        }),
+      selectSegment: (segmentId?: string) =>
+        dispatch({ type: 'select_segment', payload: segmentId }),
+      selectExercise: (exerciseId?: string) =>
+        dispatch({ type: 'select_exercise', payload: exerciseId }),
+      addExercise: (exercise: Exercise) =>
+        dispatch({ type: 'add_exercise', payload: exercise }),
+      updateExercise: (exercise: Exercise) =>
+        dispatch({ type: 'update_exercise', payload: exercise }),
+      removeExercise: (exerciseId: string) =>
+        dispatch({ type: 'remove_exercise', payload: exerciseId }),
+    },
+  }
+}

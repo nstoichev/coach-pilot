@@ -1,195 +1,50 @@
-# Coach Pilot – Project Constitution
-
-This document defines the engineering principles that guide the development of the Coach Pilot fitness application.
-
-All specifications, plans, and tasks MUST align with this constitution.
-
----
+# [PROJECT_NAME] Constitution
+<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
 
 ## Core Principles
 
-### I. Domain First Architecture
-
-The core of the system is the **Workout Domain Model**.
-
-The following entities are considered fundamental and must remain clearly defined and stable:
-
-- Exercise
-- Segment
-- Workout
-- Equipment
-- Muscle Group
-
-All new features must integrate with these domain entities rather than introducing parallel structures.
-
-Requirements:
-
-- Domain objects must be defined as **TypeScript types or interfaces**
-- Business logic must live outside UI components
-- UI should consume domain logic, not implement it
-
----
-
-### II. Simplicity Over Cleverness
-
-The system must favor **clarity and maintainability** over complex abstractions.
-
-Guidelines:
-
-- Prefer simple React patterns (`useState`, `useReducer`)
-- Avoid premature optimization
-- Avoid unnecessary libraries
-- Prefer readable code over compact code
-
-A future developer should be able to understand the system quickly.
-
----
-
-### III. Modular Feature Design
-
-Features must be implemented as **independent modules** whenever possible.
-
-Examples:
-
-- Workout Builder
-- Exercise Database
-- Timer Generator
-- Fatigue System
-
-Modules must:
-
-- Have clearly defined inputs/outputs
-- Avoid tight coupling with other modules
-- Expose small, predictable APIs
-
-This allows the application to evolve without large refactors.
-
----
-
-### IV. Deterministic Logic
-
-Core workout logic must be **deterministic and testable**.
-
-Examples of deterministic systems:
-
-- Timer generation
-- Equipment aggregation
-- Fatigue calculation
-
-Requirements:
-
-- Logic must be implemented in pure functions when possible
-- Core algorithms should be testable without UI
-- Avoid hidden side effects
-
----
-
-### V. Progressive Complexity
-
-The application will evolve through **layers of complexity**.
-
-Development order:
-
-1. Static workout builder
-2. Exercise database
-3. Timer generation
-4. Equipment aggregation
-5. Fatigue calculation
-6. Adaptive training features
-
-Features should not be implemented before their prerequisite systems exist.
-
----
-
-## Technical Standards
-
-### Frontend
-
-- React
-- TypeScript
-- Vite
-
-Rules:
-
-- Components should remain small and focused
-- Shared logic belongs in hooks or utility modules
-- Avoid deeply nested component trees
-
----
-
-### Data Model
-
-Core entities must be represented with **strict TypeScript types**.
-
-Examples:
-
-- `Exercise`
-- `WorkoutSegment`
-- `Workout`
-- `Equipment`
-- `MuscleGroup`
-
-These types represent the **source of truth for the application**.
-
----
-
-### Backend
-
-Backend will use:
-
-- Supabase
-- PostgreSQL
-
-During early development:
-
-- Mock data or local JSON may be used
-- API integration can be introduced incrementally
-
----
-
-## Development Workflow
-
-The project follows a **spec-driven development workflow**.
-
-Feature development should follow this order:
-
-1. Spec (`spec.md`)
-2. Plan (`plan.md`)
-3. Tasks (`tasks.md`)
-4. Implementation
-
-This ensures AI agents and developers follow the same process.
-
----
-
-## Testing Philosophy
-
-Testing focuses on **core business logic**.
-
-Priority areas:
-
-- Timer generation
-- Fatigue calculation
-- Equipment aggregation
-- Workout data transformations
-
-UI testing is optional during early development.
-
----
+### [PRINCIPLE_1_NAME]
+<!-- Example: I. Library-First -->
+[PRINCIPLE_1_DESCRIPTION]
+<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+
+### [PRINCIPLE_2_NAME]
+<!-- Example: II. CLI Interface -->
+[PRINCIPLE_2_DESCRIPTION]
+<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+
+### [PRINCIPLE_3_NAME]
+<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
+[PRINCIPLE_3_DESCRIPTION]
+<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+
+### [PRINCIPLE_4_NAME]
+<!-- Example: IV. Integration Testing -->
+[PRINCIPLE_4_DESCRIPTION]
+<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+
+### [PRINCIPLE_5_NAME]
+<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
+[PRINCIPLE_5_DESCRIPTION]
+<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+
+## [SECTION_2_NAME]
+<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+
+[SECTION_2_CONTENT]
+<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+
+## [SECTION_3_NAME]
+<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+
+[SECTION_3_CONTENT]
+<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
 
 ## Governance
+<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-This constitution acts as the **engineering contract** of the project.
+[GOVERNANCE_RULES]
+<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
 
-All specs, plans, and implementations should align with these principles.
-
-Changes to this document must include:
-
-- Version update
-- Date
-- Short description of the change
-
----
-
-Version: 0.2.0  
-Ratified: 2026-03-11
+**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
+<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
