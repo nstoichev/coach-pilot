@@ -1,17 +1,20 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Exercise } from '../../types/exercise.ts'
 
 type SegmentExercisePickerProps = {
   availableExercises: Exercise[]
   onAssignExercise: (exerciseId: string) => void
+  autoFocus?: boolean
 }
 
 export const SegmentExercisePicker = ({
   availableExercises,
   onAssignExercise,
+  autoFocus = false,
 }: SegmentExercisePickerProps) => {
   const [query, setQuery] = useState('')
   const [isFocused, setIsFocused] = useState(false)
+  const inputRef = useRef<HTMLInputElement | null>(null)
 
   const options = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase()
@@ -23,6 +26,12 @@ export const SegmentExercisePicker = ({
 
     return filteredExercises.slice(0, 10)
   }, [availableExercises, query])
+
+  useEffect(() => {
+    if (autoFocus) {
+      inputRef.current?.focus()
+    }
+  }, [autoFocus])
 
   if (availableExercises.length === 0) {
     return (
@@ -44,6 +53,7 @@ export const SegmentExercisePicker = ({
           aria-label="Search exercises"
           className="search-input"
           placeholder="Search exercises"
+          ref={inputRef}
           value={query}
           onFocus={() => setIsFocused(true)}
           onBlur={() => {

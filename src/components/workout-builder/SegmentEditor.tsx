@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import type { ExerciseMetric } from '../../types/domain.ts'
 import {
   formatSecondsAsClock,
@@ -7,6 +7,14 @@ import {
 } from '../../services/index.ts'
 import type { Exercise } from '../../types/exercise.ts'
 import type { AssignedExercise, Segment } from '../../types/segment.ts'
+import { ToggleSwitch } from '../ToggleSwitch.tsx'
+import {
+  IconArrowDown,
+  IconArrowDownSmall,
+  IconArrowUp,
+  IconArrowUpSmall,
+  IconXSmall,
+} from '../icons.tsx'
 import { SegmentExercisePicker } from './SegmentExercisePicker.tsx'
 
 type SegmentEditorProps = {
@@ -92,6 +100,7 @@ export const SegmentEditor = ({
     () => getSegmentEstimatedDurationSeconds(segment),
     [segment],
   )
+  const [isExerciseModalOpen, setIsExerciseModalOpen] = useState(false)
 
   const handleSegmentChange = (updated: Segment) => {
     const next =
@@ -135,14 +144,19 @@ export const SegmentEditor = ({
         </div>
 
         <div className="stacked-actions" onClick={(event) => event.stopPropagation()}>
-          <button type="button" onClick={onMoveUp}>
-            Move Up
+          <button type="button" aria-label="Move segment up" onClick={onMoveUp}>
+            <IconArrowUp />
           </button>
-          <button type="button" onClick={onMoveDown}>
-            Move Down
+          <button type="button" aria-label="Move segment down" onClick={onMoveDown}>
+            <IconArrowDown />
           </button>
-          <button type="button" className="danger-button" onClick={onRemove}>
-            Remove
+          <button
+            type="button"
+            className="danger-button"
+            aria-label="Remove segment"
+            onClick={onRemove}
+          >
+            <IconXSmall />
           </button>
         </div>
       </div>
@@ -166,10 +180,6 @@ export const SegmentEditor = ({
                   })
                 }
               />
-              <small className="field-help">
-                {formatSecondsAsClock(EMOM_INTERVAL_MIN_SECONDS)} to{' '}
-                {formatSecondsAsClock(EMOM_INTERVAL_MAX_SECONDS)} in 15 second steps
-              </small>
             </label>
 
             <label className="field">
@@ -188,9 +198,6 @@ export const SegmentEditor = ({
                   })
                 }
               />
-              <small className="field-help">
-                {EMOM_ROUNDS_MIN} to {EMOM_ROUNDS_MAX}, default {EMOM_ROUNDS_DEFAULT}
-              </small>
             </label>
           </div>
         ) : null}
@@ -215,10 +222,6 @@ export const SegmentEditor = ({
                   })
                 }
               />
-              <small className="field-help">
-                {formatSecondsAsClock(AMRAP_DURATION_MIN_SECONDS)} to{' '}
-                {formatSecondsAsClock(AMRAP_DURATION_MAX_SECONDS)} in 30 second steps
-              </small>
             </label>
           </div>
         ) : null}
@@ -243,10 +246,6 @@ export const SegmentEditor = ({
                   })
                 }
               />
-              <small className="field-help">
-                {formatSecondsAsClock(TIMECAP_MIN_SECONDS)} to{' '}
-                {formatSecondsAsClock(TIMECAP_MAX_SECONDS)} in 30 second steps
-              </small>
             </label>
           </div>
         ) : null}
@@ -270,21 +269,23 @@ export const SegmentEditor = ({
                 })
               }
             />
-            <small className="field-help">
-              {formatSecondsAsClock(restMinutesToSeconds(REST_MIN_MINUTES))} to{' '}
-              {formatSecondsAsClock(restMinutesToSeconds(REST_MAX_MINUTES))} in 15 second steps
-            </small>
           </label>
         </div>
 
-        <SegmentExercisePicker
-          availableExercises={availableExercises}
-          onAssignExercise={onAssignExercise}
-        />
+        <div className="segment-add-exercise-row" onClick={(event) => event.stopPropagation()}>
+          <button
+            type="button"
+            className="primary-button"
+            onClick={() => setIsExerciseModalOpen(true)}
+          >
+            Add exercise
+          </button>
+          {segment.exercises.length === 0 ? (
+            <p className="muted-text">No exercises assigned yet.</p>
+          ) : null}
+        </div>
 
-        {segment.exercises.length === 0 ? (
-          <p className="muted-text">No exercises assigned yet.</p>
-        ) : (
+        {segment.exercises.length > 0 ? (
           <ul className="exercise-list">
             {segment.exercises.map((assignedExercise, index) => {
               const metricOptions =
@@ -308,54 +309,59 @@ export const SegmentEditor = ({
                   <div className="exercise-item-header">
                     <div className="exercise-item-title">
                       <strong>{assignedExercise.exercise.name}</strong>
-                      <p>{assignedExercise.exercise.type.join(', ')}</p>
                     </div>
                     <div className="inline-actions">
-                      <button type="button" onClick={() => onMoveExerciseUp(index)}>
-                        Up
+                      <button
+                        type="button"
+                        aria-label="Move exercise up"
+                        onClick={() => onMoveExerciseUp(index)}
+                      >
+                        <IconArrowUpSmall />
                       </button>
-                      <button type="button" onClick={() => onMoveExerciseDown(index)}>
-                        Down
+                      <button
+                        type="button"
+                        aria-label="Move exercise down"
+                        onClick={() => onMoveExerciseDown(index)}
+                      >
+                        <IconArrowDownSmall />
                       </button>
                       <button
                         type="button"
                         className="danger-button"
+                        aria-label="Remove exercise"
                         onClick={() => onRemoveExercise(index)}
                       >
-                        Remove
+                        <IconXSmall />
                       </button>
                     </div>
                   </div>
 
                   <div className="prescription-stack">
-                    {isSetsReps ? (
-                      <>
-                        {!assignedExercise.isMaxRepetitions ? (
-                          <label className="field">
-                            <span>
-                              Sets {assignedExercise.sets ?? 0}
-                            </span>
-                            <input
-                              className="range-input"
-                              max={ASSIGNED_SETS_MAX}
-                              min={ASSIGNED_SETS_MIN}
-                              step={1}
-                              type="range"
-                              value={assignedExercise.sets ?? 0}
-                              onChange={(event) =>
-                                onUpdateAssignedExercise({
-                                  ...assignedExercise,
-                                  sets: Number(event.target.value),
-                                  metricTarget: undefined,
-                                })
-                              }
-                            />
-                            <small className="field-help">
-                              {ASSIGNED_SETS_MIN}–{ASSIGNED_SETS_MAX}
-                            </small>
-                          </label>
-                        ) : null}
-                        <label className="field">
+                        {isSetsReps ? (
+                          <>
+                            {!assignedExercise.isMaxRepetitions ? (
+                              <label className="field">
+                                <span>
+                                  Sets {assignedExercise.sets ?? 0}
+                                </span>
+                                <input
+                                  className="range-input"
+                                  max={ASSIGNED_SETS_MAX}
+                                  min={ASSIGNED_SETS_MIN}
+                                  step={1}
+                                  type="range"
+                                  value={assignedExercise.sets ?? 0}
+                                  onChange={(event) =>
+                                    onUpdateAssignedExercise({
+                                      ...assignedExercise,
+                                      sets: Number(event.target.value),
+                                      metricTarget: undefined,
+                                    })
+                                  }
+                                />
+                              </label>
+                            ) : null}
+                        <div className="field">
                           <div className="field-label-row">
                             <span>
                               Reps{' '}
@@ -363,48 +369,36 @@ export const SegmentEditor = ({
                                 ? 'Max'
                                 : assignedExercise.repetitions ?? ASSIGNED_REPS_MIN}
                             </span>
-                            <label className="max-toggle">
-                              <input
-                                type="checkbox"
-                                checked={assignedExercise.isMaxRepetitions ?? false}
-                                onChange={(event) =>
-                                  onUpdateAssignedExercise({
-                                    ...assignedExercise,
-                                    isMaxRepetitions: event.target.checked,
-                                  })
-                                }
-                              />
-                              <span className="max-toggle-label">Max</span>
-                            </label>
+                            <ToggleSwitch
+                              label="Max"
+                              checked={assignedExercise.isMaxRepetitions ?? false}
+                              onChange={(checked) =>
+                                onUpdateAssignedExercise({
+                                  ...assignedExercise,
+                                  isMaxRepetitions: checked,
+                                })
+                              }
+                            />
                           </div>
 
                           {!assignedExercise.isMaxRepetitions ? (
-                            <>
-                              <input
-                                className="range-input"
-                                max={ASSIGNED_REPS_MAX}
-                                min={ASSIGNED_REPS_MIN}
-                                step={1}
-                                type="range"
-                                value={assignedExercise.repetitions ?? ASSIGNED_REPS_MIN}
-                                onChange={(event) =>
-                                  onUpdateAssignedExercise({
-                                    ...assignedExercise,
-                                    repetitions: Number(event.target.value),
-                                    metricTarget: undefined,
-                                  })
-                                }
-                              />
-                              <small className="field-help">
-                                {ASSIGNED_REPS_MIN}–{ASSIGNED_REPS_MAX}
-                              </small>
-                            </>
-                          ) : (
-                            <small className="field-help">
-                              Max reps until segment time ends
-                            </small>
-                          )}
-                        </label>
+                            <input
+                              className="range-input"
+                              max={ASSIGNED_REPS_MAX}
+                              min={ASSIGNED_REPS_MIN}
+                              step={1}
+                              type="range"
+                              value={assignedExercise.repetitions ?? ASSIGNED_REPS_MIN}
+                              onChange={(event) =>
+                                onUpdateAssignedExercise({
+                                  ...assignedExercise,
+                                  repetitions: Number(event.target.value),
+                                  metricTarget: undefined,
+                                })
+                              }
+                            />
+                          ) : null}
+                        </div>
                       </>
                     ) : (
                       <>
@@ -438,68 +432,54 @@ export const SegmentEditor = ({
                             ))}
                           </div>
                         </div>
-                        <label className="field">
+                        <div className="field">
                           <div className="field-label-row">
                             <span>
                               Value {isMax ? 'Max' : formatMetricValue(metricType, metricValue)}
                             </span>
                             {isMaxAllowed ? (
-                              <label className="max-toggle">
-                                <input
-                                  type="checkbox"
-                                  checked={isMax}
-                                  onChange={(event) =>
-                                    onUpdateAssignedExercise({
-                                      ...assignedExercise,
-                                      sets: undefined,
-                                      repetitions: undefined,
-                                      metricTarget: {
-                                        type: metricType,
-                                        value: isMax
-                                          ? metricValue
-                                          : metricRange.min,
-                                        isMax: event.target.checked,
-                                      },
-                                    })
-                                  }
-                                />
-                                <span className="max-toggle-label">Max</span>
-                              </label>
-                            ) : null}
-                          </div>
-
-                          {!isMax ? (
-                            <>
-                              <input
-                                className="range-input"
-                                max={metricRange.max}
-                                min={metricRange.min}
-                                step={metricRange.step}
-                                type="range"
-                                value={metricValue}
-                                onChange={(event) =>
+                              <ToggleSwitch
+                                label="Max"
+                                checked={isMax}
+                                onChange={(checked) =>
                                   onUpdateAssignedExercise({
                                     ...assignedExercise,
                                     sets: undefined,
                                     repetitions: undefined,
                                     metricTarget: {
                                       type: metricType,
-                                      value: Number(event.target.value),
-                                      isMax: false,
+                                      value: checked ? metricValue : metricRange.min,
+                                      isMax: checked,
                                     },
                                   })
                                 }
                               />
-                              <small className="field-help">
-                                {formatMetricValue(metricType, metricRange.min)}–{formatMetricValue(metricType, metricRange.max)}
-                              </small>
-                            </>
-                          ) : (
-                            <small className="field-help">
-                              Max effort until segment time ends
-                            </small>
-                          )}
-                        </label>
+                            ) : null}
+                          </div>
+
+                          {!isMax ? (
+                            <input
+                              className="range-input"
+                              max={metricRange.max}
+                              min={metricRange.min}
+                              step={metricRange.step}
+                              type="range"
+                              value={metricValue}
+                              onChange={(event) =>
+                                onUpdateAssignedExercise({
+                                  ...assignedExercise,
+                                  sets: undefined,
+                                  repetitions: undefined,
+                                  metricTarget: {
+                                    type: metricType,
+                                    value: Number(event.target.value),
+                                    isMax: false,
+                                  },
+                                })
+                              }
+                            />
+                          ) : null}
+                        </div>
                       </>
                     )}
                   </div>
@@ -507,7 +487,7 @@ export const SegmentEditor = ({
               )
             })}
           </ul>
-        )}
+        ) : null}
 
         <div className="segment-footer">
           <span className="muted-text">
@@ -516,6 +496,40 @@ export const SegmentEditor = ({
           </span>
         </div>
       </div>
+
+      {isExerciseModalOpen ? (
+        <div
+          className="modal-overlay"
+          role="presentation"
+          onClick={() => setIsExerciseModalOpen(false)}
+        >
+          <div
+            aria-modal="true"
+            className="modal-panel"
+            role="dialog"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="panel-header">
+              <div>
+                <p className="eyebrow">Segment Exercise</p>
+                <h2>Add exercise</h2>
+              </div>
+              <button type="button" onClick={() => setIsExerciseModalOpen(false)}>
+                Close
+              </button>
+            </div>
+
+            <SegmentExercisePicker
+              availableExercises={availableExercises}
+              autoFocus
+              onAssignExercise={(exerciseId) => {
+                onAssignExercise(exerciseId)
+                setIsExerciseModalOpen(false)
+              }}
+            />
+          </div>
+        </div>
+      ) : null}
     </article>
   )
 }
