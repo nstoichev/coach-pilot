@@ -21,6 +21,7 @@ type SegmentEditorProps = {
   segment: Segment
   availableExercises: Exercise[]
   isSelected: boolean
+  isLastSegment?: boolean
   onNameChange: (segment: Segment) => void
   onSelect: () => void
   onRemove: () => void
@@ -104,6 +105,7 @@ export const SegmentEditor = ({
   onUpdateAssignedExercise,
   onMoveExerciseUp,
   onMoveExerciseDown,
+  isLastSegment = false,
 }: SegmentEditorProps) => {
   const estimatedDuration = useMemo(
     () => getSegmentEstimatedDurationSeconds(segment),
@@ -125,11 +127,17 @@ export const SegmentEditor = ({
       ? segment.name
       : getGeneratedSegmentName(segment)
 
+  const hasExercises = segment.exercises.length > 0
+  const segmentCardClass = [
+    'segment-card',
+    isSelected ? 'segment-card-selected' : '',
+    hasExercises ? 'segment-card-has-exercises' : 'segment-card-empty',
+  ]
+    .filter(Boolean)
+    .join(' ')
+
   return (
-    <article
-      className={`segment-card${isSelected ? ' segment-card-selected' : ''}`}
-      onClick={onSelect}
-    >
+    <article className={segmentCardClass} onClick={onSelect}>
       <div className="segment-card-header">
         <div className="segment-card-header-left">
           <span className="segment-type-badge">{segment.segmentType}</span>
@@ -148,6 +156,11 @@ export const SegmentEditor = ({
                 placeholder="Segment name"
               />
             </div>
+          ) : segment.segmentType === 'emom' &&
+            (segment.intervalSeconds ?? 60) !== 60 ? (
+            <span className="segment-generated-name">
+              E<span className="emom-interval">{formatSecondsAsClock(segment.intervalSeconds ?? 60)}</span>OM {segment.rounds ?? 10}
+            </span>
           ) : (
             <span className="segment-generated-name">{displayName}</span>
           )}
@@ -277,27 +290,29 @@ export const SegmentEditor = ({
           </div>
         ) : null}
 
-        <div className="segment-config-grid">
-          <label className="field">
-            <span>
-              Rest after segment {formatSecondsAsClock(restMinutesToSeconds(segment.restInterval ?? 0))}
-            </span>
-            <input
-              className="range-input"
-              max={REST_MAX_MINUTES}
-              min={REST_MIN_MINUTES}
-              step={REST_STEP_MINUTES}
-              type="range"
-              value={segment.restInterval ?? 0}
-              onChange={(event) =>
-                handleSegmentChange({
-                  ...segment,
-                  restInterval: Number(event.target.value),
-                })
-              }
-            />
-          </label>
-        </div>
+        {!isLastSegment ? (
+          <div className="segment-config-grid">
+            <label className="field">
+              <span>
+                Rest after segment {formatSecondsAsClock(restMinutesToSeconds(segment.restInterval ?? 0))}
+              </span>
+              <input
+                className="range-input"
+                max={REST_MAX_MINUTES}
+                min={REST_MIN_MINUTES}
+                step={REST_STEP_MINUTES}
+                type="range"
+                value={segment.restInterval ?? 0}
+                onChange={(event) =>
+                  handleSegmentChange({
+                    ...segment,
+                    restInterval: Number(event.target.value),
+                  })
+                }
+              />
+            </label>
+          </div>
+        ) : null}
 
         <div className="segment-add-exercise-row" onClick={(event) => event.stopPropagation()}>
           <button

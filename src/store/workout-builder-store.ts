@@ -27,6 +27,10 @@ export type WorkoutBuilderState = {
   deleteGuardMessage?: string
   selectedSegmentId?: string
   selectedExerciseId?: string
+  /** When true, show Workout Board instead of builder (set when user clicks Done). */
+  showWorkoutBoard: boolean
+  /** Snapshot of workout when Done was clicked; used by Workout Board. */
+  workoutBoardSnapshot: Workout | null
 }
 
 export type WorkoutBuilderAction =
@@ -56,6 +60,8 @@ export type WorkoutBuilderAction =
     }
   | { type: 'select_segment'; payload?: string }
   | { type: 'select_exercise'; payload?: string }
+  | { type: 'show_workout_board'; payload: Workout }
+  | { type: 'hide_workout_board' }
 
 export type WorkoutBuilderContextValue = {
   state: WorkoutBuilderState
@@ -124,6 +130,8 @@ export const initialWorkoutBuilderState: WorkoutBuilderState = {
   exercises: mockExerciseDatabase,
   workoutDraft: createEmptyWorkout(),
   validationErrors: [],
+  showWorkoutBoard: false,
+  workoutBoardSnapshot: null,
 }
 
 export const withValidation = (state: WorkoutBuilderState): WorkoutBuilderState => {
@@ -321,6 +329,20 @@ export const workoutBuilderReducer = (
         selectedExerciseId: action.payload,
       }
 
+    case 'show_workout_board':
+      return {
+        ...state,
+        showWorkoutBoard: true,
+        workoutBoardSnapshot: action.payload,
+      }
+
+    case 'hide_workout_board':
+      return {
+        ...state,
+        showWorkoutBoard: false,
+        workoutBoardSnapshot: null,
+      }
+
     default:
       return state
   }
@@ -396,6 +418,10 @@ export const useWorkoutBuilder = () => {
         dispatch({ type: 'select_segment', payload: segmentId }),
       selectExercise: (exerciseId?: string) =>
         dispatch({ type: 'select_exercise', payload: exerciseId }),
+      showWorkoutBoard: (workout: Workout) =>
+        dispatch({ type: 'show_workout_board', payload: workout }),
+      hideWorkoutBoard: () =>
+        dispatch({ type: 'hide_workout_board' }),
       addExercise: (exercise: Exercise) =>
         dispatch({ type: 'add_exercise', payload: exercise }),
       updateExercise: (exercise: Exercise) =>

@@ -152,6 +152,13 @@ export const validateSegment = (segment: Segment): ValidationResult<Segment> => 
     })
   }
 
+  if (segment.exercises.length === 0) {
+    errors.push({
+      field: 'exercises',
+      message: 'Segment must have at least one exercise.',
+    })
+  }
+
   segment.exercises.forEach((assignedExercise, index) => {
     const exerciseResult = validateExercise(assignedExercise.exercise)
     exerciseResult.errors.forEach((error) => {

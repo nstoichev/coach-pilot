@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useWorkoutBuilder } from '../../store/index.ts'
+import { getTimerStructure } from '../../services/timer-generator.ts'
 import { SegmentList } from './SegmentList.tsx'
 import { SegmentTypeModal } from './SegmentTypeModal.tsx'
 import { WorkoutDetailsForm } from './WorkoutDetailsForm.tsx'
@@ -16,6 +17,11 @@ export const WorkoutBuilder = () => {
           error.field.startsWith('segments.'),
       ),
     [state.validationErrors],
+  )
+
+  const timerStructure = useMemo(
+    () => getTimerStructure(state.workoutDraft),
+    [state.workoutDraft],
   )
 
   return (
@@ -69,6 +75,31 @@ export const WorkoutBuilder = () => {
             ))}
           </ul>
         )}
+      </section>
+
+      <div className="builder-done-row">
+        <button
+          type="button"
+          className="primary-button builder-done-button"
+          disabled={workoutErrors.length > 0}
+          onClick={() => actions.showWorkoutBoard(JSON.parse(JSON.stringify(state.workoutDraft)))}
+        >
+          Done
+        </button>
+      </div>
+
+      <section className="panel future-features-panel">
+        <div className="panel-header">
+          <div>
+            <p className="eyebrow">Future features</p>
+            <h2>Extension points</h2>
+          </div>
+        </div>
+        <p className="muted-text">
+          The workout domain is ready for Timer Generator, Fatigue System, and workout
+          auto-generation. Placeholder contracts consume this draft; timer structure
+          reports {timerStructure.segments.length} segment{timerStructure.segments.length === 1 ? '' : 's'}.
+        </p>
       </section>
     </main>
   )

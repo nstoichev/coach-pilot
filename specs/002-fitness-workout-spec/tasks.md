@@ -20,7 +20,7 @@ Organization: Tasks are grouped by **user story** so each story can be implement
 Elements:
 
 - **[P]** = Can run in parallel (different files, no dependency)
-- **[Story]** = User story reference (`[US1]`, `[US2]`, `[US3]`)
+- **[Story]** = User story reference (`[US1]`, `[US2]`, `[US3]`, `[US4]`)
 - Include **exact file paths**
 - Tasks should be **small and concrete**
 
@@ -130,14 +130,41 @@ Confirm the domain model and mock workout data can describe EMOM-style segments 
 
 Tasks:
 
-- [ ] T026 [P] [US3] Create the Timer Generator placeholder contract in `src/services/timer-generator.ts`
-- [ ] T027 [P] [US3] Create the Fatigue System placeholder contract in `src/services/fatigue-system.ts`
-- [ ] T028 [P] [US3] Create the workout auto-generation placeholder contract in `src/services/workout-generator.ts`
-- [ ] T029 [US3] Extend segment metadata for future EMOM and timer support in `src/types/segment.ts`
-- [ ] T030 [US3] Add CrossFit-style EMOM mock workout data in `src/services/mock-workouts.ts`
-- [ ] T031 [US3] Surface future-feature placeholders in the builder shell in `src/components/workout-builder/WorkoutBuilder.tsx`
+- [x] T026 [P] [US3] Create the Timer Generator placeholder contract in `src/services/timer-generator.ts`
+- [x] T027 [P] [US3] Create the Fatigue System placeholder contract in `src/services/fatigue-system.ts`
+- [x] T028 [P] [US3] Create the workout auto-generation placeholder contract in `src/services/workout-generator.ts`
+- [x] T029 [US3] Extend segment metadata for future EMOM and timer support in `src/types/segment.ts`
+- [x] T030 [US3] Add CrossFit-style EMOM mock workout data in `src/services/mock-workouts.ts`
+- [x] T031 [US3] Surface future-feature placeholders in the builder shell in `src/components/workout-builder/WorkoutBuilder.tsx`
 
 Checkpoint: User Story 3 is functional as a future-ready extension layer.
+
+---
+
+# Phase 6 — User Story 4: Workout Board and Timer (P4)
+
+Goal: User can click Done (when valid), see the Workout Board in CrossFit-style layout, and start a smart timer; For Time requires Stop.
+
+Independent Test:
+
+Build a workout with at least one EMOM or AMRAP segment, click Done (enabled only when validation passes), see the board in CrossFit-style layout, click Start and confirm timer runs; build a workout with a For Time segment, click Done, Start, then Stop when done.
+
+Tasks:
+
+- [x] T037 [US4] Add "Done" button to the builder shell; wire to existing validation so it is disabled when `state.validationErrors` (workout name or segments) has any error in `src/components/workout-builder/WorkoutBuilder.tsx` (or a dedicated bar component used by it). Button visible in builder view only.
+- [x] T038 [US4] Introduce app/shell state or route to switch between "builder" and "board" view (e.g. `showWorkoutBoard: boolean` in state or context, set true when Done is clicked) in `src/App.tsx` and/or `src/store/workout-builder-store.ts` (or new slice for UI mode).
+- [x] T039 [US4] Create WorkoutBoard component: accepts the current workout (finalized snapshot when Done was clicked), renders CrossFit-style layout (segment header, exercise lines, Rest: X) in `src/components/workout-builder/WorkoutBoard.tsx`.
+- [x] T040 [US4] Implement board formatting helpers: segment title line (e.g. "AMRAP 3`", "EMOM 10`", "For Time") and one line per exercise (e.g. "8 KB Swing", "Max cal Row", "5 Front Squats") in `src/services/workout-domain.ts` or `src/services/workout-board-format.ts`.
+- [x] T041 [US4] On Workout Board, add "Start" button; show/enable only when workout is time-measurable (at least one segment is EMOM, AMRAP, or For Time with required timing) in `src/components/workout-builder/WorkoutBoard.tsx`; reuse or extend `getSegmentEstimatedDurationSeconds` / timer-generator to determine "time-measurable".
+- [x] T042 [US4] Implement timer execution: when Start is clicked, run the smart timer from the segment structure (use or extend `getTimerStructure`). For EMOM/AMRAP, advance automatically; for For Time, show "Stop" and wait for user click in `src/services/timer-generator.ts` (extend) and/or `src/components/workout-builder/WorkoutTimer.tsx` (new) and state for timer run (current segment, elapsed, running, stopped).
+- [x] T043 [US4] On Workout Board, add "Back to build" (or "Edit workout") that clears board view and returns to builder; same files as T038 and WorkoutBoard.
+- [x] T044 [US4] When workout has any For Time segment, timer UI must display "Stop" (or equivalent) and record completion on user action; same files as T042.
+- [x] T045 [US4] Add validation rule: any segment with zero exercises must produce a validation error (e.g. "Segment must have at least one exercise") so Done stays disabled. Implement in `src/services/workout-validation.ts` (e.g. in `validateSegment` or `validateWorkout`); ensure `WorkoutBuilder` Done button remains gated by `state.validationErrors` (already includes segment-level errors).
+- [x] T046 [US4] Apply distinct segment card visual states: segments with no exercises use incomplete/warning styling; segments with at least one exercise use active/success styling. Add CSS classes (e.g. `segment-card-empty`, `segment-card-has-exercises`) in `src/App.css` and apply them in `src/components/workout-builder/SegmentEditor.tsx` (or segment list) based on `segment.exercises.length`.
+
+Checkpoint: User can complete flow: build → Done (disabled when invalid) → board → Start (if time-measurable) → timer runs; For Time requires Stop; user can return to builder. Done is disabled when any segment has no exercises; segment cards show clear empty vs complete state.
+
+Dependencies: Phase 5 complete (timer-generator contract and validation already exist). No new persistence required for this phase (board shows current draft; optional: snapshot draft on Done for board so edits do not change board until Done again).
 
 ---
 
@@ -166,11 +193,12 @@ Phase dependencies:
 3. User Story 1 (MVP)
 4. User Story 2
 5. User Story 3
-6. Polish
+6. User Story 4 (Workout Board and Timer) — must be done before continuing with other work
+7. Polish
 
 Story dependency graph:
 
-`Setup -> Foundations -> US1 -> US2 -> US3 -> Polish`
+`Setup -> Foundations -> US1 -> US2 -> US3 -> US4 -> Polish`
 
 Rules:
 
@@ -179,6 +207,7 @@ Rules:
 - User Story 1 is the recommended MVP scope.
 - User Story 2 depends on the shared state from Foundations and benefits from the builder shell in User Story 1.
 - User Story 3 depends on the finalized domain model from Foundations and the builder structure from User Story 1.
+- User Story 4 (Workout Board and Timer) depends on Phase 5 (timer-generator contract and validation); must be completed before Polish or next features.
 
 ---
 
@@ -212,6 +241,11 @@ Parallel User Story 3 tasks:
 - T027 `src/services/fatigue-system.ts`
 - T028 `src/services/workout-generator.ts`
 
+Parallel User Story 4 tasks (where independent):
+
+- T039 `src/components/workout-builder/WorkoutBoard.tsx`
+- T040 `src/services/workout-domain.ts` or `src/services/workout-board-format.ts`
+
 Parallel polish tasks:
 
 - T032 `src/App.css`
@@ -237,7 +271,8 @@ Stop after User Story 1 if a first usable release is needed quickly.
 
 1. Add User Story 2 to make exercises reusable and centrally managed.
 2. Add User Story 3 to prepare extension points for timers, fatigue, and generation.
-3. Finish with Polish for styles, docs, and export cleanup.
+3. Complete Phase 6 (Done, Board, Timer) before Polish or next features.
+4. Finish with Polish for styles, docs, and export cleanup.
 
 Each story should add usable value without breaking previous flows.
 

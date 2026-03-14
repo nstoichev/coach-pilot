@@ -41,6 +41,7 @@ As a coach or trainee, I can create a workout, add multiple segments, and add ex
 6. **Given** a workout has segments and exercises, **When** the user reorders items, **Then** the new order is preserved and reflected immediately.
 7. **Given** a sets/reps exercise is assigned to an EMOM, AMRAP, or For Time segment, **When** the user views the exercise prescription, **Then** the Sets range slider is not shown (segment structure provides the sets role). **Given** the same exercise type in a Custom segment, **When** the user views the prescription, **Then** the Sets range slider is shown.
 8. **Given** a metric exercise that supports advanced metrics (e.g. Row), **When** the user views the prescription, **Then** an \"Advanced settings\" button is shown at the bottom; **When** the user clicks it, **Then** optional range sliders for speed and watts (or other declared advanced metrics) are revealed; **When** the user clicks again, **Then** the advanced sliders are hidden.
+9. **Given** segment cards in the builder, **When** a segment has at least one exercise assigned, **Then** the card MUST display an active/success visual state (e.g. border or accent) so the user can see it is complete. **When** a segment has no exercises, **Then** the card MUST display a distinct incomplete/warning visual state so the user can see it still needs exercises before the workout can be completed.
 
 ---
 
@@ -73,11 +74,32 @@ As a product team member, I can define placeholder capabilities for the Fatigue 
 1. **Given** a completed workout definition, **When** the Timer Generator or Fatigue System request workout or exercise metadata, **Then** required baseline data is available through the domain model.
 2. **Given** a CrossFit-style workout with EMOM segments, **When** timer or generator placeholders process it, **Then** they can identify segment structure and duration references.
 
+**Implementation (Phase 5)**: Placeholder contracts exist in `timer-generator.ts`, `fatigue-system.ts`, and `workout-generator.ts`; they consume the workout domain and return stub results. Segment types are documented as ready for timer/EMOM consumption. CrossFit-style EMOM mock workout data is provided in `mock-workouts.ts`. The builder shell surfaces an "Extension points" panel that confirms the draft is consumable by the Timer Generator (segment count reported).
+
+---
+
+### User Story 4 — Workout Board and Timer (Priority: P4)
+
+As a coach or trainee, when I finish building a workout I can click "Done" to see a clean Workout Board and, when the workout is time-measurable, start a smart timer; For Time segments require me to click "Stop" when I finish the effort.
+
+**Why this priority**: Completes the builder flow with a clear done action and a runnable view (board + timer) without leaving the app.
+
+**Independent Test**: Build a workout with at least one EMOM or AMRAP segment, click Done (enabled only when validation passes), see the board in CrossFit-style layout, click Start and confirm timer runs; build a workout with a For Time segment, click Done, Start, then Stop when done.
+
+**Acceptance Scenarios**:
+
+1. **Given** the builder is displayed, **When** the user looks for a completion action, **Then** a "Done" button is visible (e.g. bottom of build flow or in workout details area). The button is **disabled** when there are any validation errors for workout name or segments (same rules as "Current builder status"), or when **any segment has no exercises assigned**. It is **enabled** only when the workout is structurally valid and every segment has at least one exercise.
+2. **Given** the user clicks Done, **When** the workout is valid, **Then** the builder view is replaced (or overlaid) by the **Workout Board** showing the same workout in a simple, CrossFit-style layout.
+3. **Given** the Workout Board is displayed, **Then** for each segment the board shows: a segment header (e.g. "AMRAP 3`", "EMOM 10`", "For Time"); below it, one line per exercise (e.g. "8 KB Swing", "Max cal Row", "5 Front Squats"); after each segment, "Rest: X" when rest > 0 (minutes). No editing controls; minimal, board-style presentation.
+4. **Given** the Workout Board is displayed, **Then** a "Start" button is shown only when the workout is **time-measurable** (at least one segment of type EMOM, AMRAP, or For Time with the required timing fields). If the workout has only Custom segments or no derivable duration, the workout is valid but **not time-measurable**—Start is hidden or disabled.
+5. **Given** the user clicks Start, **Then** the timer runs from the segment structure. For EMOM and AMRAP segments, the timer runs to completion with no further user action. For **For Time** segments, the timer runs until the user clicks **Stop** (user indicates they finished the effort). If the workout contains any For Time segment, the timer UI MUST expose this Stop action.
+6. **Given** the Workout Board is displayed, **Then** the board provides a way to return to the builder (e.g. "Back to build" or "Edit workout") so the user can change the workout and click Done again.
+
 ---
 
 ## Edge Cases
 
-- Segment has zero exercises: how does the system treat empty segments on save or when generating timers?
+- Segment has zero exercises: the system MUST treat empty segments as invalid for completion—Done is disabled and validation reports an error per segment with no exercises. Segment cards MUST show a distinct visual state (incomplete/warning) when they have no exercises; segments with exercises MUST show an active/success state. Empty segments are not permitted when clicking Done; timer/board flow is only available when every segment has at least one exercise.
 - Exercise requires equipment not present in gym: how is this surfaced to the user or to the equipment calculator?
 - Timer generation fails due to incompatible segment type: how does the system behave when a segment cannot produce a valid timer?
 - Duplicate exercises inside a segment: is this allowed, and how does fatigue calculation treat them?
@@ -85,6 +107,8 @@ As a product team member, I can define placeholder capabilities for the Fatigue 
 - User adds an exercise to a segment before any exercises exist in the Exercise Database: system must block or guide user to create exercises first.
 - User deletes or edits an exercise that is already used in one or more saved workouts: system must preserve workout structure or prompt corrective action.
 - Segment or exercise reordering with only one item in the list: behavior must remain predictable.
+- Workout has only Custom segments: Done is enabled when valid; board is shown; Start is hidden or disabled (not time-measurable).
+- Workout has both AMRAP and For Time: Start runs the timer; Stop is required when in or before a For Time segment.
 
 ## Requirements *(mandatory)*
 
@@ -92,7 +116,7 @@ As a product team member, I can define placeholder capabilities for the Fatigue 
 
 - **FR-001**: System MUST allow creation and editing of workouts and segments through the UI (create, edit, view, remove workouts; add, remove, reorder segments and exercises).
 - **FR-002**: System MUST store the resulting data in the domain model (Workout, Segment, Exercise, and related Equipment and Muscle Group concepts as the source of truth).
-- **FR-003**: System MUST validate user input before saving (e.g. prevent assigning non-existent exercises to segments; require necessary fields; provide clear feedback).
+- **FR-003**: System MUST validate user input before saving (e.g. prevent assigning non-existent exercises to segments; require necessary fields; provide clear feedback). For the workout to be considered valid for completion (Done enabled), **every segment MUST have at least one exercise assigned**; segments with zero exercises MUST be reported as validation errors and MUST block the Done action.
 - **FR-004**: System MUST keep the workout structure consistent (ordered segments, ordered exercises per segment, no broken references).
 - **FR-005**: System MUST expose the data so other systems can consume it (e.g. Timer Generator, Fatigue System, equipment calculator).
 - **FR-006**: System MUST model exercises with identity, name, type (strength, crossfit, mobility, or combinations), and optional equipment, muscle targets (primary and stabilizing), and working-weight or rep-max information.
@@ -115,11 +139,17 @@ As a product team member, I can define placeholder capabilities for the Fatigue 
 - **FR-021**: Assigned-exercise sets MUST use a range slider from 0 to 10, step 1 (when shown; see FR-020a); reps MUST use a range slider from 1 to 50, step 1. Metric type (calories, distance, speed, time) MUST be chosen via custom-styled radio buttons; metric value MUST use a range slider with type-specific min, max, and step (e.g. calories 0–500 step 5, distance in m, time in seconds with 15 s steps). For calories and distance only, a \"Max\" toggle MUST be available next to the metric value label; when enabled, the metric target is interpreted as \"max\" effort until the segment time ends and the value slider is hidden. For all sets-reps exercises, a \"Max reps\" toggle MUST be available next to the reps label; when enabled, the reps slider is hidden and the assignment is interpreted as \"max reps until the segment time ends\".
 - **FR-021a**: For metric exercises that support optional advanced metrics (e.g. Row), speed and similar measures that cannot be structured as a completable target MUST NOT be primary measure options. Such exercises MAY declare `advancedMetrics` (e.g. speed, watts). The UI MUST show an \"Advanced settings\" button at the bottom of the exercise prescription; when clicked, it MUST reveal additional range sliders (e.g. speed, watts) that are hidden by default to avoid overloading the UI. These advanced values are optional and are stored on the assignment when set.
 - **FR-022**: System MUST support extension points so the Timer Generator, Fatigue System, and workout auto-generation can be added later without reworking core workout data.
+- **FR-023**: The builder MUST show a "Done" button (or equivalent label). The button MUST be **disabled** when the workout has any validation errors for workout name or segments (same rules as "Current builder status"), or when **any segment has zero exercises**. It MUST be **enabled** only when there are no such errors and every segment has at least one exercise assigned.
+- **FR-024**: When the user clicks Done, the system MUST display the **Workout Board**: a read-only, CrossFit-style view of the completed workout. The board MUST show, per segment: segment type and timing as a header (e.g. "AMRAP 3`", "EMOM 10`", "For Time"); each assigned exercise on one line, in a short form (e.g. sets/reps like "8 KB Swing", or metric like "Max cal Row"); and segment rest when > 0 (e.g. "Rest: 2" for 2 minutes). Layout MUST be simple and clean, suitable for a whiteboard-style display.
+- **FR-025**: The Workout Board MUST show a "Start" button that starts the generated timer. The Start button MUST be shown and enabled only when the workout is **time-measurable** (at least one segment has type EMOM, AMRAP, or For Time with the required timing parameters). If the workout is not time-measurable (e.g. only Custom segments), the Start button MUST be hidden or disabled.
+- **FR-026**: The workout timer MUST be driven by the segment structure (Timer Generator contract). For EMOM and AMRAP segments, the timer runs to the end of the segment without requiring a user action. For **For Time** segments, the timer MUST require a user action **Stop** (or equivalent) to record that the user finished the effort; the timer UI MUST expose this Stop action when the current (or any) segment is For Time.
+- **FR-027**: The Workout Board MUST provide a clear way to return to the builder (e.g. "Back to build" or "Edit workout") so the user can edit the workout and click Done again.
+- **FR-028**: The builder MUST apply **distinct visual states** to segment cards so the user can see at a glance which segments are complete and which are incomplete: segments **with at least one exercise** MUST use an active/success-style treatment (e.g. border or accent indicating "has exercises"); segments **with no exercises** MUST use a distinct treatment (e.g. warning or incomplete styling) to signal that the segment must have exercises before the workout can be completed. The exact colors or classes are implementation-defined; the requirement is that the two states are clearly distinguishable.
 
 ### Assumptions
 
 - Workout Builder and Exercise Database are single-user for this phase; collaboration and sharing are out of scope.
-- EMOM and other segment types are represented as structured metadata and examples; active timer execution is a later phase.
+- EMOM and other segment types are represented as structured metadata and examples. Active timer execution is implemented in this phase for the Workout Board flow (Start/Stop); the Timer Generator placeholder is extended or used to produce the runnable timeline.
 - Data persistence is required for workouts and exercises; multi-device sync is not required in this phase.
 - User authentication and profile management exist outside this feature scope.
 

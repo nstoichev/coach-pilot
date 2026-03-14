@@ -102,6 +102,14 @@ input[type="number"] {
   font-weight: 600;
 }
 
+.segment-generated-name .emom-interval {
+  background: rgba(30, 58, 138, 0.5);
+  border-radius: 0.35rem;
+  font-variant-numeric: tabular-nums;
+  margin: 0 0.15em;
+  padding: 0.15em;
+}
+
 .panel h2,
 .panel h3,
 .segment-card strong,
@@ -261,6 +269,138 @@ button:hover {
   background: #dc2626;
 }
 
+.secondary-button {
+  background: rgba(51, 65, 85, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  color: #e2e8f0;
+}
+
+.secondary-button:hover {
+  background: rgba(71, 85, 105, 0.95);
+  border-color: rgba(148, 163, 184, 0.5);
+}
+
+.builder-done-row {
+  margin-top: 0.5rem;
+}
+
+.builder-done-button {
+  width: 100%;
+}
+
+.builder-done-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Workout Board */
+.board-shell {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.board-header {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.board-title {
+  color: #f8fafc;
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.board-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.board-content {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.board-segment {
+  background: rgba(15, 23, 42, 0.88);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 1rem;
+  padding: 1rem 1.25rem;
+}
+
+.board-segment-title {
+  color: #f8fafc;
+  font-size: 1.1rem;
+  margin: 0 0 0.75rem;
+}
+
+.board-exercise-list {
+  list-style: none;
+  margin: 0 0 0.5rem;
+  padding: 0;
+}
+
+.board-exercise-line {
+  color: #e2e8f0;
+  font-size: 1rem;
+  margin: 0.25rem 0;
+  padding-left: 0.5rem;
+}
+
+.board-segment-wrapper {
+  display: grid;
+  gap: 0;
+}
+
+.board-rest-separator {
+  background: rgba(30, 41, 59, 0.95);
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  border-radius: 0.5rem;
+  color: #cbd5e1;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-top: 0.5rem;
+  padding: 0.5rem 1rem;
+  text-align: center;
+}
+
+.board-rest {
+  color: #94a3b8;
+  font-size: 0.9rem;
+  margin: 0.25rem 0 0;
+}
+
+/* Timer view */
+.timer-view .timer-display {
+  font-size: 2.5rem;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  color: #f8fafc;
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 1rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  padding: 1.5rem 2rem;
+}
+
+.timer-time,
+.timer-rest-label {
+  margin: 0;
+}
+
+.timer-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.timer-stop-button {
+  min-width: 8rem;
+}
+
 .segment-card {
   display: grid;
   gap: 1rem;
@@ -268,6 +408,24 @@ button:hover {
 }
 
 .segment-card-selected {
+  border-color: rgba(56, 189, 248, 0.65);
+}
+
+/* Segment card visual state: empty = incomplete/warning, has exercises = active/success */
+.segment-card-empty {
+  border-color: rgba(251, 191, 36, 0.5);
+  background: rgba(15, 23, 42, 0.75);
+}
+
+.segment-card-empty:hover {
+  border-color: rgba(251, 191, 36, 0.7);
+}
+
+.segment-card-has-exercises {
+  border-color: rgba(34, 197, 94, 0.4);
+}
+
+.segment-card-has-exercises.segment-card-selected {
   border-color: rgba(56, 189, 248, 0.65);
 }
 

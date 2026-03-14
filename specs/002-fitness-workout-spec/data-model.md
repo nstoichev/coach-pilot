@@ -4,6 +4,10 @@
 
 This feature centers on a reusable Workout -> Segment -> Assigned Exercise -> Exercise domain model with supporting concepts for Equipment, Muscle Group, and working-weight metadata. The model must remain strict enough to support future Timer Generator, Fatigue System, and workout auto-generation modules.
 
+**Extension placeholders**: The following service contracts consume this domain and are implemented as placeholders: Timer Generator (`getTimerStructure(workout)`), Fatigue System (`estimateWorkoutFatigue(workout)`), and workout auto-generation (`generateWorkout(constraints)`). Sample data for integration testing is provided in `mock-workouts.ts` (e.g. CrossFit-style EMOM workout).
+
+**Workout Board**: The Workout Board is a read-only view of a Workout (no new entities); it displays the same Workout data in a CrossFit-style layout when the user clicks Done. Timer state (running, stopped, current segment) is UI/session state for the board view.
+
 ---
 
 ## Entity: Exercise

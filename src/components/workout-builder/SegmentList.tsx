@@ -54,6 +54,7 @@ export const SegmentList = ({
             segment={segment}
             availableExercises={availableExercises}
             isSelected={selectedSegmentId === segment.id}
+            isLastSegment={index === segments.length - 1}
             onNameChange={onUpdateSegment}
             onSelect={() => onSelectSegment(segment.id)}
             onRemove={() => onRemoveSegment(segment.id)}

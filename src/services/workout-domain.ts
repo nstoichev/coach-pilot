@@ -130,7 +130,7 @@ export const getGeneratedSegmentName = (segment: Segment): string => {
       if (interval === 60) {
         return `EMOM ${rounds}`
       }
-      return `E${formatSecondsAsClock(interval)}Om ${rounds}`
+      return `E${formatSecondsAsClock(interval)}OM ${rounds}`
     }
     case 'amrap': {
       const duration = segment.durationSeconds ?? 600
