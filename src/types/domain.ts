@@ -8,6 +8,10 @@ export const EXERCISE_METRICS = ['calories', 'distance', 'speed', 'time'] as con
 
 export type ExerciseMetric = (typeof EXERCISE_METRICS)[number]
 
+/** Advanced metric sliders (speed, watts) shown in "Advanced settings" to avoid UI overload. */
+export const ADVANCED_METRIC_KEYS = ['speed', 'watts'] as const
+export type AdvancedMetricKey = (typeof ADVANCED_METRIC_KEYS)[number]
+
 export type ExercisePrescription =
   | {
       mode: 'sets-reps'
@@ -15,12 +19,18 @@ export type ExercisePrescription =
   | {
       mode: 'metric'
       metricOptions: ExerciseMetric[]
+      /** When set, an "Advanced settings" section exposes these optional sliders (e.g. speed, watts). */
+      advancedMetrics?: readonly AdvancedMetricKey[]
     }
 
 export type MetricTarget = {
   type: ExerciseMetric
   value: number
   isMax?: boolean
+  /** Optional; used when exercise has advancedMetrics (e.g. Row). */
+  speed?: number
+  /** Optional; used when exercise has advancedMetrics (e.g. Row). */
+  watts?: number
 }
 
 export const SEGMENT_TYPES = ['custom', 'emom', 'amrap', 'forTime'] as const

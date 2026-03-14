@@ -14,12 +14,8 @@ export const WorkoutDetailsForm = ({
   <section className="panel">
     <div className="panel-header">
       <div>
-        <p className="eyebrow">Workout Details</p>
         <h2>Build your workout</h2>
       </div>
-      <button className="primary-button" onClick={onAddSegment} type="button">
-        Add Segment
-      </button>
     </div>
 
     <div className="form-grid">
@@ -38,5 +34,11 @@ export const WorkoutDetailsForm = ({
         ? 'Start by adding your first segment.'
         : `${segmentCount} segment${segmentCount === 1 ? '' : 's'} in this workout.`}
     </p>
+
+    <div className="panel-add-segment-row">
+      <button className="primary-button panel-add-segment-button" onClick={onAddSegment} type="button">
+        Add Segment
+      </button>
+    </div>
   </section>
 )

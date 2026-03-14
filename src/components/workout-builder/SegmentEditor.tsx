@@ -55,6 +55,10 @@ const TIMECAP_MAX_SECONDS = 3600 // 60 min
 const TIMECAP_STEP_SECONDS = 30
 const TIMECAP_DEFAULT_SECONDS = 900 // 15 min
 
+const FORTIME_ROUNDS_MIN = 1
+const FORTIME_ROUNDS_MAX = 30
+const FORTIME_ROUNDS_DEFAULT = 1
+
 const restMinutesToSeconds = (minutes: number): number =>
   Math.round(minutes * 60)
 
@@ -72,6 +76,11 @@ const METRIC_RANGES: Record<
   distance: { min: 0, max: 10000, step: 100, unit: 'm' },
   speed: { min: 0, max: 50, step: 1, unit: 'km/h' },
   time: { min: 0, max: 3600, step: 15, unit: 's' },
+}
+
+const ADVANCED_RANGES: Record<string, { min: number; max: number; step: number; unit: string }> = {
+  speed: { min: 0, max: 50, step: 1, unit: 'km/h' },
+  watts: { min: 0, max: 500, step: 10, unit: 'W' },
 }
 
 function formatMetricValue(metric: ExerciseMetric, value: number): string {
@@ -101,6 +110,7 @@ export const SegmentEditor = ({
     [segment],
   )
   const [isExerciseModalOpen, setIsExerciseModalOpen] = useState(false)
+  const [expandedAdvancedByAssignmentId, setExpandedAdvancedByAssignmentId] = useState<Record<string, boolean>>({})
 
   const handleSegmentChange = (updated: Segment) => {
     const next =
@@ -247,6 +257,23 @@ export const SegmentEditor = ({
                 }
               />
             </label>
+            <label className="field">
+              <span>Rounds {segment.rounds ?? FORTIME_ROUNDS_DEFAULT}</span>
+              <input
+                className="range-input"
+                max={FORTIME_ROUNDS_MAX}
+                min={FORTIME_ROUNDS_MIN}
+                step={1}
+                type="range"
+                value={segment.rounds ?? FORTIME_ROUNDS_DEFAULT}
+                onChange={(event) =>
+                  handleSegmentChange({
+                    ...segment,
+                    rounds: Number(event.target.value),
+                  })
+                }
+              />
+            </label>
           </div>
         ) : null}
 
@@ -275,14 +302,11 @@ export const SegmentEditor = ({
         <div className="segment-add-exercise-row" onClick={(event) => event.stopPropagation()}>
           <button
             type="button"
-            className="primary-button"
+            className="primary-button segment-add-exercise-button"
             onClick={() => setIsExerciseModalOpen(true)}
           >
             Add exercise
           </button>
-          {segment.exercises.length === 0 ? (
-            <p className="muted-text">No exercises assigned yet.</p>
-          ) : null}
         </div>
 
         {segment.exercises.length > 0 ? (
@@ -339,7 +363,7 @@ export const SegmentEditor = ({
                   <div className="prescription-stack">
                         {isSetsReps ? (
                           <>
-                            {!assignedExercise.isMaxRepetitions ? (
+                            {segment.segmentType === 'custom' && !assignedExercise.isMaxRepetitions ? (
                               <label className="field">
                                 <span>
                                   Sets {assignedExercise.sets ?? 0}
@@ -480,6 +504,81 @@ export const SegmentEditor = ({
                             />
                           ) : null}
                         </div>
+                        {assignedExercise.exercise.prescription.mode === 'metric' &&
+                          assignedExercise.exercise.prescription.advancedMetrics?.length ? (
+                          <div className="advanced-settings-block">
+                            <button
+                              type="button"
+                              className="advanced-settings-trigger"
+                              onClick={() =>
+                                setExpandedAdvancedByAssignmentId((prev) => ({
+                                  ...prev,
+                                  [assignedExercise.id]: !prev[assignedExercise.id],
+                                }))
+                              }
+                            >
+                              {expandedAdvancedByAssignmentId[assignedExercise.id] ? 'Hide advanced settings' : 'Advanced settings'}
+                            </button>
+                            {expandedAdvancedByAssignmentId[assignedExercise.id] ? (
+                              <div className="segment-config-stack">
+                                {assignedExercise.exercise.prescription.advancedMetrics?.includes('speed') ? (
+                                  <label className="field">
+                                    <span>
+                                      Speed {assignedExercise.metricTarget?.speed ?? 0} km/h
+                                    </span>
+                                    <input
+                                      className="range-input"
+                                      max={ADVANCED_RANGES.speed.max}
+                                      min={ADVANCED_RANGES.speed.min}
+                                      step={ADVANCED_RANGES.speed.step}
+                                      type="range"
+                                      value={assignedExercise.metricTarget?.speed ?? 0}
+                                      onChange={(event) =>
+                                        onUpdateAssignedExercise({
+                                          ...assignedExercise,
+                                          metricTarget: {
+                                            ...(assignedExercise.metricTarget ?? {}),
+                                            type: metricType,
+                                            value: metricValue,
+                                            isMax: isMax ?? false,
+                                            speed: Number(event.target.value),
+                                          },
+                                        })
+                                      }
+                                    />
+                                  </label>
+                                ) : null}
+                                {assignedExercise.exercise.prescription.advancedMetrics?.includes('watts') ? (
+                                  <label className="field">
+                                    <span>
+                                      Watts {assignedExercise.metricTarget?.watts ?? 0} W
+                                    </span>
+                                    <input
+                                      className="range-input"
+                                      max={ADVANCED_RANGES.watts.max}
+                                      min={ADVANCED_RANGES.watts.min}
+                                      step={ADVANCED_RANGES.watts.step}
+                                      type="range"
+                                      value={assignedExercise.metricTarget?.watts ?? 0}
+                                      onChange={(event) =>
+                                        onUpdateAssignedExercise({
+                                          ...assignedExercise,
+                                          metricTarget: {
+                                            ...(assignedExercise.metricTarget ?? {}),
+                                            type: metricType,
+                                            value: metricValue,
+                                            isMax: isMax ?? false,
+                                            watts: Number(event.target.value),
+                                          },
+                                        })
+                                      }
+                                    />
+                                  </label>
+                                ) : null}
+                              </div>
+                            ) : null}
+                          </div>
+                        ) : null}
                       </>
                     )}
                   </div>

@@ -136,8 +136,10 @@ export const getGeneratedSegmentName = (segment: Segment): string => {
       const duration = segment.durationSeconds ?? 600
       return `AMRAP ${formatSecondsAsClock(duration)}`
     }
-    case 'forTime':
-      return 'For Time'
+    case 'forTime': {
+      const rounds = segment.rounds ?? 1
+      return rounds === 1 ? 'For Time' : `For Time ${rounds}`
+    }
     case 'custom':
     default:
       return segment.name

@@ -58,7 +58,8 @@ export const mockExerciseDatabase: Exercise[] = [
     type: ['crossfit'],
     prescription: {
       mode: 'metric',
-      metricOptions: ['calories', 'distance', 'speed'],
+      metricOptions: ['calories', 'distance', 'time'],
+      advancedMetrics: ['speed', 'watts'],
     },
     equipment: ['rower'],
     muscles: {

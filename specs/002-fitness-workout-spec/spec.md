@@ -39,6 +39,8 @@ As a coach or trainee, I can create a workout, add multiple segments, and add ex
 4. **Given** the user selects an EMOM segment template, **When** the segment is created, **Then** it starts with default parameters of interval `1:00` and sets `10`, and the total measurable time is shown.
 5. **Given** a measurable segment type such as EMOM, AMRAP, or For Time, **When** the user edits its timing parameters, **Then** the UI updates the total segment time when it can be calculated.
 6. **Given** a workout has segments and exercises, **When** the user reorders items, **Then** the new order is preserved and reflected immediately.
+7. **Given** a sets/reps exercise is assigned to an EMOM, AMRAP, or For Time segment, **When** the user views the exercise prescription, **Then** the Sets range slider is not shown (segment structure provides the sets role). **Given** the same exercise type in a Custom segment, **When** the user views the prescription, **Then** the Sets range slider is shown.
+8. **Given** a metric exercise that supports advanced metrics (e.g. Row), **When** the user views the prescription, **Then** an \"Advanced settings\" button is shown at the bottom; **When** the user clicks it, **Then** optional range sliders for speed and watts (or other declared advanced metrics) are revealed; **When** the user clicks again, **Then** the advanced sliders are hidden.
 
 ---
 
@@ -109,7 +111,9 @@ As a product team member, I can define placeholder capabilities for the Fatigue 
 - **FR-018**: System MUST provide AMRAP duration through a range slider from 1 to 30 minutes in 30 second steps, and For Time time cap through a range slider from 1 to 60 minutes in 30 second steps.
 - **FR-019**: System MUST provide per-segment rest through a range control from 0 to 10 minutes in 15 second steps.
 - **FR-020**: For each assigned exercise in a segment, the UI MUST show the exercise title and action buttons (reorder, remove) on top, with all prescription options (sets, reps, or measure + value) stacked below.
-- **FR-021**: Assigned-exercise sets MUST use a range slider from 0 to 10, step 1; reps MUST use a range slider from 1 to 50, step 1. Metric type (calories, distance, speed, time) MUST be chosen via custom-styled radio buttons; metric value MUST use a range slider with type-specific min, max, and step (e.g. calories 0–500 step 5, distance in m, time in seconds with 15 s steps). For calories and distance only, a \"Max\" toggle MUST be available next to the metric value label; when enabled, the metric target is interpreted as \"max\" effort until the segment time ends and the value slider is hidden. For all sets-reps exercises, a \"Max reps\" toggle MUST be available next to the reps label; when enabled, the reps slider is hidden and the assignment is interpreted as \"max reps until the segment time ends\".
+- **FR-020a**: The Sets range slider MUST be shown only when the segment type is Custom. For EMOM, AMRAP, and For Time segments, the Sets slider MUST NOT be shown, because the segment structure (rounds, duration, or time cap) already plays the role of sets.
+- **FR-021**: Assigned-exercise sets MUST use a range slider from 0 to 10, step 1 (when shown; see FR-020a); reps MUST use a range slider from 1 to 50, step 1. Metric type (calories, distance, speed, time) MUST be chosen via custom-styled radio buttons; metric value MUST use a range slider with type-specific min, max, and step (e.g. calories 0–500 step 5, distance in m, time in seconds with 15 s steps). For calories and distance only, a \"Max\" toggle MUST be available next to the metric value label; when enabled, the metric target is interpreted as \"max\" effort until the segment time ends and the value slider is hidden. For all sets-reps exercises, a \"Max reps\" toggle MUST be available next to the reps label; when enabled, the reps slider is hidden and the assignment is interpreted as \"max reps until the segment time ends\".
+- **FR-021a**: For metric exercises that support optional advanced metrics (e.g. Row), speed and similar measures that cannot be structured as a completable target MUST NOT be primary measure options. Such exercises MAY declare `advancedMetrics` (e.g. speed, watts). The UI MUST show an \"Advanced settings\" button at the bottom of the exercise prescription; when clicked, it MUST reveal additional range sliders (e.g. speed, watts) that are hidden by default to avoid overloading the UI. These advanced values are optional and are stored on the assignment when set.
 - **FR-022**: System MUST support extension points so the Timer Generator, Fatigue System, and workout auto-generation can be added later without reworking core workout data.
 
 ### Assumptions
@@ -133,7 +137,7 @@ Represents a block of a workout. Examples: Custom, AMRAP, EMOM, and For Time. At
 
 ### Assigned Exercise
 
-Represents an exercise placed into a segment. Attributes may include: linked exercise record; optional sets; optional repetitions; optional metric targets such as calories, distance, or speed; order within the segment.
+Represents an exercise placed into a segment. Attributes may include: linked exercise record; optional sets; optional repetitions; optional metric targets (e.g. calories, distance, time) and optional advanced metric values (e.g. speed, watts) when the exercise supports them; order within the segment.
 
 ### Workout
 

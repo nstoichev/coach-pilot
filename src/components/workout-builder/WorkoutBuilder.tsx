@@ -20,15 +20,6 @@ export const WorkoutBuilder = () => {
 
   return (
     <main className="builder-shell">
-      <section className="hero-card">
-        <p className="eyebrow">Coach Pilot</p>
-        <h1>Workout Builder MVP</h1>
-        <p>
-          Build workouts from reusable exercises, organize them into segments, and validate the
-          structure before moving on to the Exercise Database phase.
-        </p>
-      </section>
-
       <WorkoutDetailsForm
         workoutName={state.workoutDraft.name}
         segmentCount={state.workoutDraft.segments.length}

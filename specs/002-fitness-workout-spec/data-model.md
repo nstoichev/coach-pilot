@@ -27,7 +27,7 @@ This feature centers on a reusable Workout -> Segment -> Assigned Exercise -> Ex
 - `muscles.stabilizing`: list of stabilizing muscle groups
 - `workingWeight.mode`: `weight` or `repMax`
 - `workingWeight.value`: numeric value tied to the selected mode
-- metric-based exercises can expose metric options such as `calories`, `distance`, `speed`, or `time`
+- metric-based exercises can expose metric options such as `calories`, `distance`, `speed`, or `time`; for exercises where speed (or similar) is not a structured target, it MAY be omitted from primary options and exposed via `advancedMetrics` (e.g. `speed`, `watts`) so the UI shows an \"Advanced settings\" section with optional sliders
 
 ### Validation Rules
 
@@ -61,6 +61,8 @@ This feature centers on a reusable Workout -> Segment -> Assigned Exercise -> Ex
 - `metricTarget.type`: optional metric kind for metric-based exercises
 - `metricTarget.value`: optional numeric metric value
 - `metricTarget.isMax`: optional flag indicating that this is a \"max\" effort target (e.g. max calories or max distance until the end of the segment time)
+- `metricTarget.speed`: optional (advanced); used when the exercise has `advancedMetrics` including speed (e.g. Row)
+- `metricTarget.watts`: optional (advanced); used when the exercise has `advancedMetrics` including watts (e.g. Row)
 
 ### Type-Specific Fields
 
@@ -79,7 +81,7 @@ This feature centers on a reusable Workout -> Segment -> Assigned Exercise -> Ex
 - `sets`, when provided, must be non-negative (0–10 in current UI range slider)
 - `repetitions`, when provided, must be greater than zero (1–50 in current UI range slider) unless `isMaxRepetitions` is true
 - metric-based exercises must use a supported metric target; metric value uses type-specific range sliders (e.g. calories 0–500 step 5, distance 0–10000 m step 100, time 0–60 min in 15 s steps). For calories and distance, `metricTarget.isMax` may be true, indicating \"max\" effort until the segment time ends, in which case the value slider is hidden.
-- assigned-exercise list item layout: exercise title and actions on top; sets, reps, or measure + value (with optional Max toggle) stacked below
+- assigned-exercise list item layout: exercise title and actions on top; sets, reps, or measure + value (with optional Max toggle) stacked below. The Sets range slider is shown only for Custom segments; for EMOM, AMRAP, and For Time the segment structure (rounds, duration, time cap) provides the sets role, so the per-exercise Sets slider is hidden. For metric exercises that declare `advancedMetrics` (e.g. speed, watts), an \"Advanced settings\" button is shown at the bottom of the prescription; when expanded, optional range sliders for speed and/or watts are displayed (hidden by default).
 - EMOM segments require `intervalSeconds` and `rounds`
 - EMOM interval editing is constrained to 15-second steps with a maximum of 10 minutes in the current UI
 - EMOM sets (rounds) are edited via a range control from 1 to 50, step 1, default 10; the sets control is displayed below the interval in the segment editor

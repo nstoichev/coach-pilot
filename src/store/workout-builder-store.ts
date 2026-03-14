@@ -101,6 +101,7 @@ export const createSegmentTemplate = (segmentType: SegmentType): Segment => {
         ...baseSegment,
         name: 'For Time',
         timeCapSeconds: 900,
+        rounds: 1,
       }
       return { ...seg, name: getGeneratedSegmentName(seg) }
     }
