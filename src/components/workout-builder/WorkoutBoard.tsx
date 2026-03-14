@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import type { Workout } from '../../types/workout.ts'
 import {
   getBoardSegmentTitle,
@@ -6,7 +6,7 @@ import {
   getBoardRestLine,
   isWorkoutTimeMeasurable,
 } from '../../services/workout-board-format.ts'
-import { WorkoutTimer } from './WorkoutTimer.tsx'
+import { WorkoutTimer, type TimerPhaseInfo } from './WorkoutTimer.tsx'
 
 type WorkoutBoardProps = {
   workout: Workout
@@ -15,17 +15,12 @@ type WorkoutBoardProps = {
 
 export function WorkoutBoard({ workout, onBackToBuild }: WorkoutBoardProps) {
   const [timerRunning, setTimerRunning] = useState(false)
+  const [currentPhase, setCurrentPhase] = useState<TimerPhaseInfo | null>(null)
   const timeMeasurable = isWorkoutTimeMeasurable(workout)
 
-  if (timerRunning) {
-    return (
-      <WorkoutTimer
-        workout={workout}
-        onStopTimer={() => setTimerRunning(false)}
-        onBackToBuild={onBackToBuild}
-      />
-    )
-  }
+  const handlePhaseChange = useCallback((info: TimerPhaseInfo) => {
+    setCurrentPhase(info)
+  }, [])
 
   return (
     <main className="board-shell">
@@ -39,7 +34,7 @@ export function WorkoutBoard({ workout, onBackToBuild }: WorkoutBoardProps) {
           >
             Back to build
           </button>
-          {timeMeasurable && (
+          {timeMeasurable && !timerRunning && (
             <button
               type="button"
               className="primary-button"
@@ -51,10 +46,25 @@ export function WorkoutBoard({ workout, onBackToBuild }: WorkoutBoardProps) {
         </div>
       </header>
 
+      {timerRunning && (
+        <WorkoutTimer
+          workout={workout}
+          embedded
+          onStopTimer={() => {
+            setTimerRunning(false)
+            setCurrentPhase(null)
+          }}
+          onBackToBuild={onBackToBuild}
+          onPhaseChange={handlePhaseChange}
+        />
+      )}
+
       <section className="board-content">
         {workout.segments.map((segment) => (
           <div key={segment.id} className="board-segment-wrapper">
-            <div className="board-segment">
+            <div
+              className={`board-segment${currentPhase?.phaseType === 'work' && currentPhase.segmentId === segment.id ? ' board-segment-active' : ''}`}
+            >
               <h2 className="board-segment-title">
                 {getBoardSegmentTitle(segment)}
               </h2>
@@ -67,7 +77,10 @@ export function WorkoutBoard({ workout, onBackToBuild }: WorkoutBoardProps) {
               </ul>
             </div>
             {getBoardRestLine(segment) && (
-              <div className="board-rest-separator" aria-label="Rest period">
+              <div
+                className={`board-rest-separator${currentPhase?.phaseType === 'rest' && currentPhase.segmentId === segment.id ? ' board-rest-separator-active' : ''}`}
+                aria-label="Rest period"
+              >
                 {getBoardRestLine(segment)}
               </div>
             )}

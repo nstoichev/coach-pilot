@@ -330,6 +330,19 @@ button:hover {
   padding: 1rem 1.25rem;
 }
 
+.board-segment-active {
+  border-color: rgba(239, 68, 68, 0.7);
+  background: rgba(30, 23, 23, 0.95);
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.35);
+}
+
+.board-rest-separator-active {
+  border-color: rgba(34, 197, 94, 0.6);
+  background: rgba(20, 35, 25, 0.95);
+  color: #86efac;
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.35);
+}
+
 .board-segment-title {
   color: #f8fafc;
   font-size: 1.1rem;
@@ -372,7 +385,49 @@ button:hover {
   margin: 0.25rem 0 0;
 }
 
-/* Timer view */
+/* Timer strip (embedded above board) */
+.timer-strip {
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem 1.25rem;
+}
+
+.timer-strip-header {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.timer-strip-work .timer-strip-label {
+  color: #fca5a5;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.timer-strip-rest .timer-strip-label {
+  color: #86efac;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.timer-strip .timer-display {
+  font-size: 2rem;
+  font-variant-numeric: tabular-nums;
+  margin: 0.5rem 0;
+  color: #f8fafc;
+}
+
+.timer-strip .timer-actions {
+  margin: 0.5rem 0;
+}
+
+/* Timer view (full page) */
 .timer-view .timer-display {
   font-size: 2.5rem;
   font-variant-numeric: tabular-nums;
@@ -388,6 +443,11 @@ button:hover {
 .timer-time,
 .timer-rest-label {
   margin: 0;
+}
+
+.timer-finish {
+  color: #34d399;
+  font-weight: 700;
 }
 
 .timer-actions {

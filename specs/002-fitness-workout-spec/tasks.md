@@ -143,11 +143,9 @@ Checkpoint: User Story 3 is functional as a future-ready extension layer.
 
 # Phase 6 — User Story 4: Workout Board and Timer (P4)
 
-Goal: User can click Done (when valid), see the Workout Board in CrossFit-style layout, and start a smart timer; For Time requires Stop.
+Goal: User can click Done (when valid), see the Workout Board in CrossFit-style layout, and start a smart timer that runs as a single continuous flow (work → rest → next segment) with one counter at a time; For Time shows Stop and Finish.
 
-Independent Test:
-
-Build a workout with at least one EMOM or AMRAP segment, click Done (enabled only when validation passes), see the board in CrossFit-style layout, click Start and confirm timer runs; build a workout with a For Time segment, click Done, Start, then Stop when done.
+Independent Test: See spec **Workout Timer — Detailed Behavior**. Build a workout with two+ time-measurable segments (e.g. AMRAP 1:00, rest 0:15, AMRAP 1:00, rest 0:15, For Time 2:00 cap), click Done, Start. Confirm single counter only (no "Not set", no "elapsed / total"); "Work: M:SS" countdown then "Rest: M:SS" countdown; auto-advance to next segment; For Time count-up with Stop; "Finish" then workout complete.
 
 Tasks:
 
@@ -161,8 +159,9 @@ Tasks:
 - [x] T044 [US4] When workout has any For Time segment, timer UI must display "Stop" (or equivalent) and record completion on user action; same files as T042.
 - [x] T045 [US4] Add validation rule: any segment with zero exercises must produce a validation error (e.g. "Segment must have at least one exercise") so Done stays disabled. Implement in `src/services/workout-validation.ts` (e.g. in `validateSegment` or `validateWorkout`); ensure `WorkoutBuilder` Done button remains gated by `state.validationErrors` (already includes segment-level errors).
 - [x] T046 [US4] Apply distinct segment card visual states: segments with no exercises use incomplete/warning styling; segments with at least one exercise use active/success styling. Add CSS classes (e.g. `segment-card-empty`, `segment-card-has-exercises`) in `src/App.css` and apply them in `src/components/workout-builder/SegmentEditor.tsx` (or segment list) based on `segment.exercises.length`.
+- [x] T047 [US4] Align workout timer with spec **Workout Timer — Detailed Behavior**: single continuous flow; one counter only (no "Not set" on start, no "elapsed / total" display); labels "Work: M:SS" and "Rest: M:SS"; work phases count down (EMOM/AMRAP) or count up (For Time); rest phases count down; auto-advance through all segments and rest in order; For Time shows Stop button and "Finish" on completion; workout complete when all phases done. Rest in minutes converted to seconds. Implement in `src/components/workout-builder/WorkoutTimer.tsx` and any timer/segment sequencing logic.
 
-Checkpoint: User can complete flow: build → Done (disabled when invalid) → board → Start (if time-measurable) → timer runs; For Time requires Stop; user can return to builder. Done is disabled when any segment has no exercises; segment cards show clear empty vs complete state.
+Checkpoint: User can complete flow: build → Done (disabled when invalid) → board → Start (if time-measurable) → timer runs as continuous series (Work → Rest → next segment); single counter; For Time Stop/Finish; workout complete. Segment cards show empty vs complete state.
 
 Dependencies: Phase 5 complete (timer-generator contract and validation already exist). No new persistence required for this phase (board shows current draft; optional: snapshot draft on Done for board so edits do not change board until Done again).
 

@@ -1,95 +1,186 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useMemo } from 'react'
 import type { Workout } from '../../types/workout.ts'
 import { getTimerStructure } from '../../services/timer-generator.ts'
-import type { TimerSegmentInfo } from '../../services/timer-generator.ts'
 import { formatSecondsAsClock } from '../../services/workout-domain.ts'
+
+export type TimerPhaseInfo = { phaseType: 'work' | 'rest'; segmentId: string }
 
 type WorkoutTimerProps = {
   workout: Workout
   onStopTimer: () => void
   onBackToBuild: () => void
+  /** When true, render as a compact strip (timer above board). */
+  embedded?: boolean
+  /** Called when the current phase changes (for board highlighting). */
+  onPhaseChange?: (info: TimerPhaseInfo) => void
 }
 
-type Phase = 'segment' | 'rest'
+type WorkPhase = {
+  type: 'work'
+  segmentId: string
+  segmentName: string
+  durationSeconds?: number
+  timeCapSeconds?: number
+  isForTime: boolean
+}
 
-export function WorkoutTimer({ workout, onStopTimer, onBackToBuild }: WorkoutTimerProps) {
+type RestPhase = {
+  type: 'rest'
+  restSeconds: number
+  /** Segment id that this rest follows (for board highlighting). */
+  afterSegmentId: string
+}
+
+type TimerPhase = WorkPhase | RestPhase
+
+function buildPhases(workout: Workout): TimerPhase[] {
   const structure = getTimerStructure(workout)
-  const segments = structure.segments.filter(
-    (s) => s.durationSeconds != null || s.timeCapSeconds != null,
-  )
+  const phases: TimerPhase[] = []
 
-  const [segmentIndex, setSegmentIndex] = useState(0)
-  const [phase, setPhase] = useState<Phase>('segment')
-  const [elapsedSeconds, setElapsedSeconds] = useState(0)
-  const [restRemaining, setRestRemaining] = useState(0)
-  const [isRunning, setIsRunning] = useState(true)
+  for (const seg of structure.segments) {
+    const hasDuration = seg.durationSeconds != null && seg.durationSeconds > 0
+    const hasCap = seg.timeCapSeconds != null && seg.timeCapSeconds > 0
+    if (!hasDuration && !hasCap) continue
+
+    phases.push({
+      type: 'work',
+      segmentId: seg.segmentId,
+      segmentName: seg.segmentName,
+      durationSeconds: seg.durationSeconds,
+      timeCapSeconds: seg.timeCapSeconds,
+      isForTime: seg.segmentType === 'forTime',
+    })
+
+    const workoutSegment = workout.segments.find((s) => s.id === seg.segmentId)
+    const restMinutes = workoutSegment?.restInterval ?? 0
+    const restSeconds = Math.round(restMinutes * 60)
+    if (restSeconds > 0) {
+      phases.push({ type: 'rest', restSeconds, afterSegmentId: seg.segmentId })
+    }
+  }
+
+  return phases
+}
+
+function getInitialCounter(phase: TimerPhase | undefined): { remaining: number; elapsed: number } {
+  if (!phase) return { remaining: 0, elapsed: 0 }
+  if (phase.type === 'rest') return { remaining: phase.restSeconds, elapsed: 0 }
+  if (phase.isForTime) return { remaining: 0, elapsed: 0 }
+  return { remaining: phase.durationSeconds ?? 0, elapsed: 0 }
+}
+
+export function WorkoutTimer({
+  workout,
+  onStopTimer,
+  onBackToBuild,
+  embedded = false,
+  onPhaseChange,
+}: WorkoutTimerProps) {
+  const phases = useMemo(() => buildPhases(workout), [workout])
+  const firstCounter = useMemo(() => getInitialCounter(phases[0]), [phases])
+  const [phaseIndex, setPhaseIndex] = useState(0)
+  const [remainingSeconds, setRemainingSeconds] = useState(() => firstCounter.remaining)
+  const [elapsedSeconds, setElapsedSeconds] = useState(() => firstCounter.elapsed)
+  const [showingFinish, setShowingFinish] = useState(false)
   const tickRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const phaseIndexRef = useRef(phaseIndex)
+  const remainingSecondsRef = useRef(remainingSeconds)
+  const elapsedSecondsRef = useRef(elapsedSeconds)
 
-  const currentSegment: TimerSegmentInfo | undefined = segments[segmentIndex]
-  const isForTime = currentSegment?.segmentType === 'forTime'
-  const isResting = phase === 'rest'
+  phaseIndexRef.current = phaseIndex
+  remainingSecondsRef.current = remainingSeconds
+  elapsedSecondsRef.current = elapsedSeconds
 
+  const currentPhase = phases[phaseIndex]
+  const isComplete = phaseIndex >= phases.length
+
+  // Notify parent of current phase for board highlighting (work = red segment, rest = green rest card)
   useEffect(() => {
-    if (!isRunning || segments.length === 0) return
+    if (!onPhaseChange || !currentPhase) return
+    if (currentPhase.type === 'work') {
+      onPhaseChange({ phaseType: 'work', segmentId: currentPhase.segmentId })
+    } else {
+      onPhaseChange({ phaseType: 'rest', segmentId: currentPhase.afterSegmentId })
+    }
+  }, [phaseIndex, currentPhase, onPhaseChange])
+
+  // When phase index changes, initialize counter for the new phase (no "Not set")
+  useEffect(() => {
+    const p = phases[phaseIndex]
+    if (!p) return
+    const { remaining, elapsed } = getInitialCounter(p)
+    setRemainingSeconds(remaining)
+    setElapsedSeconds(elapsed)
+    setShowingFinish(false)
+    remainingSecondsRef.current = remaining
+    elapsedSecondsRef.current = elapsed
+  }, [phaseIndex, phases])
+
+  // Single interval: read phase and counters from refs so rest phase always sees correct remainingSeconds (avoids sync/closure issues).
+  useEffect(() => {
+    if (!currentPhase || showingFinish) return
 
     tickRef.current = setInterval(() => {
-      if (isResting) {
-        setRestRemaining((r) => {
-          if (r <= 1) {
-            setPhase('segment')
-            setSegmentIndex((i) => i + 1)
-            setElapsedSeconds(0)
-            return 0
-          }
-          return r - 1
-        })
-        return
-      }
+      const idx = phaseIndexRef.current
+      const phase = phases[idx]
+      if (!phase) return
 
-      if (isForTime) {
-        setElapsedSeconds((e) => e + 1)
-        return
-      }
-
-      const duration = currentSegment?.durationSeconds ?? 0
-      setElapsedSeconds((e) => {
-        const next = e + 1
-        if (next >= duration) {
-          advanceToRestOrNext()
-          return 0
+      if (phase.type === 'rest') {
+        const r = remainingSecondsRef.current
+        if (r <= 1) {
+          setPhaseIndex((i) => i + 1)
+          setRemainingSeconds(0)
+          remainingSecondsRef.current = 0
+          return
         }
-        return next
-      })
+        const next = r - 1
+        remainingSecondsRef.current = next
+        setRemainingSeconds(next)
+        return
+      }
+
+      if (phase.isForTime) {
+        const cap = phase.timeCapSeconds ?? 0
+        const e = elapsedSecondsRef.current
+        const next = e + 1
+        elapsedSecondsRef.current = next
+        setElapsedSeconds(next)
+        if (cap > 0 && next >= cap) setShowingFinish(true)
+        return
+      }
+
+      const r = remainingSecondsRef.current
+      if (r <= 1) {
+        setPhaseIndex((i) => i + 1)
+        setRemainingSeconds(0)
+        remainingSecondsRef.current = 0
+        return
+      }
+      const next = r - 1
+      remainingSecondsRef.current = next
+      setRemainingSeconds(next)
     }, 1000)
 
     return () => {
       if (tickRef.current) clearInterval(tickRef.current)
     }
-  }, [isRunning, segmentIndex, phase, isForTime, isResting, segments.length])
+  }, [phaseIndex, phases, currentPhase, showingFinish])
 
-  function advanceToRestOrNext() {
-    const current = segments[segmentIndex]
-    const workoutSegment = current
-      ? workout.segments.find((s) => s.id === current.segmentId)
-      : undefined
-    const restMinutes = workoutSegment?.restInterval ?? 0
-    const restSeconds = Math.round(restMinutes * 60)
-    if (restSeconds > 0) {
-      setPhase('rest')
-      setRestRemaining(restSeconds)
-    } else {
-      setSegmentIndex((i) => i + 1)
-      setElapsedSeconds(0)
-    }
-  }
+  // After showing "Finish", advance to next phase or complete
+  useEffect(() => {
+    if (!showingFinish) return
+    const t = setTimeout(() => {
+      setShowingFinish(false)
+      setPhaseIndex((i) => i + 1)
+    }, 1200)
+    return () => clearTimeout(t)
+  }, [showingFinish])
 
   function handleForTimeStop() {
-    setIsRunning(false)
-    advanceToRestOrNext()
-    setIsRunning(true)
+    setShowingFinish(true)
   }
 
-  if (segments.length === 0) {
+  if (phases.length === 0) {
     return (
       <main className="board-shell">
         <p className="muted-text">No time-measurable segments.</p>
@@ -100,7 +191,7 @@ export function WorkoutTimer({ workout, onStopTimer, onBackToBuild }: WorkoutTim
     )
   }
 
-  if (segmentIndex >= segments.length) {
+  if (isComplete && !embedded) {
     return (
       <main className="board-shell">
         <h2 className="board-title">Workout complete</h2>
@@ -116,38 +207,53 @@ export function WorkoutTimer({ workout, onStopTimer, onBackToBuild }: WorkoutTim
     )
   }
 
-  const duration = currentSegment?.durationSeconds
-  const timeCap = currentSegment?.timeCapSeconds
-  const displayTime = isResting
-    ? formatSecondsAsClock(restRemaining)
-    : isForTime
-      ? formatSecondsAsClock(elapsedSeconds)
-      : duration != null
-        ? `${formatSecondsAsClock(elapsedSeconds)} / ${formatSecondsAsClock(duration)}`
-        : '—'
+  const phase = isComplete ? null : currentPhase!
+  const isWork = phase?.type === 'work'
+  const isRest = phase?.type === 'rest'
+  const isForTime = isWork && phase?.isForTime
 
-  return (
-    <main className="board-shell timer-view">
-      <header className="board-header">
-        <h1 className="board-title">{currentSegment?.segmentName ?? 'Segment'}</h1>
-        <button
-          type="button"
-          className="secondary-button"
-          onClick={onBackToBuild}
-        >
-          Back to build
-        </button>
+  const label =
+    isComplete
+      ? 'Workout complete'
+      : isRest
+        ? `Rest: ${formatSecondsAsClock(phase!.restSeconds)}`
+        : isForTime
+          ? `Work: ${formatSecondsAsClock(phase!.timeCapSeconds ?? 0)}`
+          : `Work: ${formatSecondsAsClock(phase!.durationSeconds ?? 0)}`
+
+  const counterValue =
+    isRest
+      ? remainingSeconds
+      : isForTime
+        ? elapsedSeconds
+        : remainingSeconds
+
+  const displayTime = formatSecondsAsClock(counterValue)
+
+  const timerContent = (
+    <>
+      <header className={`timer-strip-header ${isRest ? 'timer-strip-rest' : 'timer-strip-work'}`}>
+        <h2 className="timer-strip-label">{label}</h2>
+        {!embedded && (
+          <button
+            type="button"
+            className="secondary-button"
+            onClick={onBackToBuild}
+          >
+            Back to build
+          </button>
+        )}
       </header>
-
       <div className="timer-display">
-        {isResting ? (
-          <p className="timer-rest-label">Rest: {displayTime}</p>
+        {isComplete ? (
+          <p className="timer-time timer-finish">Done</p>
+        ) : showingFinish ? (
+          <p className="timer-time timer-finish">Finish</p>
         ) : (
           <p className="timer-time">{displayTime}</p>
         )}
       </div>
-
-      {isForTime && !isResting && (
+      {isWork && isForTime && !showingFinish && (
         <div className="timer-actions">
           <button
             type="button"
@@ -156,19 +262,25 @@ export function WorkoutTimer({ workout, onStopTimer, onBackToBuild }: WorkoutTim
           >
             Stop
           </button>
-          {timeCap != null && elapsedSeconds >= timeCap && (
-            <p className="muted-text">Time cap reached.</p>
-          )}
         </div>
       )}
-
       <button
         type="button"
         className="secondary-button"
         onClick={onStopTimer}
       >
-        Exit timer
+        {embedded ? 'Exit timer' : 'Back to board'}
       </button>
+    </>
+  )
+
+  if (embedded) {
+    return <section className="timer-strip">{timerContent}</section>
+  }
+
+  return (
+    <main className="board-shell timer-view">
+      {timerContent}
     </main>
   )
 }

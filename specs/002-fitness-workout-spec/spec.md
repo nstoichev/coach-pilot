@@ -84,7 +84,7 @@ As a coach or trainee, when I finish building a workout I can click "Done" to se
 
 **Why this priority**: Completes the builder flow with a clear done action and a runnable view (board + timer) without leaving the app.
 
-**Independent Test**: Build a workout with at least one EMOM or AMRAP segment, click Done (enabled only when validation passes), see the board in CrossFit-style layout, click Start and confirm timer runs; build a workout with a For Time segment, click Done, Start, then Stop when done.
+**Independent Test**: Build a workout with two or more time-measurable segments (e.g. AMRAP 1:00, rest 0:15, AMRAP 1:00, rest 0:15, For Time 2:00 cap), click Done, see the board, click Start. Confirm the timer shows a single counter only (no "Not set" at start, no "elapsed / total"); that it shows "Work: 1:00" countdown, then "Rest: 0:15" countdown, then the next work and rest, then "Work: 2:00" count-up with Stop button; that clicking Stop or reaching the cap shows "Finish" and then workout complete.
 
 **Acceptance Scenarios**:
 
@@ -92,8 +92,42 @@ As a coach or trainee, when I finish building a workout I can click "Done" to se
 2. **Given** the user clicks Done, **When** the workout is valid, **Then** the builder view is replaced (or overlaid) by the **Workout Board** showing the same workout in a simple, CrossFit-style layout.
 3. **Given** the Workout Board is displayed, **Then** for each segment the board shows: a segment header (e.g. "AMRAP 3`", "EMOM 10`", "For Time"); below it, one line per exercise (e.g. "8 KB Swing", "Max cal Row", "5 Front Squats"); after each segment, "Rest: X" when rest > 0 (minutes). No editing controls; minimal, board-style presentation.
 4. **Given** the Workout Board is displayed, **Then** a "Start" button is shown only when the workout is **time-measurable** (at least one segment of type EMOM, AMRAP, or For Time with the required timing fields). If the workout has only Custom segments or no derivable duration, the workout is valid but **not time-measurable**—Start is hidden or disabled.
-5. **Given** the user clicks Start, **Then** the timer runs from the segment structure. For EMOM and AMRAP segments, the timer runs to completion with no further user action. For **For Time** segments, the timer runs until the user clicks **Stop** (user indicates they finished the effort). If the workout contains any For Time segment, the timer UI MUST expose this Stop action.
+5. **Given** the user clicks Start, **Then** the workout timer starts immediately with the first time-measurable segment. The timer MUST display a **single** counter (no "elapsed / total" or "Not set" at start). It MUST automatically advance through every segment and rest in order; see **Workout Timer — Detailed Behavior** below.
 6. **Given** the Workout Board is displayed, **Then** the board provides a way to return to the builder (e.g. "Back to build" or "Edit workout") so the user can change the workout and click Done again.
+7. **Given** the timer is running and the current phase is a **work** segment (EMOM, AMRAP, or For Time), **Then** the UI shows the label **"Work: M:SS"** (e.g. "Work: 1:00") and a single countdown (for EMOM/AMRAP) or count-up (for For Time). The target or cap MUST NOT be shown as a second number next to the counter.
+8. **Given** the timer is running and the current phase is **rest** (after a segment that has rest), **Then** the UI shows the label **"Rest: M:SS"** and a single countdown to zero; when it reaches zero the timer MUST automatically switch to the next segment.
+9. **Given** the current segment is **For Time**, **Then** the timer counts **up** from 0:00 toward the time cap. The UI MUST show a **"Stop"** button so the user can finish early. When the user clicks Stop OR the time cap is reached, the timer MUST show **"Finish"** for that segment and then automatically advance (to rest, if any, or to the next segment, or to workout complete).
+10. **Given** the timer has run through all segments and optional rest phases, **Then** the UI shows a **workout complete** state (e.g. "Workout complete") and a way to exit the timer or return to the board.
+
+---
+
+### Workout Timer — Detailed Behavior
+
+The workout timer is a **single continuous flow**: a series of work and rest phases in segment order. There is exactly **one** visible counter at any time. The timer MUST NOT show "Not set" or an empty state when Start is clicked; the first phase MUST appear immediately.
+
+**Phases and display**
+
+- **Work phase (EMOM, AMRAP)**: Label **"Work: M:SS"** (e.g. "Work: 1:00") with the segment duration. The counter **counts down** (e.g. 0:59, 0:58 … 0:00). When it reaches 0:00, the timer automatically moves to the rest phase (if the segment has rest) or to the next segment.
+- **Work phase (For Time)**: Label **"Work: M:SS"** (e.g. "Work: 2:00" for the time cap). The counter **counts up** from 0:00 (0:01, 0:02 …) toward the time cap. The UI MUST show a **"Stop"** button. When the user clicks **Stop**, or when the count reaches the time cap, the phase ends and the UI shows **"Finish"**; then the timer automatically advances to rest (if any) or the next segment.
+- **Rest phase**: Label **"Rest: M:SS"** (e.g. "Rest: 0:15"). The counter **counts down** to 0:00. When it reaches 0:00, the timer automatically moves to the next segment’s work phase.
+- **Workout complete**: When all segments (and their rest phases) have been completed, the UI shows a clear **workout complete** state and options to exit or return to the board.
+
+**Example flow**
+
+Workout: AMRAP 1:00 → rest 0:15 → AMRAP 1:00 → rest 0:15 → For Time (2:00 cap).
+
+1. Start → **"Work: 1:00"** countdown 0:59 … 0:00.  
+2. → **"Rest: 0:15"** countdown 0:14 … 0:00.  
+3. → **"Work: 1:00"** countdown 0:59 … 0:00.  
+4. → **"Rest: 0:15"** countdown 0:14 … 0:00.  
+5. → **"Work: 2:00"** count-up 0:00, 0:01 … with **Stop** button. User clicks Stop or time cap reached → **"Finish"** → workout complete.
+
+**Rules**
+
+- One counter only: never show "elapsed / total" or two numbers; never show "Not set" after Start.
+- Segment order: process segments in workout order; after each work phase, run that segment’s rest (if rest > 0), then the next segment.
+- Rest is stored in minutes in the data model; the timer MUST convert to seconds for countdown (e.g. 0.25 min → 15 s).
+- Custom segments have no built-in duration; they are skipped for timer purposes (only EMOM, AMRAP, and For Time with timing are run).
 
 ---
 
@@ -108,7 +142,9 @@ As a coach or trainee, when I finish building a workout I can click "Done" to se
 - User deletes or edits an exercise that is already used in one or more saved workouts: system must preserve workout structure or prompt corrective action.
 - Segment or exercise reordering with only one item in the list: behavior must remain predictable.
 - Workout has only Custom segments: Done is enabled when valid; board is shown; Start is hidden or disabled (not time-measurable).
-- Workout has both AMRAP and For Time: Start runs the timer; Stop is required when in or before a For Time segment.
+- Workout has both AMRAP and For Time: Start runs the timer; the timer runs as a continuous series (work → rest → next work → …); For Time shows Stop and Finish.
+- Timer must not show "Not set" or a blank counter when Start is clicked: the first work or rest phase must display immediately with the correct label and counter.
+- Multiple segments: the timer must automatically advance through every segment and rest in workout order; no manual "next" is required.
 
 ## Requirements *(mandatory)*
 
@@ -142,7 +178,7 @@ As a coach or trainee, when I finish building a workout I can click "Done" to se
 - **FR-023**: The builder MUST show a "Done" button (or equivalent label). The button MUST be **disabled** when the workout has any validation errors for workout name or segments (same rules as "Current builder status"), or when **any segment has zero exercises**. It MUST be **enabled** only when there are no such errors and every segment has at least one exercise assigned.
 - **FR-024**: When the user clicks Done, the system MUST display the **Workout Board**: a read-only, CrossFit-style view of the completed workout. The board MUST show, per segment: segment type and timing as a header (e.g. "AMRAP 3`", "EMOM 10`", "For Time"); each assigned exercise on one line, in a short form (e.g. sets/reps like "8 KB Swing", or metric like "Max cal Row"); and segment rest when > 0 (e.g. "Rest: 2" for 2 minutes). Layout MUST be simple and clean, suitable for a whiteboard-style display.
 - **FR-025**: The Workout Board MUST show a "Start" button that starts the generated timer. The Start button MUST be shown and enabled only when the workout is **time-measurable** (at least one segment has type EMOM, AMRAP, or For Time with the required timing parameters). If the workout is not time-measurable (e.g. only Custom segments), the Start button MUST be hidden or disabled.
-- **FR-026**: The workout timer MUST be driven by the segment structure (Timer Generator contract). For EMOM and AMRAP segments, the timer runs to the end of the segment without requiring a user action. For **For Time** segments, the timer MUST require a user action **Stop** (or equivalent) to record that the user finished the effort; the timer UI MUST expose this Stop action when the current (or any) segment is For Time.
+- **FR-026**: The workout timer MUST implement the behavior described in **Workout Timer — Detailed Behavior**. It MUST be a single continuous flow through all time-measurable segments in order. The timer MUST show exactly **one** counter at a time (no "elapsed / total" or dual display). On Start, the first phase MUST appear immediately with no "Not set" or blank state. Work phases (EMOM, AMRAP) use label "Work: M:SS" and **count down**; rest phases use label "Rest: M:SS" and **count down**; For Time uses "Work: M:SS" and **counts up**, with a **Stop** button and **Finish** on completion (Stop or time cap). The timer MUST automatically advance to the next segment or rest after each phase ends. Rest duration is stored in minutes and MUST be converted to seconds for the countdown.
 - **FR-027**: The Workout Board MUST provide a clear way to return to the builder (e.g. "Back to build" or "Edit workout") so the user can edit the workout and click Done again.
 - **FR-028**: The builder MUST apply **distinct visual states** to segment cards so the user can see at a glance which segments are complete and which are incomplete: segments **with at least one exercise** MUST use an active/success-style treatment (e.g. border or accent indicating "has exercises"); segments **with no exercises** MUST use a distinct treatment (e.g. warning or incomplete styling) to signal that the segment must have exercises before the workout can be completed. The exact colors or classes are implementation-defined; the requirement is that the two states are clearly distinguishable.
 
