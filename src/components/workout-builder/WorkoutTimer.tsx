@@ -33,6 +33,9 @@ type RestPhase = {
 
 type TimerPhase = WorkPhase | RestPhase
 
+/** How long to show "Finish" before advancing to next phase (ms). */
+const FINISH_DISPLAY_MS = 1200
+
 function buildPhases(workout: Workout): TimerPhase[] {
   const structure = getTimerStructure(workout)
   const phases: TimerPhase[] = []
@@ -82,7 +85,6 @@ export function WorkoutTimer({
   const [remainingSeconds, setRemainingSeconds] = useState(() => firstCounter.remaining)
   const [elapsedSeconds, setElapsedSeconds] = useState(() => firstCounter.elapsed)
   const [showingFinish, setShowingFinish] = useState(false)
-  const tickRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const phaseIndexRef = useRef(phaseIndex)
   const remainingSecondsRef = useRef(remainingSeconds)
   const elapsedSecondsRef = useRef(elapsedSeconds)
@@ -120,7 +122,7 @@ export function WorkoutTimer({
   useEffect(() => {
     if (!currentPhase || showingFinish) return
 
-    tickRef.current = setInterval(() => {
+    const intervalId = setInterval(() => {
       const idx = phaseIndexRef.current
       const phase = phases[idx]
       if (!phase) return
@@ -149,6 +151,7 @@ export function WorkoutTimer({
         return
       }
 
+      // Work phase (countdown): same pattern as rest
       const r = remainingSecondsRef.current
       if (r <= 1) {
         setPhaseIndex((i) => i + 1)
@@ -161,19 +164,17 @@ export function WorkoutTimer({
       setRemainingSeconds(next)
     }, 1000)
 
-    return () => {
-      if (tickRef.current) clearInterval(tickRef.current)
-    }
+    return () => clearInterval(intervalId)
   }, [phaseIndex, phases, currentPhase, showingFinish])
 
   // After showing "Finish", advance to next phase or complete
   useEffect(() => {
     if (!showingFinish) return
-    const t = setTimeout(() => {
+    const timeoutId = setTimeout(() => {
       setShowingFinish(false)
       setPhaseIndex((i) => i + 1)
-    }, 1200)
-    return () => clearTimeout(t)
+    }, FINISH_DISPLAY_MS)
+    return () => clearTimeout(timeoutId)
   }, [showingFinish])
 
   function handleForTimeStop() {
