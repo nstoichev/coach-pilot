@@ -119,6 +119,24 @@ export const createSegmentTemplate = (segmentType: SegmentType): Segment => {
       }
       return { ...seg, name: getGeneratedSegmentName(seg) }
     }
+    case 'chipper': {
+      const seg = {
+        ...baseSegment,
+        name: 'Chipper',
+        timeCapSeconds: 1800,
+      }
+      return { ...seg, name: getGeneratedSegmentName(seg) }
+    }
+    case 'tabata': {
+      const seg = {
+        ...baseSegment,
+        name: 'Tabata',
+        workSeconds: 20,
+        restSeconds: 10,
+        rounds: 8,
+      }
+      return { ...seg, name: getGeneratedSegmentName(seg) }
+    }
     case 'custom':
     default:
       return {

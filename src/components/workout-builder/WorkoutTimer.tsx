@@ -92,6 +92,35 @@ function buildPhases(workout: Workout): TimerPhase[] {
       continue
     }
 
+    // Tabata: alternating work/rest per round (e.g. 20s work, 10s rest × 8)
+    if (
+      seg.segmentType === 'tabata' &&
+      seg.workSeconds != null &&
+      seg.restSeconds != null &&
+      (seg.rounds ?? 0) > 0
+    ) {
+      const rounds = seg.rounds ?? 8
+      const workSec = seg.workSeconds
+      const restSec = seg.restSeconds
+      for (let r = 0; r < rounds; r++) {
+        phases.push({
+          type: 'work',
+          segmentId: seg.segmentId,
+          segmentName: seg.segmentName,
+          durationSeconds: workSec,
+          timeCapSeconds: undefined,
+          isForTime: false,
+        })
+        phases.push({ type: 'rest', restSeconds: restSec, afterSegmentId: seg.segmentId })
+      }
+      const restMinutes = workoutSegment?.restInterval ?? 0
+      const segmentRestSec = Math.round(restMinutes * 60)
+      if (segmentRestSec > 0) {
+        phases.push({ type: 'rest', restSeconds: segmentRestSec, afterSegmentId: seg.segmentId })
+      }
+      continue
+    }
+
     const hasDuration = seg.durationSeconds != null && seg.durationSeconds > 0
     const hasCap = seg.timeCapSeconds != null && seg.timeCapSeconds > 0
     if (!hasDuration && !hasCap) continue
@@ -102,7 +131,7 @@ function buildPhases(workout: Workout): TimerPhase[] {
       segmentName: seg.segmentName,
       durationSeconds: seg.durationSeconds,
       timeCapSeconds: seg.timeCapSeconds,
-      isForTime: seg.segmentType === 'forTime',
+      isForTime: seg.segmentType === 'forTime' || seg.segmentType === 'chipper',
     })
 
     const restMinutes = workoutSegment?.restInterval ?? 0

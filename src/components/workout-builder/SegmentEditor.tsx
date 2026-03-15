@@ -60,6 +60,14 @@ const FORTIME_ROUNDS_MIN = 1
 const FORTIME_ROUNDS_MAX = 30
 const FORTIME_ROUNDS_DEFAULT = 1
 
+const TABATA_WORK_MIN = 10
+const TABATA_WORK_MAX = 60
+const TABATA_REST_MIN = 10
+const TABATA_REST_MAX = 60
+const TABATA_ROUNDS_MIN = 4
+const TABATA_ROUNDS_MAX = 20
+const TABATA_ROUNDS_DEFAULT = 8
+
 const restMinutesToSeconds = (minutes: number): number =>
   Math.round(minutes * 60)
 
@@ -141,7 +149,13 @@ export const SegmentEditor = ({
       <div className="segment-card-header">
         <div className="segment-card-header-left">
           <span className="segment-type-badge">
-            {segment.segmentType === 'deathBy' ? 'Death by' : segment.segmentType}
+            {segment.segmentType === 'deathBy'
+              ? 'Death by'
+              : segment.segmentType === 'chipper'
+                ? 'Chipper'
+                : segment.segmentType === 'tabata'
+                  ? 'Tabata'
+                  : segment.segmentType}
           </span>
           {segment.segmentType === 'custom' ? (
             <div className="segment-name-field">
@@ -292,6 +306,86 @@ export const SegmentEditor = ({
           </div>
         ) : null}
 
+        {segment.segmentType === 'chipper' ? (
+          <div className="segment-config-stack">
+            <label className="field">
+              <span>
+                Time cap {formatSecondsAsClock(segment.timeCapSeconds ?? TIMECAP_DEFAULT_SECONDS)}
+              </span>
+              <input
+                className="range-input"
+                max={TIMECAP_MAX_SECONDS}
+                min={TIMECAP_MIN_SECONDS}
+                step={TIMECAP_STEP_SECONDS}
+                type="range"
+                value={segment.timeCapSeconds ?? TIMECAP_DEFAULT_SECONDS}
+                onChange={(event) =>
+                  handleSegmentChange({
+                    ...segment,
+                    timeCapSeconds: Number(event.target.value),
+                  })
+                }
+              />
+            </label>
+          </div>
+        ) : null}
+
+        {segment.segmentType === 'tabata' ? (
+          <div className="segment-config-stack">
+            <label className="field">
+              <span>Work {formatSecondsAsClock(segment.workSeconds ?? 20)}</span>
+              <input
+                className="range-input"
+                max={TABATA_WORK_MAX}
+                min={TABATA_WORK_MIN}
+                step={1}
+                type="range"
+                value={segment.workSeconds ?? 20}
+                onChange={(event) =>
+                  handleSegmentChange({
+                    ...segment,
+                    workSeconds: Number(event.target.value),
+                  })
+                }
+              />
+            </label>
+            <label className="field">
+              <span>Rest {formatSecondsAsClock(segment.restSeconds ?? 10)}</span>
+              <input
+                className="range-input"
+                max={TABATA_REST_MAX}
+                min={TABATA_REST_MIN}
+                step={1}
+                type="range"
+                value={segment.restSeconds ?? 10}
+                onChange={(event) =>
+                  handleSegmentChange({
+                    ...segment,
+                    restSeconds: Number(event.target.value),
+                  })
+                }
+              />
+            </label>
+            <label className="field">
+              <span>Rounds {segment.rounds ?? TABATA_ROUNDS_DEFAULT}</span>
+              <input
+                className="range-input"
+                max={TABATA_ROUNDS_MAX}
+                min={TABATA_ROUNDS_MIN}
+                step={1}
+                type="range"
+                value={segment.rounds ?? TABATA_ROUNDS_DEFAULT}
+                onChange={(event) =>
+                  handleSegmentChange({
+                    ...segment,
+                    rounds: Number(event.target.value),
+                  })
+                }
+              />
+            </label>
+          </div>
+        ) : null}
+
         {!isLastSegment ? (
           <div className="segment-config-grid">
             <label className="field">
@@ -317,13 +411,24 @@ export const SegmentEditor = ({
         ) : null}
 
         <div className="segment-add-exercise-row" onClick={(event) => event.stopPropagation()}>
-          <button
-            type="button"
-            className="primary-button segment-add-exercise-button"
-            onClick={() => setIsExerciseModalOpen(true)}
-          >
-            Add exercise
-          </button>
+          {segment.segmentType === 'tabata' &&
+          segment.exercises.length >= (segment.rounds ?? TABATA_ROUNDS_DEFAULT) ? (
+            <p className="muted-text">
+              Max {segment.rounds ?? TABATA_ROUNDS_DEFAULT} exercises (one per round).
+            </p>
+          ) : (
+            <button
+              type="button"
+              className="primary-button segment-add-exercise-button"
+              onClick={() => setIsExerciseModalOpen(true)}
+              disabled={
+                segment.segmentType === 'tabata' &&
+                segment.exercises.length >= (segment.rounds ?? TABATA_ROUNDS_DEFAULT)
+              }
+            >
+              Add exercise
+            </button>
+          )}
         </div>
 
         {segment.exercises.length > 0 ? (
@@ -377,7 +482,7 @@ export const SegmentEditor = ({
                     </div>
                   </div>
 
-                  {segment.segmentType !== 'deathBy' && (
+                  {segment.segmentType !== 'deathBy' && segment.segmentType !== 'tabata' && (
                   <div className="prescription-stack">
                         {isSetsReps ? (
                           <>

@@ -152,6 +152,36 @@ export const validateSegment = (segment: Segment): ValidationResult<Segment> => 
     })
   }
 
+  if (segment.segmentType === 'tabata') {
+    const work = segment.workSeconds ?? 20
+    const rest = segment.restSeconds ?? 10
+    const rounds = segment.rounds ?? 8
+    if (work < 10 || work > 60) {
+      errors.push({
+        field: 'workSeconds',
+        message: 'Tabata work must be between 10 and 60 seconds.',
+      })
+    }
+    if (rest < 10 || rest > 60) {
+      errors.push({
+        field: 'restSeconds',
+        message: 'Tabata rest must be between 10 and 60 seconds.',
+      })
+    }
+    if (rounds < 1) {
+      errors.push({
+        field: 'rounds',
+        message: 'Tabata rounds must be at least 1.',
+      })
+    }
+    if (segment.exercises.length > rounds) {
+      errors.push({
+        field: 'exercises',
+        message: `Tabata: number of exercises (${segment.exercises.length}) must not exceed rounds (${rounds}).`,
+      })
+    }
+  }
+
   if (segment.exercises.length === 0) {
     errors.push({
       field: 'exercises',

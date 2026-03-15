@@ -28,5 +28,9 @@ export type Segment = {
   intervalSeconds?: number
   rounds?: number
   timeCapSeconds?: number
+  /** Tabata: work interval in seconds (default 20, range 10–60). */
+  workSeconds?: number
+  /** Tabata: rest interval in seconds (default 10, range 10–60). */
+  restSeconds?: number
   restInterval?: number
 }

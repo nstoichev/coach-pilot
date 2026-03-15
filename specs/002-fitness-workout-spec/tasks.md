@@ -174,6 +174,38 @@ Dependencies: Phase 5 complete (timer-generator contract and validation already 
 
 ---
 
+# Phase 6c — Chipper segment (US4)
+
+Purpose: Add **Chipper** segment type—long list of movements performed once each (user "chips away"); timer is a stopwatch like For Time (count up to time cap, Stop button, Finish). Exercises have reps only (no sets).
+
+Independent Test: Add a Chipper segment from the segment-type modal; set time cap; add exercises with reps only (no Sets slider); click Done → board shows "Chipper (M:SS cap)" and exercise lines; Start → timer counts up, Stop shows Finish, then advance.
+
+Tasks:
+
+- [x] T057 [US4] Add **Chipper** segment type: add `chipper` to `SEGMENT_TYPES` in `src/types/domain.ts`. In `src/store/workout-builder-store.ts`, add `createSegmentTemplate('chipper')` with `timeCapSeconds` (e.g. 1800), no rounds. In `src/components/workout-builder/SegmentTypeModal.tsx`, add "Chipper" option.
+- [x] T058 [US4] Chipper in builder and board: in `src/components/workout-builder/SegmentEditor.tsx`, for Chipper show time cap slider only (no Rounds); show type badge "Chipper". In `src/services/workout-domain.ts`, add `chipper` case to `getGeneratedSegmentName` ("Chipper" or "Chipper (M:SS cap)") and `getSegmentEstimatedDurationSeconds` (return `timeCapSeconds`). In `src/services/workout-board-format.ts`, add `chipper` to `getBoardSegmentTitle`; `isWorkoutTimeMeasurable` already includes chipper via duration. Hide Sets for exercises in Chipper (same as other predefined types—already hidden when segment type is not Custom).
+- [x] T059 [US4] Chipper timer: in `src/services/timer-generator.ts`, use `getGeneratedSegmentName` for chipper segment name. In `src/components/workout-builder/WorkoutTimer.tsx`, in `buildPhases` set `isForTime: seg.segmentType === 'forTime' || seg.segmentType === 'chipper'` so Chipper uses count-up, time cap, and Stop/Finish like For Time.
+
+Checkpoint: User can add Chipper segment, set time cap, add exercises (reps only), see board and run timer (stopwatch + Stop/Finish).
+
+---
+
+# Phase 6d — Tabata segment (US4)
+
+Purpose: Add **Tabata** segment type—20 s work / 10 s rest × 8 rounds by default; user can set work and rest 10–60 s and rounds. Exercises have no sets or reps; number of exercises must not exceed rounds. Timer alternates work countdown and rest countdown per round.
+
+Independent Test: Add a Tabata segment; set work 20 s, rest 10 s, 8 rounds; add up to 8 exercises (no sets/reps); click Done → board shows "Tabata 0:20/0:10 × 8"; Start → timer shows Work 0:20 countdown, Rest 0:10 countdown, repeated for 8 rounds, then segment rest or next segment. Reduce rounds to 4 and confirm "Add exercise" is disabled when 4 exercises are present; validation errors if exercises > rounds.
+
+Tasks:
+
+- [x] T060 [US4] Add **Tabata** segment type: add `tabata` to `SEGMENT_TYPES` in `src/types/domain.ts`. Add `workSeconds` and `restSeconds` to Segment in `src/types/segment.ts`. In `src/store/workout-builder-store.ts`, add `createSegmentTemplate('tabata')` with `workSeconds: 20`, `restSeconds: 10`, `rounds: 8`. In `src/components/workout-builder/SegmentTypeModal.tsx`, add "Tabata" option.
+- [x] T061 [US4] Tabata in builder: in `src/components/workout-builder/SegmentEditor.tsx`, add Tabata config (Work 10–60 s, Rest 10–60 s, Rounds e.g. 4–20 default 8); show type badge "Tabata"; hide prescription-stack for tabata (`segment.segmentType !== 'tabata'`). Cap exercises: disable "Add exercise" when `segment.segmentType === 'tabata'` and `segment.exercises.length >= (segment.rounds ?? 8)`; show "Max N exercises (one per round)" when at cap. In `src/services/workout-validation.ts`, add Tabata validation: workSeconds 10–60, restSeconds 10–60, rounds ≥ 1, and **exercises.length ≤ rounds**.
+- [x] T062 [US4] Tabata domain, board, timer: in `src/services/workout-domain.ts`, add `tabata` to `getGeneratedSegmentName` ("Tabata {work}/{rest} × {rounds}") and `getSegmentEstimatedDurationSeconds` (rounds * (workSeconds + restSeconds)). In `src/services/workout-board-format.ts`, add `getBoardSegmentTitle` for tabata. In `src/services/timer-generator.ts`, add workSeconds, restSeconds, rounds to TimerSegmentInfo and map for tabata; duration = rounds * (work + rest). In `src/components/workout-builder/WorkoutTimer.tsx`, in `buildPhases` add Tabata block: for each round push work phase (duration workSeconds) and rest phase (restSeconds); then segment rest if any.
+
+Checkpoint: User can add Tabata segment, set work/rest/rounds, add up to N exercises (N = rounds), see board and run timer (alternating work/rest per round).
+
+---
+
 # Final Phase — Polish
 
 Purpose: Finish presentation, documentation, and shared exports needed across the whole feature.

@@ -115,7 +115,14 @@ export const getSegmentEstimatedDurationSeconds = (
     case 'amrap':
       return segment.durationSeconds
     case 'forTime':
+    case 'chipper':
       return segment.timeCapSeconds
+    case 'tabata': {
+      const rounds = segment.rounds ?? 8
+      const work = segment.workSeconds ?? 20
+      const rest = segment.restSeconds ?? 10
+      return rounds * (work + rest)
+    }
     case 'deathBy':
       return undefined
     default:
@@ -147,6 +154,16 @@ export const getGeneratedSegmentName = (segment: Segment): string => {
       if (names.length === 0) return 'Death by'
       if (names.length === 1) return `Death by ${names[0]}`
       return `Death by ${names.join(' + ')}`
+    }
+    case 'chipper': {
+      const cap = segment.timeCapSeconds
+      return cap != null && cap > 0 ? `Chipper (${formatSecondsAsClock(cap)} cap)` : 'Chipper'
+    }
+    case 'tabata': {
+      const work = segment.workSeconds ?? 20
+      const rest = segment.restSeconds ?? 10
+      const rounds = segment.rounds ?? 8
+      return `Tabata ${formatSecondsAsClock(work)}/${formatSecondsAsClock(rest)} × ${rounds}`
     }
     case 'custom':
     default:

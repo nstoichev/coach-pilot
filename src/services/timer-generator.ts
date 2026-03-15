@@ -18,6 +18,12 @@ export type TimerSegmentInfo = {
   intervalSeconds?: number
   /** Time cap in seconds for For Time segments. */
   timeCapSeconds?: number
+  /** Tabata: work interval in seconds. */
+  workSeconds?: number
+  /** Tabata: rest interval in seconds. */
+  restSeconds?: number
+  /** Round count (EMOM, Tabata). */
+  rounds?: number
 }
 
 export type TimerGeneratorResult = {
@@ -37,9 +43,18 @@ export function getTimerStructure(workout: Workout): TimerGeneratorResult {
     const durationSeconds =
       seg.segmentType === 'emom' && seg.intervalSeconds != null && seg.rounds != null
         ? seg.intervalSeconds * seg.rounds
-        : seg.durationSeconds
+        : seg.segmentType === 'tabata' &&
+            seg.workSeconds != null &&
+            seg.restSeconds != null &&
+            seg.rounds != null
+          ? seg.rounds * (seg.workSeconds + seg.restSeconds)
+          : seg.durationSeconds
     const segmentName =
-      seg.segmentType === 'deathBy' ? getGeneratedSegmentName(seg) : seg.name
+      seg.segmentType === 'deathBy' ||
+      seg.segmentType === 'chipper' ||
+      seg.segmentType === 'tabata'
+        ? getGeneratedSegmentName(seg)
+        : seg.name
     return {
       segmentId: seg.id,
       segmentName,
@@ -47,6 +62,9 @@ export function getTimerStructure(workout: Workout): TimerGeneratorResult {
       durationSeconds,
       intervalSeconds: seg.intervalSeconds,
       timeCapSeconds: seg.timeCapSeconds,
+      workSeconds: seg.workSeconds,
+      restSeconds: seg.restSeconds,
+      rounds: seg.rounds,
     }
   })
 

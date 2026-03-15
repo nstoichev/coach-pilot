@@ -27,6 +27,14 @@ const segmentOptions: Array<{
     title: 'Death by…',
   },
   {
+    type: 'chipper',
+    title: 'Chipper',
+  },
+  {
+    type: 'tabata',
+    title: 'Tabata',
+  },
+  {
     type: 'custom',
     title: 'Custom',
   },

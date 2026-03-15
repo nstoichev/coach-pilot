@@ -32,6 +32,13 @@ export function getBoardSegmentTitle(segment: Segment): string {
     }
     case 'deathBy':
       return getGeneratedSegmentName(segment)
+    case 'chipper': {
+      const cap = segment.timeCapSeconds
+      const capStr = cap != null && cap > 0 ? ` (${formatSecondsAsClock(cap)} cap)` : ''
+      return `Chipper${capStr}`
+    }
+    case 'tabata':
+      return getGeneratedSegmentName(segment)
     case 'custom':
     default:
       return segment.name

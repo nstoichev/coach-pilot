@@ -50,8 +50,8 @@ This feature centers on a reusable Workout -> Segment -> Assigned Exercise -> Ex
 ### Core Fields
 
 - `id`: unique string identifier
-- `name`: display name; for predefined types (emom, amrap, forTime, deathBy) this is generated from parameters (e.g. "EMOM 10", "E2:30Om 10", "AMRAP 10:30", "For Time", "Death by Burpees" or "Death by Burpees + Kettlebell Swings"); only `custom` segments have a user-editable name
-- `segmentType`: segment template (`custom`, `emom`, `amrap`, `forTime`, `deathBy`)
+- `name`: display name; for predefined types (emom, amrap, forTime, deathBy, chipper, tabata) this is generated from parameters (e.g. "EMOM 10", "Tabata 0:20/0:10 × 8", "Chipper (30:00 cap)", "Death by Burpees"); only `custom` segments have a user-editable name
+- `segmentType`: segment template (`custom`, `emom`, `amrap`, `forTime`, `deathBy`, `chipper`, `tabata`)
 - `exercises`: ordered list of exercise assignments
 
 ### Exercise Assignment Fields
@@ -73,7 +73,11 @@ This feature centers on a reusable Workout -> Segment -> Assigned Exercise -> Ex
 - `intervalSeconds`: optional timing interval for EMOM-style segments
 - `rounds`: optional set or round count for EMOM-style segments
 - `durationSeconds`: optional fixed duration for AMRAP-style segments; UI range slider 1–30 min in 30 s steps
-- `timeCapSeconds`: optional cap for For Time-style segments; UI range slider 1–60 min in 30 s steps
+- `timeCapSeconds`: optional cap for For Time-style and Chipper segments; UI range slider 1–60 min in 30 s steps
+- `workSeconds`: optional; Tabata work interval in seconds (default 20, range 10–60)
+- `restSeconds`: optional; Tabata rest interval in seconds (default 10, range 10–60)
+- **Chipper**: long list of movements performed once each (user "chips away" at the list). Has `timeCapSeconds` (optional time cap); no `rounds` or `intervalSeconds`. Exercises have **reps only** (no sets). Timer behaves like For Time: stopwatch (count up to cap) with Stop button and Finish.
+- **Tabata**: interval protocol work/rest/rounds (default 20 s work / 10 s rest × 8). Has `workSeconds`, `restSeconds`, `rounds`. Exercises have **no sets or reps** (one exercise per round). Number of exercises MUST NOT exceed rounds. Timer alternates work countdown and rest countdown for each round; then segment rest (if any).
 - **Death by**: no `intervalSeconds`, `rounds`, or `durationSeconds`—reps increase each minute (round 1 = 1 rep, round 2 = 2 reps, …) until the user stops. Timer is always 1:00 countdown per round; user taps Stop when they cannot complete the round. The round in which the user stops does not count (e.g. stop in round 7 → completed rounds = 6). Future: performance data may record completed rounds.
 - `restInterval`: optional per-segment rest value (minutes); UI uses a range slider 0–10 min in 15 s steps
 
@@ -86,15 +90,17 @@ This feature centers on a reusable Workout -> Segment -> Assigned Exercise -> Ex
 - `sets`, when provided, must be non-negative (0–10 in current UI range slider)
 - `repetitions`, when provided, must be greater than zero (1–50 in current UI range slider) unless `isMaxRepetitions` is true
 - metric-based exercises must use a supported metric target; metric value uses type-specific range sliders (e.g. calories 0–500 step 5, distance 0–10000 m step 100, time 0–60 min in 15 s steps). For calories and distance, `metricTarget.isMax` may be true, indicating \"max\" effort until the segment time ends, in which case the value slider is hidden.
-- assigned-exercise list item layout: exercise title and actions on top; sets, reps, or measure + value (with optional Max toggle) stacked below. The Sets range slider is shown only for Custom segments; for EMOM, AMRAP, For Time, and Death by the segment structure (rounds, duration, time cap, or performance-dependent rounds) provides the sets role, so the per-exercise Sets slider is hidden. For **Death by**, the Reps slider and Max-reps toggle are also hidden (reps = round number: 1, 2, 3…). For metric exercises that declare `advancedMetrics` (e.g. speed, watts), an \"Advanced settings\" button is shown at the bottom of the prescription; when expanded, optional range sliders for speed and/or watts are displayed (hidden by default).
+- assigned-exercise list item layout: exercise title and actions on top; sets, reps, or measure + value (with optional Max toggle) stacked below. The Sets range slider is shown only for Custom segments; for EMOM, AMRAP, For Time, Chipper, Tabata, and Death by the segment structure (rounds, duration, time cap, single-pass list, work/rest rounds, or performance-dependent rounds) provides the sets role, so the per-exercise Sets slider is hidden. For **Tabata**, the prescription stack (sets/reps) is hidden and exercises must not exceed rounds. For **Death by**, the Reps slider and Max-reps toggle are also hidden (reps = round number: 1, 2, 3…). For metric exercises that declare `advancedMetrics` (e.g. speed, watts), an \"Advanced settings\" button is shown at the bottom of the prescription; when expanded, optional range sliders for speed and/or watts are displayed (hidden by default).
 - EMOM segments require `intervalSeconds` and `rounds`
 - EMOM interval editing is constrained to 15-second steps with a maximum of 10 minutes in the current UI
 - EMOM sets (rounds) are edited via a range control from 1 to 50, step 1, default 10; the sets control is displayed below the interval in the segment editor
 - AMRAP segments require `durationSeconds`; duration is edited via range slider 1–30 min, 30 s steps
 - For Time segments require `timeCapSeconds`; time cap is edited via range slider 1–60 min, 30 s steps
+- Chipper segments use `timeCapSeconds` (optional time cap); time cap is edited via range slider 1–60 min, 30 s steps; no rounds; exercises show reps only (no sets)
+- Tabata segments use `workSeconds` (10–60 s, default 20), `restSeconds` (10–60 s, default 10), and `rounds` (e.g. 4–20, default 8); exercises have no sets or reps; **exercises.length ≤ rounds** (validation and UI cap)
 - `restInterval`, when present, must be zero or greater
 - exercise ordering must be stable after insert, remove, and reorder actions
-- generated name rules: EMOM with 1:00 interval → "EMOM {rounds}"; EMOM with other interval → "E{mm:ss}Om {rounds}"; AMRAP → "AMRAP {duration mm:ss}"; For Time → "For Time" (no dynamic time in title); Death by → "Death by {exercise names}" (e.g. "Death by Burpees" or "Death by Burpees + Kettlebell Swings"), no interval/rounds/sets controls
+- generated name rules: EMOM with 1:00 interval → "EMOM {rounds}"; EMOM with other interval → "E{mm:ss}Om {rounds}"; AMRAP → "AMRAP {duration mm:ss}"; For Time → "For Time" (no dynamic time in title); Tabata → "Tabata {work}/{rest} × {rounds}"; Chipper → "Chipper ({cap} cap)"; Death by → "Death by {exercise names}"
 
 ---
 

@@ -33,7 +33,7 @@ export type MetricTarget = {
   watts?: number
 }
 
-export const SEGMENT_TYPES = ['custom', 'emom', 'amrap', 'forTime', 'deathBy'] as const
+export const SEGMENT_TYPES = ['custom', 'emom', 'amrap', 'forTime', 'deathBy', 'chipper', 'tabata'] as const
 
 export type SegmentType = (typeof SEGMENT_TYPES)[number]
 
