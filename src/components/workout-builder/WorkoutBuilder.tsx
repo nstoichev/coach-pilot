@@ -1,9 +1,20 @@
 import { useMemo, useState } from 'react'
 import { useWorkoutBuilder } from '../../store/index.ts'
 import { getTimerStructure } from '../../services/timer-generator.ts'
+import {
+  mockWorkoutDeathByBurpees,
+  mockWorkoutDeathByBurpeesAndSwings,
+  mockWorkoutEmom10,
+} from '../../services/mock-workouts.ts'
 import { SegmentList } from './SegmentList.tsx'
 import { SegmentTypeModal } from './SegmentTypeModal.tsx'
 import { WorkoutDetailsForm } from './WorkoutDetailsForm.tsx'
+
+const SAMPLE_WORKOUTS = [
+  { label: mockWorkoutEmom10.name, workout: mockWorkoutEmom10 },
+  { label: mockWorkoutDeathByBurpees.name, workout: mockWorkoutDeathByBurpees },
+  { label: mockWorkoutDeathByBurpeesAndSwings.name, workout: mockWorkoutDeathByBurpeesAndSwings },
+]
 
 export const WorkoutBuilder = () => {
   const { state, actions } = useWorkoutBuilder()
@@ -31,6 +42,8 @@ export const WorkoutBuilder = () => {
         segmentCount={state.workoutDraft.segments.length}
         onWorkoutNameChange={actions.setWorkoutName}
         onAddSegment={() => setIsSegmentTypeModalOpen(true)}
+        sampleWorkouts={SAMPLE_WORKOUTS}
+        onLoadSample={actions.loadWorkout}
       />
 
       <SegmentTypeModal

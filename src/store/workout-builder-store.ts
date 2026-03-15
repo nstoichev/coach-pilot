@@ -62,6 +62,7 @@ export type WorkoutBuilderAction =
   | { type: 'select_exercise'; payload?: string }
   | { type: 'show_workout_board'; payload: Workout }
   | { type: 'hide_workout_board' }
+  | { type: 'load_workout'; payload: Workout }
 
 export type WorkoutBuilderContextValue = {
   state: WorkoutBuilderState
@@ -108,6 +109,13 @@ export const createSegmentTemplate = (segmentType: SegmentType): Segment => {
         name: 'For Time',
         timeCapSeconds: 900,
         rounds: 1,
+      }
+      return { ...seg, name: getGeneratedSegmentName(seg) }
+    }
+    case 'deathBy': {
+      const seg = {
+        ...baseSegment,
+        name: 'Death by',
       }
       return { ...seg, name: getGeneratedSegmentName(seg) }
     }
@@ -343,6 +351,31 @@ export const workoutBuilderReducer = (
         workoutBoardSnapshot: null,
       }
 
+    case 'load_workout': {
+      const w = action.payload
+      const draft: Workout = {
+        ...w,
+        id: createId('workout'),
+        segments: w.segments.map((seg) => ({
+          ...seg,
+          id: createId('segment'),
+          exercises: seg.exercises.map((ae) => {
+            const ex = state.exercises.find((e) => e.id === ae.exerciseId)
+            return {
+              ...ae,
+              id: createId('assigned-exercise'),
+              exercise: ex ?? ae.exercise,
+            }
+          }),
+        })),
+      }
+      return withValidation({
+        ...state,
+        workoutDraft: draft,
+        selectedSegmentId: draft.segments[0]?.id,
+      })
+    }
+
     default:
       return state
   }
@@ -422,6 +455,8 @@ export const useWorkoutBuilder = () => {
         dispatch({ type: 'show_workout_board', payload: workout }),
       hideWorkoutBoard: () =>
         dispatch({ type: 'hide_workout_board' }),
+      loadWorkout: (workout: Workout) =>
+        dispatch({ type: 'load_workout', payload: workout }),
       addExercise: (exercise: Exercise) =>
         dispatch({ type: 'add_exercise', payload: exercise }),
       updateExercise: (exercise: Exercise) =>

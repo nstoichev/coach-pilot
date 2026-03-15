@@ -47,6 +47,21 @@ function emomSegment(
   return { ...seg, name: getGeneratedSegmentName(seg) }
 }
 
+function deathBySegment(
+  id: string,
+  exercises: AssignedExercise[],
+  restInterval?: number,
+): Segment {
+  const seg: Segment = {
+    id,
+    name: 'Death by',
+    exercises,
+    segmentType: 'deathBy',
+    restInterval,
+  }
+  return { ...seg, name: getGeneratedSegmentName(seg) }
+}
+
 /** CrossFit-style EMOM workout: 10 min, 10 rounds, 1 min per round. */
 export const mockWorkoutEmom10: Workout = (() => {
   const segment = emomSegment(
@@ -68,5 +83,40 @@ export const mockWorkoutEmom10: Workout = (() => {
   }
 })()
 
+/** Death by Burpees: 1 rep min 1, 2 reps min 2, … until failure; Stop ends segment. */
+export const mockWorkoutDeathByBurpees: Workout = (() => {
+  const segment = deathBySegment(
+    'segment-mock-deathby-burpees',
+    [assigned('ae-db-1', 'exercise-burpee-over-bar')],
+    0,
+  )
+  return {
+    id: 'workout-mock-deathby-burpees',
+    name: 'Death by Burpees',
+    segments: [segment],
+  }
+})()
+
+/** Death by Burpees + Kettlebell Swings: two exercises, reps increase each round. */
+export const mockWorkoutDeathByBurpeesAndSwings: Workout = (() => {
+  const segment = deathBySegment(
+    'segment-mock-deathby-burpees-swings',
+    [
+      assigned('ae-db-2a', 'exercise-burpee-over-bar'),
+      assigned('ae-db-2b', 'exercise-kettlebell-swing'),
+    ],
+    0, // no rest in sample; add rest in builder if you add more segments
+  )
+  return {
+    id: 'workout-mock-deathby-burpees-swings',
+    name: 'Death by Burpees + Kettlebell Swings',
+    segments: [segment],
+  }
+})()
+
 /** Sample workout list for placeholder consumers. */
-export const mockWorkouts: Workout[] = [mockWorkoutEmom10]
+export const mockWorkouts: Workout[] = [
+  mockWorkoutEmom10,
+  mockWorkoutDeathByBurpees,
+  mockWorkoutDeathByBurpeesAndSwings,
+]

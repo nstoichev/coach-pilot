@@ -140,7 +140,9 @@ export const SegmentEditor = ({
     <article className={segmentCardClass} onClick={onSelect}>
       <div className="segment-card-header">
         <div className="segment-card-header-left">
-          <span className="segment-type-badge">{segment.segmentType}</span>
+          <span className="segment-type-badge">
+            {segment.segmentType === 'deathBy' ? 'Death by' : segment.segmentType}
+          </span>
           {segment.segmentType === 'custom' ? (
             <div className="segment-name-field">
               <input
@@ -375,6 +377,7 @@ export const SegmentEditor = ({
                     </div>
                   </div>
 
+                  {segment.segmentType !== 'deathBy' && (
                   <div className="prescription-stack">
                         {isSetsReps ? (
                           <>
@@ -597,6 +600,7 @@ export const SegmentEditor = ({
                       </>
                     )}
                   </div>
+                  )}
                 </li>
               )
             })}

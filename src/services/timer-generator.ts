@@ -1,5 +1,6 @@
 import type { Segment } from '../types/segment.ts'
 import type { Workout } from '../types/workout.ts'
+import { getGeneratedSegmentName } from './workout-domain.ts'
 
 /**
  * Placeholder contract for the Timer Generator.
@@ -37,9 +38,11 @@ export function getTimerStructure(workout: Workout): TimerGeneratorResult {
       seg.segmentType === 'emom' && seg.intervalSeconds != null && seg.rounds != null
         ? seg.intervalSeconds * seg.rounds
         : seg.durationSeconds
+    const segmentName =
+      seg.segmentType === 'deathBy' ? getGeneratedSegmentName(seg) : seg.name
     return {
       segmentId: seg.id,
-      segmentName: seg.name,
+      segmentName,
       segmentType: seg.segmentType,
       durationSeconds,
       intervalSeconds: seg.intervalSeconds,

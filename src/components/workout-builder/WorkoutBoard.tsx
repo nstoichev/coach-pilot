@@ -60,32 +60,35 @@ export function WorkoutBoard({ workout, onBackToBuild }: WorkoutBoardProps) {
       )}
 
       <section className="board-content">
-        {workout.segments.map((segment) => (
-          <div key={segment.id} className="board-segment-wrapper">
-            <div
-              className={`board-segment${currentPhase?.phaseType === 'work' && currentPhase.segmentId === segment.id ? ' board-segment-active' : ''}`}
-            >
-              <h2 className="board-segment-title">
-                {getBoardSegmentTitle(segment)}
-              </h2>
-              <ul className="board-exercise-list">
-                {segment.exercises.map((assigned) => (
-                  <li key={assigned.id} className="board-exercise-line">
-                    {getBoardExerciseLine(assigned)}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            {getBoardRestLine(segment) && (
+        {workout.segments.map((segment, index) => {
+          const isLastSegment = index === workout.segments.length - 1
+          return (
+            <div key={segment.id} className="board-segment-wrapper">
               <div
-                className={`board-rest-separator${currentPhase?.phaseType === 'rest' && currentPhase.segmentId === segment.id ? ' board-rest-separator-active' : ''}`}
-                aria-label="Rest period"
+                className={`board-segment${currentPhase?.phaseType === 'work' && currentPhase.segmentId === segment.id ? ' board-segment-active' : ''}`}
               >
-                {getBoardRestLine(segment)}
+                <h2 className="board-segment-title">
+                  {getBoardSegmentTitle(segment)}
+                </h2>
+                <ul className="board-exercise-list">
+                  {segment.exercises.map((assigned) => (
+                    <li key={assigned.id} className="board-exercise-line">
+                      {getBoardExerciseLine(assigned)}
+                    </li>
+                  ))}
+                </ul>
               </div>
-            )}
-          </div>
-        ))}
+              {!isLastSegment && getBoardRestLine(segment) && (
+                <div
+                  className={`board-rest-separator${currentPhase?.phaseType === 'rest' && currentPhase.segmentId === segment.id ? ' board-rest-separator-active' : ''}`}
+                  aria-label="Rest period"
+                >
+                  {getBoardRestLine(segment)}
+                </div>
+              )}
+            </div>
+          )
+        })}
       </section>
     </main>
   )

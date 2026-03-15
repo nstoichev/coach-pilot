@@ -116,6 +116,8 @@ export const getSegmentEstimatedDurationSeconds = (
       return segment.durationSeconds
     case 'forTime':
       return segment.timeCapSeconds
+    case 'deathBy':
+      return undefined
     default:
       return undefined
   }
@@ -139,6 +141,12 @@ export const getGeneratedSegmentName = (segment: Segment): string => {
     case 'forTime': {
       const rounds = segment.rounds ?? 1
       return rounds === 1 ? 'For Time' : `For Time ${rounds}`
+    }
+    case 'deathBy': {
+      const names = segment.exercises.map((a) => a.exercise.name)
+      if (names.length === 0) return 'Death by'
+      if (names.length === 1) return `Death by ${names[0]}`
+      return `Death by ${names.join(' + ')}`
     }
     case 'custom':
     default:

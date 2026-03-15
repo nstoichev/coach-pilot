@@ -2,6 +2,7 @@ import type { AssignedExercise, Segment } from '../types/segment.ts'
 import type { Workout } from '../types/workout.ts'
 import {
   formatSecondsAsClock,
+  getGeneratedSegmentName,
   getSegmentEstimatedDurationSeconds,
 } from './workout-domain.ts'
 
@@ -29,6 +30,8 @@ export function getBoardSegmentTitle(segment: Segment): string {
       const capStr = cap != null ? ` (${formatSecondsAsClock(cap)} cap)` : ''
       return rounds === 1 ? `For Time${capStr}` : `For Time ${rounds}${capStr}`
     }
+    case 'deathBy':
+      return getGeneratedSegmentName(segment)
     case 'custom':
     default:
       return segment.name
@@ -36,7 +39,8 @@ export function getBoardSegmentTitle(segment: Segment): string {
 }
 
 /**
- * One line per exercise for the board, e.g. "8 KB Swing", "Max cal Row", "5 Front Squats".
+ * One line per exercise for the board. Reps/sets are not shown (exercise name only for sets-reps).
+ * e.g. "Burpee Over Bar", "Max cal Row", "15 cal Row".
  */
 export function getBoardExerciseLine(assigned: AssignedExercise): string {
   const name = assigned.exercise.name
@@ -50,14 +54,6 @@ export function getBoardExerciseLine(assigned: AssignedExercise): string {
   }
   if (assigned.isMaxRepetitions) {
     return `Max reps ${name}`
-  }
-  const sets = assigned.sets ?? 0
-  const reps = assigned.repetitions ?? 0
-  if (sets > 0 && reps > 0) {
-    return `${sets}×${reps} ${name}`
-  }
-  if (reps > 0) {
-    return `${reps} ${name}`
   }
   return name
 }
@@ -74,10 +70,13 @@ export function getBoardRestLine(segment: Segment): string | null {
 }
 
 /**
- * Whether the workout has at least one time-measurable segment (EMOM, AMRAP, or For Time with timing).
+ * Whether the workout has at least one time-measurable segment (EMOM, AMRAP, For Time, or Death by with exercises).
  */
 export function isWorkoutTimeMeasurable(workout: Workout): boolean {
   return workout.segments.some((seg) => {
+    if (seg.segmentType === 'deathBy') {
+      return seg.exercises.length > 0
+    }
     const duration = getSegmentEstimatedDurationSeconds(seg)
     return duration !== undefined && duration > 0
   })

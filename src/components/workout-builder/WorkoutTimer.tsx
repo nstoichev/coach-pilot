@@ -22,6 +22,8 @@ type WorkPhase = {
   durationSeconds?: number
   timeCapSeconds?: number
   isForTime: boolean
+  /** Death by: 1:00 countdown per round, repeat until user stops; no fixed round count. */
+  isDeathBy?: boolean
 }
 
 type RestPhase = {
@@ -63,6 +65,25 @@ function buildPhases(workout: Workout): TimerPhase[] {
           isForTime: false,
         })
       }
+      const restMinutes = workoutSegment.restInterval ?? 0
+      const restSeconds = Math.round(restMinutes * 60)
+      if (restSeconds > 0) {
+        phases.push({ type: 'rest', restSeconds, afterSegmentId: seg.segmentId })
+      }
+      continue
+    }
+
+    // Death by: one work phase, 60s per round, repeat until user stops (handled in timer tick)
+    if (seg.segmentType === 'deathBy' && workoutSegment && workoutSegment.exercises.length > 0) {
+      phases.push({
+        type: 'work',
+        segmentId: seg.segmentId,
+        segmentName: seg.segmentName,
+        durationSeconds: 60,
+        timeCapSeconds: undefined,
+        isForTime: false,
+        isDeathBy: true,
+      })
       const restMinutes = workoutSegment.restInterval ?? 0
       const restSeconds = Math.round(restMinutes * 60)
       if (restSeconds > 0) {
@@ -189,6 +210,20 @@ export function WorkoutTimer({
         return
       }
 
+      // Death by: 1:00 countdown per round; when 0, reset to 60 (next round), don't advance phase
+      if (phase.isDeathBy) {
+        const r = remainingSecondsRef.current
+        if (r <= 1) {
+          remainingSecondsRef.current = 60
+          setRemainingSeconds(60)
+          return
+        }
+        const next = r - 1
+        remainingSecondsRef.current = next
+        setRemainingSeconds(next)
+        return
+      }
+
       // Work phase (countdown): same pattern as rest
       const r = remainingSecondsRef.current
       if (r <= 1) {
@@ -215,6 +250,17 @@ export function WorkoutTimer({
 
   function handleForTimeStop() {
     setShowingFinish(true)
+  }
+
+  function handleDeathByStop() {
+    const nextIdx = phaseIndex + 1
+    const nextPhase = phases[nextIdx]
+    const { remaining, elapsed } = getInitialCounter(nextPhase)
+    setPhaseIndex((i) => i + 1)
+    setRemainingSeconds(remaining)
+    setElapsedSeconds(elapsed)
+    remainingSecondsRef.current = remaining
+    elapsedSecondsRef.current = elapsed
   }
 
   if (phases.length === 0) {
@@ -248,6 +294,7 @@ export function WorkoutTimer({
   const isWork = phase?.type === 'work'
   const isRest = phase?.type === 'rest'
   const isForTime = isWork && phase?.isForTime
+  const isDeathBy = isWork && phase?.isDeathBy
 
   const label =
     isComplete
@@ -290,12 +337,12 @@ export function WorkoutTimer({
           <p className="timer-time">{displayTime}</p>
         )}
       </div>
-      {isWork && isForTime && !showingFinish && (
+      {isWork && (isForTime || isDeathBy) && !showingFinish && (
         <div className="timer-actions">
           <button
             type="button"
             className="primary-button timer-stop-button"
-            onClick={handleForTimeStop}
+            onClick={isDeathBy ? handleDeathByStop : handleForTimeStop}
           >
             Stop
           </button>

@@ -23,6 +23,10 @@ const segmentOptions: Array<{
     title: 'For Time',
   },
   {
+    type: 'deathBy',
+    title: 'Death by…',
+  },
+  {
     type: 'custom',
     title: 'Custom',
   },
