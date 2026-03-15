@@ -84,7 +84,7 @@ As a coach or trainee, when I finish building a workout I can click "Done" to se
 
 **Why this priority**: Completes the builder flow with a clear done action and a runnable view (board + timer) without leaving the app.
 
-**Independent Test**: Build a workout with two or more time-measurable segments (e.g. AMRAP 1:00, rest 0:15, AMRAP 1:00, rest 0:15, For Time 2:00 cap), click Done, see the board, click Start. Confirm the timer shows a single counter only (no "Not set" at start, no "elapsed / total"); that it shows "Work: 1:00" countdown, then "Rest: 0:15" countdown, then the next work and rest, then "Work: 2:00" count-up with Stop button; that clicking Stop or reaching the cap shows "Finish" and then workout complete.
+**Independent Test**: Build a workout with two or more time-measurable segments (e.g. AMRAP 1:00, rest 0:15, AMRAP 1:00, rest 0:15, For Time 2:00 cap), click Done, see the board, click Start. Confirm the timer shows a single counter only (no "Not set" at start, no "elapsed / total"); that it shows "Work: 1:00" countdown, then "Rest: 0:15" countdown, then the next work and rest, then "Work: 2:00" count-up with Stop button; that clicking Stop or reaching the cap shows "Finish" and then workout complete. For EMOM (e.g. E0:15MOM 3), confirm the timer shows **one countdown per interval** (e.g. "Work: 0:15" three times), not one long total countdown; rest runs only after all EMOM rounds complete.
 
 **Acceptance Scenarios**:
 
@@ -107,12 +107,13 @@ The workout timer is a **single continuous flow**: a series of work and rest pha
 
 **Phases and display**
 
-- **Work phase (EMOM, AMRAP)**: Label **"Work: M:SS"** (e.g. "Work: 1:00") with the segment duration. The counter **counts down** (e.g. 0:59, 0:58 … 0:00). When it reaches 0:00, the timer automatically moves to the rest phase (if the segment has rest) or to the next segment.
+- **Work phase (EMOM)**: EMOM is shown as **one countdown per interval**, not one long countdown for the whole segment. For example, "E0:15MOM 3" means three intervals of 15 seconds each. The timer shows **"Work: 0:15"** and counts down 0:14 … 0:00, then immediately starts the next interval with the same **"Work: 0:15"** countdown, and so on until all rounds are done. The board keeps highlighting the same EMOM segment for every interval. Rest (if any) runs only after all EMOM intervals are complete. This supports future features (e.g. sounds) so the user can complete the exercises in each interval without having to watch the screen.
+- **Work phase (AMRAP)**: Label **"Work: M:SS"** (e.g. "Work: 1:00") with the segment duration. The counter **counts down** (e.g. 0:59, 0:58 … 0:00). When it reaches 0:00, the timer automatically moves to the rest phase (if the segment has rest) or to the next segment.
 - **Work phase (For Time)**: Label **"Work: M:SS"** (e.g. "Work: 2:00" for the time cap). The counter **counts up** from 0:00 (0:01, 0:02 …) toward the time cap. The UI MUST show a **"Stop"** button. When the user clicks **Stop**, or when the count reaches the time cap, the phase ends and the UI shows **"Finish"**; then the timer automatically advances to rest (if any) or the next segment.
 - **Rest phase**: Label **"Rest: M:SS"** (e.g. "Rest: 0:15"). The counter **counts down** to 0:00. When it reaches 0:00, the timer automatically moves to the next segment’s work phase.
 - **Workout complete**: When all segments (and their rest phases) have been completed, the UI shows a clear **workout complete** state and options to exit or return to the board.
 
-**Example flow**
+**Example flows**
 
 Workout: AMRAP 1:00 → rest 0:15 → AMRAP 1:00 → rest 0:15 → For Time (2:00 cap).
 
@@ -121,6 +122,13 @@ Workout: AMRAP 1:00 → rest 0:15 → AMRAP 1:00 → rest 0:15 → For Time (2:0
 3. → **"Work: 1:00"** countdown 0:59 … 0:00.  
 4. → **"Rest: 0:15"** countdown 0:14 … 0:00.  
 5. → **"Work: 2:00"** count-up 0:00, 0:01 … with **Stop** button. User clicks Stop or time cap reached → **"Finish"** → workout complete.
+
+Workout: E0:15MOM 3 (3 rounds, 15 s interval) → rest 0:15.
+
+1. Start → **"Work: 0:15"** countdown 0:14 … 0:00.  
+2. → **"Work: 0:15"** countdown 0:14 … 0:00 (round 2).  
+3. → **"Work: 0:15"** countdown 0:14 … 0:00 (round 3).  
+4. → **"Rest: 0:15"** countdown 0:14 … 0:00 → next segment or workout complete.
 
 **Rules**
 

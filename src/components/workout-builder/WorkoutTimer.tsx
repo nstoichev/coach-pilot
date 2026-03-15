@@ -41,6 +41,36 @@ function buildPhases(workout: Workout): TimerPhase[] {
   const phases: TimerPhase[] = []
 
   for (const seg of structure.segments) {
+    const workoutSegment = workout.segments.find((s) => s.id === seg.segmentId)
+
+    // EMOM: one work phase per round, each with interval duration (user sees each interval countdown)
+    if (
+      seg.segmentType === 'emom' &&
+      seg.intervalSeconds != null &&
+      seg.intervalSeconds > 0 &&
+      workoutSegment?.rounds != null &&
+      workoutSegment.rounds > 0
+    ) {
+      const rounds = workoutSegment.rounds
+      const intervalSeconds = seg.intervalSeconds
+      for (let r = 0; r < rounds; r++) {
+        phases.push({
+          type: 'work',
+          segmentId: seg.segmentId,
+          segmentName: seg.segmentName,
+          durationSeconds: intervalSeconds,
+          timeCapSeconds: undefined,
+          isForTime: false,
+        })
+      }
+      const restMinutes = workoutSegment.restInterval ?? 0
+      const restSeconds = Math.round(restMinutes * 60)
+      if (restSeconds > 0) {
+        phases.push({ type: 'rest', restSeconds, afterSegmentId: seg.segmentId })
+      }
+      continue
+    }
+
     const hasDuration = seg.durationSeconds != null && seg.durationSeconds > 0
     const hasCap = seg.timeCapSeconds != null && seg.timeCapSeconds > 0
     if (!hasDuration && !hasCap) continue
@@ -54,7 +84,6 @@ function buildPhases(workout: Workout): TimerPhase[] {
       isForTime: seg.segmentType === 'forTime',
     })
 
-    const workoutSegment = workout.segments.find((s) => s.id === seg.segmentId)
     const restMinutes = workoutSegment?.restInterval ?? 0
     const restSeconds = Math.round(restMinutes * 60)
     if (restSeconds > 0) {
@@ -127,12 +156,21 @@ export function WorkoutTimer({
       const phase = phases[idx]
       if (!phase) return
 
+      const applyNextPhase = () => {
+        const nextIdx = idx + 1
+        const nextPhase = phases[nextIdx]
+        const { remaining, elapsed } = getInitialCounter(nextPhase)
+        setPhaseIndex((i) => i + 1)
+        setRemainingSeconds(remaining)
+        setElapsedSeconds(elapsed)
+        remainingSecondsRef.current = remaining
+        elapsedSecondsRef.current = elapsed
+      }
+
       if (phase.type === 'rest') {
         const r = remainingSecondsRef.current
         if (r <= 1) {
-          setPhaseIndex((i) => i + 1)
-          setRemainingSeconds(0)
-          remainingSecondsRef.current = 0
+          applyNextPhase()
           return
         }
         const next = r - 1
@@ -154,9 +192,7 @@ export function WorkoutTimer({
       // Work phase (countdown): same pattern as rest
       const r = remainingSecondsRef.current
       if (r <= 1) {
-        setPhaseIndex((i) => i + 1)
-        setRemainingSeconds(0)
-        remainingSecondsRef.current = 0
+        applyNextPhase()
         return
       }
       const next = r - 1

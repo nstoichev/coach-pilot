@@ -6,7 +6,7 @@ This feature centers on a reusable Workout -> Segment -> Assigned Exercise -> Ex
 
 **Extension placeholders**: The following service contracts consume this domain and are implemented as placeholders: Timer Generator (`getTimerStructure(workout)`), Fatigue System (`estimateWorkoutFatigue(workout)`), and workout auto-generation (`generateWorkout(constraints)`). Sample data for integration testing is provided in `mock-workouts.ts` (e.g. CrossFit-style EMOM workout).
 
-**Workout Board**: The Workout Board is a read-only view of a Workout (no new entities); it displays the same Workout data in a CrossFit-style layout when the user clicks Done. Timer state (running, stopped, current phase) is UI/session state. The workout timer is a single continuous flow: it runs through each time-measurable segment in order, showing one counter at a time—work phases (EMOM/AMRAP count down, For Time counts up with Stop) and rest phases (count down). Rest is stored in minutes; the timer converts to seconds for display and countdown. See spec **Workout Timer — Detailed Behavior** for full rules.
+**Workout Board**: The Workout Board is a read-only view of a Workout (no new entities); it displays the same Workout data in a CrossFit-style layout when the user clicks Done. Timer state (running, stopped, current phase) is UI/session state. The workout timer is a single continuous flow: it runs through each time-measurable segment in order, showing one counter at a time—work phases (EMOM as one countdown per interval/round, AMRAP count down, For Time counts up with Stop) and rest phases (count down). Rest is stored in minutes; the timer converts to seconds for display and countdown. See spec **Workout Timer — Detailed Behavior** for full rules.
 
 ---
 
