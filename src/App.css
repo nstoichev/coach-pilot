@@ -914,6 +914,67 @@ input.range-input {
   color: #86efac;
 }
 
+.schedule-date-picker {
+  position: relative;
+}
+
+.schedule-date-picker-input-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background: rgba(15, 23, 42, 0.85);
+}
+
+.schedule-date-picker-input {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #e2e8f0;
+  padding: 0.8rem 0.9rem;
+  font: inherit;
+  text-align: left;
+}
+
+.schedule-date-picker-input:hover {
+  background: rgba(30, 41, 59, 0.35);
+}
+
+.schedule-date-picker-trigger {
+  border: 0;
+  border-left: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 0;
+  background: rgba(30, 41, 59, 0.9);
+  color: #f8fafc;
+  padding: 0.65rem 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.schedule-date-picker-popover {
+  position: absolute;
+  z-index: 40;
+  margin-top: 0.5rem;
+  background: rgba(15, 23, 42, 0.98);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 0.9rem;
+  box-shadow: 0 20px 45px rgba(2, 6, 23, 0.6);
+  padding: 0.75rem;
+}
+
+.schedule-date-picker-popover .rdp-root {
+  --rdp-accent-color: #2563eb;
+  --rdp-accent-background-color: rgba(37, 99, 235, 0.25);
+}
+
+.schedule-date-picker-popover .rdp-month_caption,
+.schedule-date-picker-popover .rdp-weekday,
+.schedule-date-picker-popover .rdp-day_button {
+  color: #e2e8f0;
+}
+
 @media (max-width: 720px) {
   #root {
     padding: 1rem;

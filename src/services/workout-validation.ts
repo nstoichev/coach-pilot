@@ -1,4 +1,5 @@
 import type { Exercise } from '../types/exercise.ts'
+import { isDateInPast } from './schedule-utils.ts'
 import {
   EXERCISE_METRICS,
   TRAINING_TYPES,
@@ -237,6 +238,12 @@ export const validateWorkout = (
 
   if (!hasText(workout.name)) {
     errors.push({ field: 'name', message: 'Workout name is required.' })
+  }
+
+  if (!workout.scheduledDate || workout.scheduledDate.trim() === '') {
+    errors.push({ field: 'scheduledDate', message: 'Scheduled date is required.' })
+  } else if (isDateInPast(workout.scheduledDate)) {
+    errors.push({ field: 'scheduledDate', message: 'Scheduled date cannot be in the past.' })
   }
 
   workout.segments.forEach((segment, segmentIndex) => {

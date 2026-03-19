@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useWorkoutBuilder } from '../../store/index.ts'
 import { getTimerStructure } from '../../services/timer-generator.ts'
+import { getTodayLocalDateString } from '../../services/schedule-utils.ts'
 import {
   mockWorkoutDeathByBurpees,
   mockWorkoutDeathByBurpeesAndSwings,
@@ -19,12 +20,14 @@ const SAMPLE_WORKOUTS = [
 export const WorkoutBuilder = () => {
   const { state, actions } = useWorkoutBuilder()
   const [isSegmentTypeModalOpen, setIsSegmentTypeModalOpen] = useState(false)
+  const today = useMemo(() => getTodayLocalDateString(), [])
 
   const workoutErrors = useMemo(
     () =>
       state.validationErrors.filter(
         (error) =>
           error.field === 'name' ||
+          error.field === 'scheduledDate' ||
           error.field.startsWith('segments.'),
       ),
     [state.validationErrors],
@@ -44,6 +47,9 @@ export const WorkoutBuilder = () => {
       <WorkoutDetailsForm
         workoutName={state.workoutDraft.name}
         segmentCount={state.workoutDraft.segments.length}
+        scheduledDate={state.workoutDraft.scheduledDate ?? ''}
+        scheduledDateMin={today}
+        onScheduledDateChange={actions.setScheduledDate}
         onWorkoutNameChange={actions.setWorkoutName}
         onAddSegment={() => setIsSegmentTypeModalOpen(true)}
         sampleWorkouts={SAMPLE_WORKOUTS}

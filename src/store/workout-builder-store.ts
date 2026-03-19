@@ -9,6 +9,7 @@ import {
   replaceSegment,
   updateAssignedExercise,
 } from '../services/workout-domain.ts'
+import { getTodayLocalDateString } from '../services/schedule-utils.ts'
 import {
   findExerciseValidationErrors,
   getExerciseDeleteGuardMessage,
@@ -35,6 +36,7 @@ export type WorkoutBuilderState = {
 
 export type WorkoutBuilderAction =
   | { type: 'set_workout_name'; payload: string }
+  | { type: 'set_scheduled_date'; payload: string }
   | { type: 'add_segment'; payload?: Segment }
   | { type: 'update_segment'; payload: Segment }
   | { type: 'remove_segment'; payload: string }
@@ -150,6 +152,7 @@ export const createEmptyWorkout = (): Workout => ({
   id: createId('workout'),
   name: 'New Workout',
   segments: [],
+  scheduledDate: getTodayLocalDateString(),
 })
 
 export const initialWorkoutBuilderState: WorkoutBuilderState = {
@@ -182,6 +185,15 @@ export const workoutBuilderReducer = (
         workoutDraft: {
           ...state.workoutDraft,
           name: action.payload,
+        },
+      })
+
+    case 'set_scheduled_date':
+      return withValidation({
+        ...state,
+        workoutDraft: {
+          ...state.workoutDraft,
+          scheduledDate: action.payload,
         },
       })
 
@@ -374,6 +386,7 @@ export const workoutBuilderReducer = (
       const draft: Workout = {
         ...w,
         id: createId('workout'),
+        scheduledDate: w.scheduledDate ?? getTodayLocalDateString(),
         segments: w.segments.map((seg) => ({
           ...seg,
           id: createId('segment'),
@@ -419,6 +432,8 @@ export const useWorkoutBuilder = () => {
     actions: {
       setWorkoutName: (name: string) =>
         dispatch({ type: 'set_workout_name', payload: name }),
+      setScheduledDate: (date: string) =>
+        dispatch({ type: 'set_scheduled_date', payload: date }),
       addSegment: () => {
         const segment = createSegmentTemplate('custom')
         dispatch({ type: 'add_segment', payload: segment })
