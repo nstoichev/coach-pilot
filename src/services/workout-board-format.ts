@@ -1,5 +1,6 @@
 import type { AssignedExercise, Segment } from '../types/segment.ts'
 import type { Workout } from '../types/workout.ts'
+import type { SegmentType } from '../types/domain.ts'
 import {
   formatSecondsAsClock,
   getGeneratedSegmentName,
@@ -46,22 +47,42 @@ export function getBoardSegmentTitle(segment: Segment): string {
 }
 
 /**
- * One line per exercise for the board. Reps/sets are not shown (exercise name only for sets-reps).
- * e.g. "Burpee Over Bar", "Max cal Row", "15 cal Row".
+ * One line per exercise for the board.
+ *
+ * For metric targets, show the metric amount (e.g. calories) before the exercise name.
+ * For sets/reps, show reps before the exercise name (e.g. "4 - Front Squat").
+ *
+ * Death by is strict: reps are never shown on the board.
  */
-export function getBoardExerciseLine(assigned: AssignedExercise): string {
+export function getBoardExerciseLine(
+  assigned: AssignedExercise,
+  segmentType?: SegmentType,
+): string {
   const name = assigned.exercise.name
+
+  // Death by: never show reps/sets values on the board.
+  if (segmentType === 'deathBy') {
+    return name
+  }
+
   if (assigned.metricTarget) {
     const { type, value, isMax } = assigned.metricTarget
     const abbrev = type === 'calories' ? 'cal' : type === 'distance' ? 'm' : type === 'time' ? 'min' : type
     if (isMax) {
-      return `Max ${value} ${abbrev} ${name}`
+      return `Max ${value} ${abbrev} - ${name}`
     }
-    return `${value} ${abbrev} ${name}`
+    return `${value} ${abbrev} - ${name}`
   }
+
   if (assigned.isMaxRepetitions) {
-    return `Max reps ${name}`
+    return `Max reps - ${name}`
   }
+
+  // For sets/reps: show reps when present.
+  if (assigned.repetitions != null) {
+    return `${assigned.repetitions} - ${name}`
+  }
+
   return name
 }
 

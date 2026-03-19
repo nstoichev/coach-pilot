@@ -30,6 +30,10 @@ export const WorkoutBuilder = () => {
     [state.validationErrors],
   )
 
+  const hasAtLeastOneExerciseInAnySegment = state.workoutDraft.segments.some(
+    (seg) => seg.exercises.length > 0,
+  )
+
   const timerStructure = useMemo(
     () => getTimerStructure(state.workoutDraft),
     [state.workoutDraft],
@@ -94,7 +98,7 @@ export const WorkoutBuilder = () => {
         <button
           type="button"
           className="primary-button builder-done-button"
-          disabled={workoutErrors.length > 0}
+          disabled={workoutErrors.length > 0 || !hasAtLeastOneExerciseInAnySegment}
           onClick={() => actions.showWorkoutBoard(JSON.parse(JSON.stringify(state.workoutDraft)))}
         >
           Done
