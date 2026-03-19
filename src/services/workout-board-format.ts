@@ -66,7 +66,10 @@ export function getBoardExerciseLine(
   }
 
   if (assigned.metricTarget) {
-    const { type, value, isMax } = assigned.metricTarget
+    const { type, value, isMax, customText } = assigned.metricTarget
+    if (type === 'custom' && customText?.trim()) {
+      return `${customText.trim()} - ${name}`
+    }
     const abbrev = type === 'calories' ? 'cal' : type === 'distance' ? 'm' : type === 'time' ? 'min' : type
     if (isMax) {
       return `Max ${value} ${abbrev} - ${name}`

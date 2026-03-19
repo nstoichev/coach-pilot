@@ -85,6 +85,7 @@ const METRIC_RANGES: Record<
   distance: { min: 0, max: 10000, step: 100, unit: 'm' },
   speed: { min: 0, max: 50, step: 1, unit: 'km/h' },
   time: { min: 0, max: 3600, step: 15, unit: 's' },
+  custom: { min: 0, max: 1, step: 1, unit: '' },
 }
 
 const ADVANCED_RANGES: Record<string, { min: number; max: number; step: number; unit: string }> = {
@@ -92,7 +93,8 @@ const ADVANCED_RANGES: Record<string, { min: number; max: number; step: number; 
   watts: { min: 0, max: 500, step: 10, unit: 'W' },
 }
 
-function formatMetricValue(metric: ExerciseMetric, value: number): string {
+function formatMetricValue(metric: ExerciseMetric, value: number, customText?: string): string {
+  if (metric === 'custom' && customText) return customText
   if (metric === 'time') {
     return formatSecondsAsClock(value)
   }
@@ -442,10 +444,12 @@ export const SegmentEditor = ({
                 assignedExercise.exercise.prescription.mode === 'sets-reps'
               const metricType =
                 assignedExercise.metricTarget?.type ?? metricOptions[0] ?? 'distance'
-              const metricRange = METRIC_RANGES[metricType]
+                              const metricRange = METRIC_RANGES[metricType]
               const metricValue = assignedExercise.metricTarget?.value ?? metricRange.min
+              const customText = assignedExercise.metricTarget?.customText ?? ''
               const isMaxAllowed = metricType === 'calories' || metricType === 'distance'
               const isMax = assignedExercise.metricTarget?.isMax ?? false
+              const isCustomMeasure = metricType === 'custom'
 
               return (
                 <li
@@ -567,65 +571,102 @@ export const SegmentEditor = ({
                                       ...assignedExercise,
                                       sets: undefined,
                                       repetitions: undefined,
-                                      metricTarget: {
-                                        type: metric,
-                                        value: METRIC_RANGES[metric].min,
-                                      },
+                                      metricTarget:
+                                        metric === 'custom'
+                                          ? {
+                                              type: 'custom',
+                                              value: 0,
+                                              customText: assignedExercise.metricTarget?.type === 'custom' ? assignedExercise.metricTarget.customText ?? '' : '',
+                                              speed: assignedExercise.metricTarget?.speed,
+                                              watts: assignedExercise.metricTarget?.watts,
+                                            }
+                                          : {
+                                              type: metric,
+                                              value: METRIC_RANGES[metric].min,
+                                            },
                                     })
                                   }
                                 />
-                                <span className="measure-radio-label">{metric}</span>
+                                <span className="measure-radio-label">{metric === 'custom' ? 'Custom' : metric}</span>
                               </label>
                             ))}
                           </div>
                         </div>
                         <div className="field">
-                          <div className="field-label-row">
-                            <span>
-                              Value {isMax ? 'Max' : formatMetricValue(metricType, metricValue)}
-                            </span>
-                            {isMaxAllowed ? (
-                              <ToggleSwitch
-                                label="Max"
-                                checked={isMax}
-                                onChange={(checked) =>
+                          {isCustomMeasure ? (
+                            <>
+                              <span>Custom value</span>
+                              <input
+                                type="text"
+                                value={customText}
+                                onChange={(e) =>
                                   onUpdateAssignedExercise({
                                     ...assignedExercise,
                                     sets: undefined,
                                     repetitions: undefined,
                                     metricTarget: {
-                                      type: metricType,
-                                      value: checked ? metricValue : metricRange.min,
-                                      isMax: checked,
+                                      type: 'custom',
+                                      value: 0,
+                                      customText: e.target.value,
+                                      speed: assignedExercise.metricTarget?.speed,
+                                      watts: assignedExercise.metricTarget?.watts,
                                     },
                                   })
                                 }
+                                placeholder="e.g. 1 mile, 10 km"
+                                aria-label="Custom measure (e.g. 1 mile, 10 km)"
                               />
-                            ) : null}
-                          </div>
+                            </>
+                          ) : (
+                            <>
+                              <div className="field-label-row">
+                                <span>
+                                  Value {isMax ? 'Max' : formatMetricValue(metricType, metricValue)}
+                                </span>
+                                {isMaxAllowed ? (
+                                  <ToggleSwitch
+                                    label="Max"
+                                    checked={isMax}
+                                    onChange={(checked) =>
+                                      onUpdateAssignedExercise({
+                                        ...assignedExercise,
+                                        sets: undefined,
+                                        repetitions: undefined,
+                                        metricTarget: {
+                                          type: metricType,
+                                          value: checked ? metricValue : metricRange.min,
+                                          isMax: checked,
+                                        },
+                                      })
+                                    }
+                                  />
+                                ) : null}
+                              </div>
 
-                          {!isMax ? (
-                            <input
-                              className="range-input"
-                              max={metricRange.max}
-                              min={metricRange.min}
-                              step={metricRange.step}
-                              type="range"
-                              value={metricValue}
-                              onChange={(event) =>
-                                onUpdateAssignedExercise({
-                                  ...assignedExercise,
-                                  sets: undefined,
-                                  repetitions: undefined,
-                                  metricTarget: {
-                                    type: metricType,
-                                    value: Number(event.target.value),
-                                    isMax: false,
-                                  },
-                                })
-                              }
-                            />
-                          ) : null}
+                              {!isMax ? (
+                                <input
+                                  className="range-input"
+                                  max={metricRange.max}
+                                  min={metricRange.min}
+                                  step={metricRange.step}
+                                  type="range"
+                                  value={metricValue}
+                                  onChange={(event) =>
+                                    onUpdateAssignedExercise({
+                                      ...assignedExercise,
+                                      sets: undefined,
+                                      repetitions: undefined,
+                                      metricTarget: {
+                                        type: metricType,
+                                        value: Number(event.target.value),
+                                        isMax: false,
+                                      },
+                                    })
+                                  }
+                                />
+                              ) : null}
+                            </>
+                          )}
                         </div>
                         {assignedExercise.exercise.prescription.mode === 'metric' &&
                           assignedExercise.exercise.prescription.advancedMetrics?.length ? (

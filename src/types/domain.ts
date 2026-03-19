@@ -4,7 +4,7 @@ export type TrainingType = (typeof TRAINING_TYPES)[number]
 
 export type ExerciseType = TrainingType[]
 
-export const EXERCISE_METRICS = ['calories', 'distance', 'speed', 'time'] as const
+export const EXERCISE_METRICS = ['calories', 'distance', 'speed', 'time', 'custom'] as const
 
 export type ExerciseMetric = (typeof EXERCISE_METRICS)[number]
 
@@ -27,6 +27,8 @@ export type MetricTarget = {
   type: ExerciseMetric
   value: number
   isMax?: boolean
+  /** When type is 'custom', free-text value (e.g. "1 mile", "10 km"); no range slider. */
+  customText?: string
   /** Optional; used when exercise has advancedMetrics (e.g. Row). */
   speed?: number
   /** Optional; used when exercise has advancedMetrics (e.g. Row). */

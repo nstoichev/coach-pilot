@@ -211,6 +211,14 @@ export const validateSegment = (segment: Segment): ValidationResult<Segment> => 
         message: 'Repetitions must be greater than zero when provided.',
       })
     }
+
+    const assignedResult = validateAssignedExercise(assignedExercise)
+    assignedResult.errors.forEach((error) => {
+      errors.push({
+        field: `exercises.${index}.${error.field}`,
+        message: error.message,
+      })
+    })
   })
 
   return buildResult(segment, errors)
@@ -317,7 +325,14 @@ export const validateAssignedExercise = (
         })
       }
 
-      if (assignedExercise.metricTarget.value <= 0) {
+      if (assignedExercise.metricTarget.type === 'custom') {
+        if (!assignedExercise.metricTarget.customText?.trim()) {
+          errors.push({
+            field: 'metricTarget.customText',
+            message: 'Custom measure must be entered (e.g. 1 mile, 10 km).',
+          })
+        }
+      } else if (assignedExercise.metricTarget.value <= 0) {
         errors.push({
           field: 'metricTarget.value',
           message: 'Metric value must be greater than zero.',
