@@ -73,7 +73,7 @@ export function WorkoutBoard({ workout, onBackToBuild }: WorkoutBoardProps) {
                 <ul className="board-exercise-list">
                   {segment.exercises.map((assigned) => (
                     <li key={assigned.id} className="board-exercise-line">
-                      {getBoardExerciseLine(assigned)}
+                      {getBoardExerciseLine(assigned, segment.segmentType)}
                     </li>
                   ))}
                 </ul>

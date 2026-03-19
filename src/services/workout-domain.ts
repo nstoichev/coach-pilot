@@ -55,6 +55,11 @@ export const assignExerciseToSegment = (
     exercise,
   }
 
+  // Persist default reps for sets-reps so board shows "1 - Name" even when user never touches the slider.
+  if (exercise.prescription.mode === 'sets-reps') {
+    assignedExercise.repetitions = 1
+  }
+
   return {
     ...segment,
     exercises: [...segment.exercises, assignedExercise],

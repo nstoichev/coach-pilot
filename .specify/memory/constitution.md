@@ -55,6 +55,7 @@ Examples:
 - Exercise Database
 - Timer Generator
 - Fatigue System
+- Calendar / Scheduling
 
 Modules must:
 
@@ -93,9 +94,10 @@ Development order:
 1. Static workout builder
 2. Exercise database
 3. Timer generation
-4. Equipment aggregation
-5. Fatigue calculation
-6. Adaptive training features
+4. Calendar and scheduling (workouts attached to dates; calendar view and execution)
+5. Equipment aggregation
+6. Fatigue calculation
+7. Adaptive training features
 
 Features should not be implemented before their prerequisite systems exist.
 

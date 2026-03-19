@@ -206,6 +206,20 @@ Checkpoint: User can add Tabata segment, set work/rest/rounds, add up to N exerc
 
 ---
 
+# Phase 6e — Add segment modal: search (US1)
+
+Purpose: Change the "Add segment" modal to use the same method and logic as "Add exercise": search input with options listed below; user can type to filter and click to select a segment format.
+
+Independent Test: Click "Add segment"; modal shows search input and list of segment types (e.g. EMOM, AMRAP, Tabata, …). Type "tabata" → list filters to Tabata; click Tabata → segment added and modal closes. Type "em" → list shows EMOM; select to add. Empty search shows all formats (up to 10).
+
+Tasks:
+
+- [x] T063 [US1] Replace segment-type grid with search-and-select in `src/components/workout-builder/SegmentTypeModal.tsx`: add search input (placeholder e.g. "Search segment format (e.g. Tabata, EMOM)"), filter segment options by query (title, type, optional search terms); show filtered options in a list below using same classes as exercise picker (`search-picker`, `search-input`, `search-results`, `search-result-item`). On option click, call `onSelectSegmentType` and close modal. Auto-focus search when modal opens; clear query on open. Document in spec FR-013.
+
+Checkpoint: Add segment modal uses search + list; user can search and select a format like Add exercise.
+
+---
+
 # Final Phase — Polish
 
 Purpose: Finish presentation, documentation, and shared exports needed across the whole feature.
