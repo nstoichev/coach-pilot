@@ -21,9 +21,9 @@
 
 Tasks:
 
-- [ ] T001 [P] Extend Workout type or add Schedule type with `scheduledDate` (date-only) and completion state in `src/types/workout.ts` (or new `src/types/schedule.ts`).
-- [ ] T002 Add validation or helper: “is date in the past?” (local date) in `src/services/` (e.g. `workout-domain.ts` or `schedule-utils.ts`).
-- [ ] T003 Extend workout builder store (or add calendar store) to hold and update `scheduledDate` and completion; ensure new workouts require a valid date (today or future) before save in `src/store/`.
+- [X] T001 [P] Extend Workout type or add Schedule type with `scheduledDate` (date-only) and completion state in `src/types/workout.ts` (or new `src/types/schedule.ts`).
+- [X] T002 Add validation or helper: “is date in the past?” (local date) in `src/services/` (e.g. `workout-domain.ts` or `schedule-utils.ts`).
+- [X] T003 Extend workout builder store (or add calendar store) to hold and update `scheduledDate` and completion; ensure new workouts require a valid date (today or future) before save in `src/store/`.
 
 **Checkpoint**: Domain and state support scheduled date and completion; past-date check available.
 
@@ -37,9 +37,9 @@ Tasks:
 
 Tasks:
 
-- [ ] T004 [US1] Add date picker UI above (or beside) workout name in builder in `src/components/workout-builder/WorkoutDetailsForm.tsx` (or equivalent).
-- [ ] T005 [US1] Wire date picker to state: set `scheduledDate` on the workout/schedule; disable or reject past dates in the picker and on save in `src/store/` and relevant components.
-- [ ] T006 [US1] Enforce “valid date required” before saving a new or edited workout (e.g. disable Done or Save until date is set and not in past) in `src/components/workout-builder/` and validation.
+- [X] T004 [US1] Add date picker UI above (or beside) workout name in builder in `src/components/workout-builder/WorkoutDetailsForm.tsx` (or equivalent).
+- [X] T005 [US1] Wire date picker to state: set `scheduledDate` on the workout/schedule; disable or reject past dates in the picker and on save in `src/store/` and relevant components.
+- [X] T006 [US1] Enforce “valid date required” before saving a new or edited workout (e.g. disable Done or Save until date is set and not in past) in `src/components/workout-builder/` and validation.
 
 **Checkpoint**: Every saved workout has a date (today or future); no workouts can be created for past days.
 

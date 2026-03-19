@@ -1,8 +1,14 @@
 import type { Workout } from '../../types/workout.ts'
+import { ScheduleDatePicker } from './ScheduleDatePicker.tsx'
 
 type WorkoutDetailsFormProps = {
   workoutName: string
   segmentCount: number
+  /** Scheduled date (YYYY-MM-DD). Shown above workout name; past dates are blocked via min. */
+  scheduledDate: string
+  /** Minimum selectable date (e.g. today) to disable past dates. */
+  scheduledDateMin: string
+  onScheduledDateChange: (date: string) => void
   onWorkoutNameChange: (name: string) => void
   onAddSegment: () => void
   /** Optional: list of sample workouts for "Load sample" dropdown (e.g. Death by, EMOM). */
@@ -13,6 +19,9 @@ type WorkoutDetailsFormProps = {
 export const WorkoutDetailsForm = ({
   workoutName,
   segmentCount,
+  scheduledDate,
+  scheduledDateMin,
+  onScheduledDateChange,
   onWorkoutNameChange,
   onAddSegment,
   sampleWorkouts = [],
@@ -26,6 +35,15 @@ export const WorkoutDetailsForm = ({
     </div>
 
     <div className="form-grid">
+      <label className="field">
+        <span>Scheduled date</span>
+        <ScheduleDatePicker
+          value={scheduledDate}
+          min={scheduledDateMin}
+          onChange={onScheduledDateChange}
+          ariaLabel="Scheduled date (today or future)"
+        />
+      </label>
       <label className="field">
         <span>Workout name</span>
         <input

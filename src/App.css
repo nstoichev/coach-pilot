@@ -914,6 +914,135 @@ input.range-input {
   color: #86efac;
 }
 
+/* Schedule date picker (react-day-picker) */
+.schedule-date-picker {
+  position: relative;
+  width: 100%;
+}
+
+.schedule-date-picker-input-row {
+  display: flex;
+  gap: 0;
+  align-items: stretch;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+.schedule-date-picker-input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #e2e8f0;
+  padding: 0.8rem 0.9rem;
+  font: inherit;
+  cursor: pointer;
+}
+
+.schedule-date-picker-input::placeholder {
+  color: #94a3b8;
+}
+
+.schedule-date-picker-input:focus {
+  outline: none;
+}
+
+.schedule-date-picker-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.75rem;
+  background: rgba(30, 41, 59, 0.9);
+  border: 0;
+  border-left: 1px solid rgba(148, 163, 184, 0.25);
+  color: #e2e8f0;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.schedule-date-picker-trigger:hover {
+  background: rgba(51, 65, 85, 0.95);
+  color: #f8fafc;
+}
+
+.schedule-date-picker-trigger:focus-visible {
+  outline: 2px solid #38bdf8;
+  outline-offset: -2px;
+}
+
+.schedule-date-picker-popover {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 0.35rem);
+  left: 0;
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.98);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 1rem;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+}
+
+/* React Day Picker dark theme overrides inside our popover */
+.schedule-date-picker-popover .rdp-root {
+  --rdp-accent-color: #2563eb;
+  --rdp-accent-background-color: rgba(37, 99, 235, 0.25);
+  --rdp-outline: 2px solid #38bdf8;
+}
+
+.schedule-date-picker-popover .rdp-months {
+  background: transparent;
+}
+
+.schedule-date-picker-popover .rdp-month {
+  color: #e2e8f0;
+}
+
+.schedule-date-picker-popover .rdp-caption_label {
+  color: #f8fafc;
+  font-weight: 600;
+}
+
+.schedule-date-picker-popover .rdp-weekday {
+  color: #94a3b8;
+}
+
+.schedule-date-picker-popover .rdp-day {
+  color: #e2e8f0;
+}
+
+.schedule-date-picker-popover .rdp-day:hover:not(.rdp-disabled):not(.rdp-selected) {
+  background: rgba(51, 65, 85, 0.8);
+  color: #f8fafc;
+}
+
+.schedule-date-picker-popover .rdp-day.rdp-disabled {
+  color: #64748b;
+}
+
+.schedule-date-picker-popover .rdp-day.rdp-selected {
+  background: #2563eb;
+  color: #fff;
+}
+
+.schedule-date-picker-popover .rdp-day.rdp-today:not(.rdp-selected) {
+  font-weight: 600;
+  color: #38bdf8;
+}
+
+.schedule-date-picker-popover .rdp-nav button {
+  color: #e2e8f0;
+  background: transparent;
+  border-radius: 0.5rem;
+}
+
+.schedule-date-picker-popover .rdp-nav button:hover {
+  background: rgba(51, 65, 85, 0.9);
+  color: #f8fafc;
+}
+
 @media (max-width: 720px) {
   #root {
     padding: 1rem;
