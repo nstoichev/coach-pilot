@@ -3,6 +3,7 @@ import type { Workout } from '../../types/workout.ts'
 import {
   getBoardSegmentTitle,
   getBoardExerciseLine,
+  getBoardRepSequenceSummary,
   getBoardRestLine,
   isWorkoutTimeMeasurable,
 } from '../../services/workout-board-format.ts'
@@ -62,6 +63,7 @@ export function WorkoutBoard({ workout, onBackToBuild }: WorkoutBoardProps) {
       <section className="board-content">
         {workout.segments.map((segment, index) => {
           const isLastSegment = index === workout.segments.length - 1
+          const repSeqSummary = getBoardRepSequenceSummary(segment)
           return (
             <div key={segment.id} className="board-segment-wrapper">
               <div
@@ -70,10 +72,15 @@ export function WorkoutBoard({ workout, onBackToBuild }: WorkoutBoardProps) {
                 <h2 className="board-segment-title">
                   {getBoardSegmentTitle(segment)}
                 </h2>
-                <ul className="board-exercise-list">
+                {repSeqSummary ? (
+                  <p className="board-rep-sequence-line">{repSeqSummary}</p>
+                ) : null}
+                <ul
+                  className={`board-exercise-list${repSeqSummary ? ' board-exercise-list--rep-sequence' : ''}`}
+                >
                   {segment.exercises.map((assigned) => (
                     <li key={assigned.id} className="board-exercise-line">
-                      {getBoardExerciseLine(assigned, segment.segmentType)}
+                      {getBoardExerciseLine(assigned, segment)}
                     </li>
                   ))}
                 </ul>

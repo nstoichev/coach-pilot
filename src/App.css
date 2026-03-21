@@ -350,10 +350,29 @@ button:hover {
   margin: 0 0 0.75rem;
 }
 
+.board-rep-sequence-line {
+  color: #cbd5e1;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin: -0.35rem 0 0.65rem;
+}
+
 .board-exercise-list {
   list-style: none;
   margin: 0 0 0.5rem;
   padding: 0;
+}
+
+.board-exercise-list--rep-sequence .board-exercise-line {
+  padding-left: 0;
+  position: relative;
+}
+
+.board-exercise-list--rep-sequence .board-exercise-line::before {
+  content: '* ';
+  color: #94a3b8;
+  font-weight: 600;
 }
 
 .board-exercise-line {

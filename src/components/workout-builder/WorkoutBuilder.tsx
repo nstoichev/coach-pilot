@@ -2,20 +2,15 @@ import { useMemo, useState } from 'react'
 import { useWorkoutBuilder } from '../../store/index.ts'
 import { getTimerStructure } from '../../services/timer-generator.ts'
 import { getTodayLocalDateString } from '../../services/schedule-utils.ts'
-import {
-  mockWorkoutDeathByBurpees,
-  mockWorkoutDeathByBurpeesAndSwings,
-  mockWorkoutEmom10,
-} from '../../services/mock-workouts.ts'
+import { mockWorkouts } from '../../services/mock-workouts.ts'
 import { SegmentList } from './SegmentList.tsx'
 import { SegmentTypeModal } from './SegmentTypeModal.tsx'
 import { WorkoutDetailsForm } from './WorkoutDetailsForm.tsx'
 
-const SAMPLE_WORKOUTS = [
-  { label: mockWorkoutEmom10.name, workout: mockWorkoutEmom10 },
-  { label: mockWorkoutDeathByBurpees.name, workout: mockWorkoutDeathByBurpees },
-  { label: mockWorkoutDeathByBurpeesAndSwings.name, workout: mockWorkoutDeathByBurpeesAndSwings },
-]
+const SAMPLE_WORKOUTS = mockWorkouts.map((workout) => ({
+  label: workout.name,
+  workout,
+}))
 
 export const WorkoutBuilder = () => {
   const { state, actions } = useWorkoutBuilder()

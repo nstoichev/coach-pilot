@@ -1,11 +1,24 @@
 import type { AssignedExercise, Segment } from '../types/segment.ts'
 import type { Workout } from '../types/workout.ts'
-import type { SegmentType } from '../types/domain.ts'
 import {
   formatSecondsAsClock,
   getGeneratedSegmentName,
   getSegmentEstimatedDurationSeconds,
 } from './workout-domain.ts'
+import { isSegmentRepGenActive } from './repetition-generation.ts'
+
+/** When true, board shows `21-15-9` under the title and exercise lines without per-line reps. */
+function segmentBoardRepSequenceLine(segment: Segment): string | null {
+  if (!isSegmentRepGenActive(segment)) return null
+  const seq = segment.repSequence
+  if (!seq?.length) return null
+  return seq.join('-')
+}
+
+/** Summary line for the board (e.g. `21-15-9`) when reps-per-round generation is active. */
+export function getBoardRepSequenceSummary(segment: Segment): string | null {
+  return segmentBoardRepSequenceLine(segment)
+}
 
 /**
  * Board-style segment title with exact durations (no rounding).
@@ -53,15 +66,28 @@ export function getBoardSegmentTitle(segment: Segment): string {
  * For sets/reps, show reps before the exercise name (e.g. "4 - Front Squat").
  *
  * Death by is strict: reps are never shown on the board.
+ *
+ * When repetition generation is on and `repSequence` is set, the sequence is shown once
+ * under the segment title; each sets/reps exercise is listed by name only (no `21 -` prefix).
  */
 export function getBoardExerciseLine(
   assigned: AssignedExercise,
-  segmentType?: SegmentType,
+  segment: Segment,
 ): string {
   const name = assigned.exercise.name
 
   // Death by: never show reps/sets values on the board.
-  if (segmentType === 'deathBy') {
+  if (segment.segmentType === 'deathBy') {
+    return name
+  }
+
+  const repSeqLine = segmentBoardRepSequenceLine(segment)
+  if (
+    repSeqLine &&
+    assigned.exercise.prescription.mode === 'sets-reps' &&
+    !assigned.metricTarget &&
+    !assigned.isMaxRepetitions
+  ) {
     return name
   }
 

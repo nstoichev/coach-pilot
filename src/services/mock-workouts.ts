@@ -1,12 +1,19 @@
 import type { Workout } from '../types/workout.ts'
-import type { Segment } from '../types/segment.ts'
-import type { AssignedExercise } from '../types/segment.ts'
+import type { AssignedExercise, Segment } from '../types/segment.ts'
 import { mockExerciseDatabase } from './mock-exercise-database.ts'
 import { getGeneratedSegmentName } from './workout-domain.ts'
 
 /**
- * Sample workouts for Timer Generator, Fatigue System, and workout-generator
- * placeholder integration. CrossFit-style EMOM and mixed segment types.
+ * Girl / Hero-style benchmark workouts for “Load sample”.
+ *
+ * Builder limitations (domain is still segment + assigned exercises):
+ * - Fran / Diane / Annie: “Reps per round” encodes the prescribed ladder for all sets/reps
+ *   movements in that segment. Classic execution alternates movements within each tier;
+ *   the builder treats them as sharing the same per-round rep sequence.
+ * - Helen: one For Time segment with rounds = 3; run / swing / pull-up reps differ (no single
+ *   shared rep ladder)—static reps + metric run per assignment.
+ * - Murph: chipper order (run → pull/push/squat → run). Partitioning “Cindy” style in the middle
+ *   is not modeled—totals match the benchmark prescription.
  */
 
 function findExercise(id: string) {
@@ -28,95 +35,208 @@ function assigned(
   }
 }
 
-function emomSegment(
+function forTimeSegment(
   id: string,
-  intervalSeconds: number,
+  exercises: AssignedExercise[],
+  timeCapSeconds: number,
   rounds: number,
-  exercises: AssignedExercise[],
-  restInterval?: number,
+  opts?: Pick<Segment, 'repGenerationEnabled' | 'repScheme' | 'repSequence'>,
 ): Segment {
   const seg: Segment = {
     id,
-    name: 'EMOM',
+    name: 'For Time',
     exercises,
-    segmentType: 'emom',
-    intervalSeconds,
+    segmentType: 'forTime',
+    timeCapSeconds,
     rounds,
-    restInterval,
+    ...opts,
   }
   return { ...seg, name: getGeneratedSegmentName(seg) }
 }
 
-function deathBySegment(
+function amrapSegment(
   id: string,
+  durationSeconds: number,
   exercises: AssignedExercise[],
-  restInterval?: number,
 ): Segment {
   const seg: Segment = {
     id,
-    name: 'Death by',
+    name: 'AMRAP',
     exercises,
-    segmentType: 'deathBy',
-    restInterval,
+    segmentType: 'amrap',
+    durationSeconds,
   }
   return { ...seg, name: getGeneratedSegmentName(seg) }
 }
 
-/** CrossFit-style EMOM workout: 10 min, 10 rounds, 1 min per round. */
-export const mockWorkoutEmom10: Workout = (() => {
-  const segment = emomSegment(
-    'segment-mock-emom-10',
-    60,
-    10,
-    [
-      assigned('ae-1', 'exercise-front-squat', { sets: 5, repetitions: 5 }),
-      assigned('ae-2', 'exercise-row', {
-        metricTarget: { type: 'calories', value: 15, isMax: false },
+function chipperSegment(
+  id: string,
+  timeCapSeconds: number,
+  exercises: AssignedExercise[],
+): Segment {
+  const seg: Segment = {
+    id,
+    name: 'Chipper',
+    exercises,
+    segmentType: 'chipper',
+    timeCapSeconds,
+  }
+  return { ...seg, name: getGeneratedSegmentName(seg) }
+}
+
+/** 21-15-9 Thrusters + Pull-ups */
+export const mockWorkoutFran: Workout = {
+  id: 'workout-fran',
+  name: 'Fran',
+  segments: [
+    forTimeSegment(
+      'segment-fran',
+      [
+        assigned('ae-fran-1', 'exercise-thrusters', { repetitions: 21 }),
+        assigned('ae-fran-2', 'exercise-pull-ups', { repetitions: 21 }),
+      ],
+      30 * 60,
+      3,
+      {
+        repGenerationEnabled: true,
+        repScheme: { pattern: 'linear', rounds: 3, start: 21, end: 9 },
+        repSequence: [21, 15, 9],
+      },
+    ),
+  ],
+}
+
+/** AMRAP 20: 5-10-15 Cindy */
+export const mockWorkoutCindy: Workout = {
+  id: 'workout-cindy',
+  name: 'Cindy',
+  segments: [
+    amrapSegment('segment-cindy', 20 * 60, [
+      assigned('ae-cindy-1', 'exercise-pull-ups', { repetitions: 5 }),
+      assigned('ae-cindy-2', 'exercise-push-ups', { repetitions: 10 }),
+      assigned('ae-cindy-3', 'exercise-air-squats', { repetitions: 15 }),
+    ]),
+  ],
+}
+
+/** 3 rounds: 400 m run, 21 KB swings, 12 pull-ups */
+export const mockWorkoutHelen: Workout = {
+  id: 'workout-helen',
+  name: 'Helen',
+  segments: [
+    forTimeSegment('segment-helen', [
+      assigned('ae-helen-1', 'exercise-run', {
+        metricTarget: { type: 'distance', value: 400 },
       }),
-    ],
-    0,
-  )
-  return {
-    id: 'workout-mock-emom-10',
-    name: 'EMOM 10 CrossFit',
-    segments: [segment],
-  }
-})()
+      assigned('ae-helen-2', 'exercise-kettlebell-swing', { repetitions: 21 }),
+      assigned('ae-helen-3', 'exercise-pull-ups', { repetitions: 12 }),
+    ], 30 * 60, 3),
+  ],
+}
 
-/** Death by Burpees: 1 rep min 1, 2 reps min 2, … until failure; Stop ends segment. */
-export const mockWorkoutDeathByBurpees: Workout = (() => {
-  const segment = deathBySegment(
-    'segment-mock-deathby-burpees',
-    [assigned('ae-db-1', 'exercise-burpee-over-bar')],
-    0,
-  )
-  return {
-    id: 'workout-mock-deathby-burpees',
-    name: 'Death by Burpees',
-    segments: [segment],
-  }
-})()
+/** 30 Clean & Jerks for time */
+export const mockWorkoutGrace: Workout = {
+  id: 'workout-grace',
+  name: 'Grace',
+  segments: [
+    forTimeSegment(
+      'segment-grace',
+      [assigned('ae-grace-1', 'exercise-clean-jerk', { repetitions: 30 })],
+      30 * 60,
+      1,
+    ),
+  ],
+}
 
-/** Death by Burpees + Kettlebell Swings: two exercises, reps increase each round. */
-export const mockWorkoutDeathByBurpeesAndSwings: Workout = (() => {
-  const segment = deathBySegment(
-    'segment-mock-deathby-burpees-swings',
-    [
-      assigned('ae-db-2a', 'exercise-burpee-over-bar'),
-      assigned('ae-db-2b', 'exercise-kettlebell-swing'),
-    ],
-    0, // no rest in sample; add rest in builder if you add more segments
-  )
-  return {
-    id: 'workout-mock-deathby-burpees-swings',
-    name: 'Death by Burpees + Kettlebell Swings',
-    segments: [segment],
-  }
-})()
+/** 21-15-9 Deadlifts + Handstand push-ups */
+export const mockWorkoutDiane: Workout = {
+  id: 'workout-diane',
+  name: 'Diane',
+  segments: [
+    forTimeSegment(
+      'segment-diane',
+      [
+        assigned('ae-diane-1', 'exercise-deadlift', { repetitions: 21 }),
+        assigned('ae-diane-2', 'exercise-handstand-push-ups', { repetitions: 21 }),
+      ],
+      30 * 60,
+      3,
+      {
+        repGenerationEnabled: true,
+        repScheme: { pattern: 'linear', rounds: 3, start: 21, end: 9 },
+        repSequence: [21, 15, 9],
+      },
+    ),
+  ],
+}
 
-/** Sample workout list for placeholder consumers. */
+/** 50-40-30-20-10 Double-unders + Sit-ups */
+export const mockWorkoutAnnie: Workout = {
+  id: 'workout-annie',
+  name: 'Annie',
+  segments: [
+    forTimeSegment(
+      'segment-annie',
+      [
+        assigned('ae-annie-1', 'exercise-double-unders', { repetitions: 50 }),
+        assigned('ae-annie-2', 'exercise-sit-ups', { repetitions: 50 }),
+      ],
+      30 * 60,
+      5,
+      {
+        repGenerationEnabled: true,
+        repScheme: { pattern: 'linear', rounds: 5, start: 50, end: 10 },
+        repSequence: [50, 40, 30, 20, 10],
+      },
+    ),
+  ],
+}
+
+/** 150 Wall Balls for time */
+export const mockWorkoutKaren: Workout = {
+  id: 'workout-karen',
+  name: 'Karen',
+  segments: [
+    forTimeSegment(
+      'segment-karen',
+      [assigned('ae-karen-1', 'exercise-wall-ball', { repetitions: 150 })],
+      45 * 60,
+      1,
+    ),
+  ],
+}
+
+/** 1 mile run – 100/200/300 – 1 mile run (chipper) */
+export const mockWorkoutMurph: Workout = {
+  id: 'workout-murph',
+  name: 'Murph',
+  segments: [
+    chipperSegment(
+      'segment-murph',
+      90 * 60,
+      [
+        assigned('ae-murph-1', 'exercise-run', {
+          metricTarget: { type: 'distance', value: 1609 },
+        }),
+        assigned('ae-murph-2', 'exercise-pull-ups', { repetitions: 100 }),
+        assigned('ae-murph-3', 'exercise-push-ups', { repetitions: 200 }),
+        assigned('ae-murph-4', 'exercise-squat', { repetitions: 300 }),
+        assigned('ae-murph-5', 'exercise-run', {
+          metricTarget: { type: 'distance', value: 1609 },
+        }),
+      ],
+    ),
+  ],
+}
+
+/** Ordered list for Load sample dropdown and consumers. */
 export const mockWorkouts: Workout[] = [
-  mockWorkoutEmom10,
-  mockWorkoutDeathByBurpees,
-  mockWorkoutDeathByBurpeesAndSwings,
+  mockWorkoutFran,
+  mockWorkoutCindy,
+  mockWorkoutHelen,
+  mockWorkoutGrace,
+  mockWorkoutDiane,
+  mockWorkoutAnnie,
+  mockWorkoutKaren,
+  mockWorkoutMurph,
 ]
