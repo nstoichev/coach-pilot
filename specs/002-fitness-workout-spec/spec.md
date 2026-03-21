@@ -13,7 +13,7 @@ This feature establishes the **Workout Builder** and exercise data foundation fo
 
 - **Problem**: Users need to create, edit, and reuse workouts built from segments and exercises without duplicate or inconsistent data.
 - **Interaction**: The feature defines and stores Workout, Segment, and Exercise entities and ensures workouts stay consistent and consumable by the timer generator, fatigue engine, and equipment calculator.
-- **Place in the app**: Workout Builder (create/edit workouts and segments, search and assign exercises, set optional sets/reps or metric targets); exercise data is available through a lightweight search experience backed by a mock database in phase 1. Placeholders are set for Timer Generator, Fatigue System, and workout auto-generation. The Calendar feature (see `specs/003-workout-calendar/spec.md`) will attach workouts to dates and provide a calendar view and execution entry point.
+- **Place in the app**: Workout Builder (create/edit workouts and segments, search and assign exercises, set optional sets/reps or metric targets); exercise data is available through a lightweight search experience backed by a mock database in phase 1. Placeholders are set for Timer Generator, Fatigue System, and workout auto-generation. The Calendar feature (see `specs/003-workout-calendar/spec.md`) will attach workouts to dates and provide a calendar view and execution entry point. **Segment repetition generation** (see `specs/004-segment-repetition-generation/spec.md`) extends eligible segments with linear / pyramid / fixed rep sequences per round (builder UX + domain extension); it does not replace `segmentType`.
 
 ---
 

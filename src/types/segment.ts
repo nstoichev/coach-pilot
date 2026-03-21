@@ -19,6 +19,19 @@ export type AssignedExercise = {
   metricTarget?: MetricTarget
 }
 
+/** Per-round repetition generation pattern (builder). */
+export type RepSchemePattern = 'linear' | 'pyramid' | 'fixed'
+
+/** User-facing repetition scheme; may be corrected on blur (linear end, pyramid peak, etc.). */
+export type RepSchemeConfig = {
+  pattern: RepSchemePattern
+  rounds: number
+  start?: number
+  end?: number
+  peak?: number
+  reps?: number
+}
+
 export type Segment = {
   id: string
   name: string
@@ -33,4 +46,13 @@ export type Segment = {
   /** Tabata: rest interval in seconds (default 10, range 10–60). */
   restSeconds?: number
   restInterval?: number
+  /**
+   * When true, builder shows reps-per-round controls and drives sets/reps from `repSequence`.
+   * Explicit `false` clears UI even if legacy data existed; omit/false with no scheme = off.
+   */
+  repGenerationEnabled?: boolean
+  /** Last committed repetition-generation inputs (after blur). */
+  repScheme?: RepSchemeConfig
+  /** Generated integer reps per round; length === repScheme.rounds when build succeeds. */
+  repSequence?: number[]
 }

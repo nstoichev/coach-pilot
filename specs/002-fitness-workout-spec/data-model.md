@@ -4,6 +4,8 @@
 
 This feature centers on a reusable Workout -> Segment -> Assigned Exercise -> Exercise domain model with supporting concepts for Equipment, Muscle Group, and working-weight metadata. The model must remain strict enough to support future Timer Generator, Fatigue System, and workout auto-generation modules.
 
+**Segment repetition generation (004)**: Optional per-segment `repScheme` and `repSequence` (integer array per round) may be added for in-scope segments; see `specs/004-segment-repetition-generation/data-model.md`. This extends `Segment` without replacing `segmentType`.
+
 **Extension placeholders**: The following service contracts consume this domain and are implemented as placeholders: Timer Generator (`getTimerStructure(workout)`), Fatigue System (`estimateWorkoutFatigue(workout)`), and workout auto-generation (`generateWorkout(constraints)`). Sample data for integration testing is provided in `mock-workouts.ts` (e.g. CrossFit-style EMOM workout).
 
 **Workout Board**: The Workout Board is a read-only view of a Workout (no new entities); it displays the same Workout data in a CrossFit-style layout when the user clicks Done. Timer state (running, stopped, current phase) is UI/session state. The workout timer is a single continuous flow: it runs through each time-measurable segment in order, showing one counter at a time—work phases (EMOM as one countdown per interval/round, AMRAP count down, For Time counts up with Stop, Death by 1:00 countdown per round with Stop) and rest phases (count down). Rest is stored in minutes; the timer converts to seconds for display and countdown. See spec **Workout Timer — Detailed Behavior** for full rules.

@@ -1,34 +1,48 @@
-﻿---
+---
 description: Project Development Guidelines
 globs: ["**/*"]
 alwaysApply: true
 ---
 # coach-pilot Development Guidelines
 
-Auto-generated from all feature plans. Last updated: 2026-03-13
+Auto-generated from Specify workflow; last updated: 2026-03-13
 
 ## Active Technologies
 
+- TypeScript 5.x + React 19 + Vite 7 (SPA)
+- In-memory / client state for drafts (no production DB in repo yet)
 
+## Specs (features)
+
+- `specs/002-fitness-workout-spec/` — Workout builder domain, board, timer behavior
+- `specs/003-workout-calendar/` — Scheduling and calendar
+- `specs/004-segment-repetition-generation/` — Segment repetition generation (linear / pyramid / fixed)
 
 ## Project Structure
 
 ```text
 src/
-tests/
+  components/
+  services/
+  store/
+  types/
+specs/
 ```
 
 ## Commands
 
-# Add commands for 
+- `npm run dev` — local dev
+- `npm run build` — typecheck + production build
+- `npm run lint` — ESLint
 
 ## Code Style
 
-General: Follow standard conventions
+- Domain logic in `src/services/`; UI consumes it
+- Prefer explicit TypeScript types; keep components thin
 
 ## Recent Changes
 
-
+- Documented segment repetition generation feature in `specs/004-segment-repetition-generation/` (plan, spec, research, data-model, contracts, quickstart).
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->

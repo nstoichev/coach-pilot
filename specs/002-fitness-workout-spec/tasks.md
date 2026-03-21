@@ -330,6 +330,17 @@ Each story should add usable value without breaking previous flows.
 
 ---
 
+# Related feature: Segment repetition generation (004)
+
+**Workout Segment Repetition Generation** extends the builder with optional `repScheme` / `repSequence` on segments (linear, pyramid, fixed; blur-time correction; preview; totals). Implementation tasks live in a separate list:
+
+- **`specs/004-segment-repetition-generation/tasks.md`** (T001–T020) and **`specs/004-segment-repetition-generation/spec.md`**
+- **Code touchpoints (post–Phase 7):** `src/services/repetition-generation.ts`, `src/components/workout-builder/SegmentRepGenerationPanel.tsx`, `applyRepSequenceToSetsRepsRepetitions` in `src/services/workout-domain.ts`, non-blocking validation policy for `repSequence` in `src/services/workout-validation.ts`
+
+Do not duplicate 004 tasks here; extend the builder via the 004 task list.
+
+---
+
 # Notes
 
 - All tasks follow the required checklist format: checkbox, task ID, optional `[P]`, required `[US#]` in story phases, and an exact file path.

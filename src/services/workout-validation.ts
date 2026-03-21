@@ -190,6 +190,24 @@ export const validateSegment = (segment: Segment): ValidationResult<Segment> => 
     })
   }
 
+  /**
+   * 004 — Repetition generation (`repScheme` / `repSequence`):
+   * Values are corrected in the builder (linear/fixed on blur). Do **not** add blocking errors for
+   * benign drift vs user intent (e.g. corrected `end`, temporary pyramid parity mismatch).
+   * Optional defensive check only for clearly corrupt stored sequences.
+   */
+  if (segment.repSequence && segment.repSequence.length > 0) {
+    const corrupt = segment.repSequence.some(
+      (n) => !Number.isFinite(n) || !Number.isInteger(n) || n < 0,
+    )
+    if (corrupt) {
+      errors.push({
+        field: 'repSequence',
+        message: 'Repetition sequence contains invalid values.',
+      })
+    }
+  }
+
   segment.exercises.forEach((assignedExercise, index) => {
     const exerciseResult = validateExercise(assignedExercise.exercise)
     exerciseResult.errors.forEach((error) => {

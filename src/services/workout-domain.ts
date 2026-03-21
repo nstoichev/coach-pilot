@@ -109,6 +109,30 @@ export const replaceSegment = (workout: Workout, updatedSegment: Segment): Worko
   ),
 })
 
+/**
+ * 004 / T018: After a successful `repSequence` build, set each sets/reps assignment’s
+ * `repetitions` to **round 1** (`repSequence[0]`) so board/timer/sliders show a consistent
+ * default. Skips assignments with `isMaxRepetitions` (leave user intent unchanged).
+ */
+export const applyRepSequenceToSetsRepsRepetitions = (
+  segment: Segment,
+  repSequence: number[],
+): Segment => {
+  const first = repSequence[0]
+  if (first === undefined || !Number.isFinite(first) || first < 1 || !Number.isInteger(first)) {
+    return segment
+  }
+
+  return {
+    ...segment,
+    exercises: segment.exercises.map((assigned) =>
+      assigned.exercise.prescription.mode === 'sets-reps' && !assigned.isMaxRepetitions
+        ? { ...assigned, repetitions: first }
+        : assigned,
+    ),
+  }
+}
+
 export const getSegmentEstimatedDurationSeconds = (
   segment: Segment,
 ): number | undefined => {

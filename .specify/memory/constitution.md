@@ -56,6 +56,7 @@ Examples:
 - Timer Generator
 - Fatigue System
 - Calendar / Scheduling
+- Segment repetition generation (per-round rep sequences in the builder)
 
 Modules must:
 
@@ -95,6 +96,7 @@ Development order:
 2. Exercise database
 3. Timer generation
 4. Calendar and scheduling (workouts attached to dates; calendar view and execution)
+4a. Segment repetition generation (linear / pyramid / fixed; extends Segment; see `specs/004-segment-repetition-generation/`)
 5. Equipment aggregation
 6. Fatigue calculation
 7. Adaptive training features

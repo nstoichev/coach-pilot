@@ -524,6 +524,77 @@ button:hover {
   grid-template-columns: 1fr;
 }
 
+.rep-generation-panel {
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  border-radius: 0.65rem;
+  padding: 0.85rem 1rem;
+  background: rgba(2, 6, 23, 0.45);
+  display: grid;
+  gap: 0.75rem;
+}
+
+.rep-generation-enable-row {
+  align-items: center;
+  color: #e2e8f0;
+  cursor: pointer;
+  display: flex;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.rep-generation-enable-row input {
+  margin: 0;
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+.rep-generation-panel .eyebrow {
+  margin: 0;
+}
+
+.rep-generation-pattern-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+}
+
+.rep-generation-pattern-option {
+  align-items: center;
+  cursor: pointer;
+  display: inline-flex;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+  color: #e2e8f0;
+}
+
+.rep-generation-pattern-option input {
+  margin: 0;
+}
+
+.rep-generation-option-disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.rep-generation-hint {
+  color: #fbbf24;
+  font-size: 0.82rem;
+  margin: 0;
+}
+
+.rep-generation-sequence-line {
+  border-top: 1px solid rgba(148, 163, 184, 0.25);
+  color: #e2e8f0;
+  font-size: 0.95rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  margin: 0;
+  padding-top: 0.75rem;
+}
+
 /* Range inputs – override .field input padding only; keep default appearance */
 .field input.range-input,
 input.range-input {

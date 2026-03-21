@@ -4,6 +4,7 @@ import {
   formatSecondsAsClock,
   getGeneratedSegmentName,
   getSegmentEstimatedDurationSeconds,
+  isSegmentRepGenActive,
 } from '../../services/index.ts'
 import type { Exercise } from '../../types/exercise.ts'
 import type { AssignedExercise, Segment } from '../../types/segment.ts'
@@ -16,6 +17,7 @@ import {
   IconXSmall,
 } from '../icons.tsx'
 import { SegmentExercisePicker } from './SegmentExercisePicker.tsx'
+import { SegmentRepGenerationPanel } from './SegmentRepGenerationPanel.tsx'
 
 type SegmentEditorProps = {
   segment: Segment
@@ -412,6 +414,8 @@ export const SegmentEditor = ({
           </div>
         ) : null}
 
+        <SegmentRepGenerationPanel segment={segment} onCommit={handleSegmentChange} />
+
         <div className="segment-add-exercise-row" onClick={(event) => event.stopPropagation()}>
           {segment.segmentType === 'tabata' &&
           segment.exercises.length >= (segment.rounds ?? TABATA_ROUNDS_DEFAULT) ? (
@@ -486,7 +490,9 @@ export const SegmentEditor = ({
                     </div>
                   </div>
 
-                  {segment.segmentType !== 'deathBy' && segment.segmentType !== 'tabata' && (
+                  {segment.segmentType !== 'deathBy' &&
+                  segment.segmentType !== 'tabata' &&
+                  !(isSegmentRepGenActive(segment) && isSetsReps) && (
                   <div className="prescription-stack">
                         {isSetsReps ? (
                           <>
