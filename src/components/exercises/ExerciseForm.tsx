@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { TRAINING_TYPES, type TrainingType } from '../../types/domain.ts'
+import { TRAINING_TYPES } from '../../types/domain.ts'
 import type { Exercise } from '../../types/exercise.ts'
+import { ToggleSwitch } from '../ToggleSwitch.tsx'
 
 type ExerciseFormProps = {
   initialDraft: Exercise
@@ -14,9 +15,6 @@ const parseCsv = (value: string) =>
     .split(',')
     .map((item) => item.trim())
     .filter(Boolean)
-
-const toggleTrainingType = (types: TrainingType[], type: TrainingType) =>
-  types.includes(type) ? types.filter((item) => item !== type) : [...types, type]
 
 export const ExerciseForm = ({
   initialDraft,
@@ -96,21 +94,23 @@ export const ExerciseForm = ({
 
     <div className="field-group">
       <span className="field-group-label">Training type</span>
-      <div className="chip-row">
+      <div className="toggle-switch-row toggle-switch-row--inline">
         {TRAINING_TYPES.map((type) => (
-          <label key={type} className="checkbox-chip">
-            <input
-              checked={draft.type.includes(type)}
-              type="checkbox"
-              onChange={() =>
-                setDraft({
-                  ...draft,
-                  type: toggleTrainingType(draft.type, type),
-                })
-              }
-            />
-            <span>{type}</span>
-          </label>
+          <ToggleSwitch
+            key={type}
+            label={type.charAt(0).toUpperCase() + type.slice(1)}
+            checked={draft.type.includes(type)}
+            onChange={(on) =>
+              setDraft({
+                ...draft,
+                type: on
+                  ? draft.type.includes(type)
+                    ? draft.type
+                    : [...draft.type, type]
+                  : draft.type.filter((t) => t !== type),
+              })
+            }
+          />
         ))}
       </div>
     </div>

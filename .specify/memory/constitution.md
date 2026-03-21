@@ -119,6 +119,12 @@ Rules:
 - Shared logic belongs in hooks or utility modules
 - Avoid deeply nested component trees
 
+#### UI — form controls (checkboxes & single-choice radios)
+
+- **Binary checkboxes** (on/off): use the shared **`ToggleSwitch`** component (`src/components/ToggleSwitch.tsx`) and its **`.toggle-switch`** styles — do not use native square checkboxes in product UI unless a documented exception applies (e.g. third-party embeds).
+- **Mutually exclusive choices** (radio behavior): prefer the shared **`SegmentedControl`** component (`src/components/SegmentedControl.tsx`) with **`.segmented-control`** styles — flush segments, selected state visually “pressed” (inset), no floating pill gaps unless wrapping is required (`segmented-control--wrap`).
+- New screens should reuse these patterns before introducing one-off control styles.
+
 ---
 
 ### Data Model
@@ -195,5 +201,6 @@ Changes to this document must include:
 
 ---
 
-Version: 0.2.0  
-Ratified: 2026-03-11
+Version: 0.2.2  
+Ratified: 2026-03-11  
+Amendment: UI form-control rules (ToggleSwitch / SegmentedControl).

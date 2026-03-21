@@ -8,6 +8,7 @@ import {
 } from '../../services/index.ts'
 import type { Exercise } from '../../types/exercise.ts'
 import type { AssignedExercise, Segment } from '../../types/segment.ts'
+import { SegmentedControl } from '../SegmentedControl.tsx'
 import { ToggleSwitch } from '../ToggleSwitch.tsx'
 import {
   IconArrowDown,
@@ -561,42 +562,39 @@ export const SegmentEditor = ({
                       <>
                         <div className="field">
                           <span>Measure</span>
-                          <div className="measure-radio-group" role="radiogroup" aria-label="Metric type">
-                            {metricOptions.map((metric) => (
-                              <label
-                                key={metric}
-                                className={`measure-radio-option${metricType === metric ? ' measure-radio-option-selected' : ''}`}
-                              >
-                                <input
-                                  type="radio"
-                                  name={`measure-${assignedExercise.id}`}
-                                  value={metric}
-                                  checked={metricType === metric}
-                                  onChange={() =>
-                                    onUpdateAssignedExercise({
-                                      ...assignedExercise,
-                                      sets: undefined,
-                                      repetitions: undefined,
-                                      metricTarget:
-                                        metric === 'custom'
-                                          ? {
-                                              type: 'custom',
-                                              value: 0,
-                                              customText: assignedExercise.metricTarget?.type === 'custom' ? assignedExercise.metricTarget.customText ?? '' : '',
-                                              speed: assignedExercise.metricTarget?.speed,
-                                              watts: assignedExercise.metricTarget?.watts,
-                                            }
-                                          : {
-                                              type: metric,
-                                              value: METRIC_RANGES[metric].min,
-                                            },
-                                    })
-                                  }
-                                />
-                                <span className="measure-radio-label">{metric === 'custom' ? 'Custom' : metric}</span>
-                              </label>
-                            ))}
-                          </div>
+                          <SegmentedControl<ExerciseMetric>
+                            name={`measure-${assignedExercise.id}`}
+                            value={metricType}
+                            options={metricOptions.map((metric) => ({
+                              value: metric,
+                              label: metric === 'custom' ? 'Custom' : metric,
+                            }))}
+                            onChange={(metric) =>
+                              onUpdateAssignedExercise({
+                                ...assignedExercise,
+                                sets: undefined,
+                                repetitions: undefined,
+                                metricTarget:
+                                  metric === 'custom'
+                                    ? {
+                                        type: 'custom',
+                                        value: 0,
+                                        customText:
+                                          assignedExercise.metricTarget?.type === 'custom'
+                                            ? assignedExercise.metricTarget.customText ?? ''
+                                            : '',
+                                        speed: assignedExercise.metricTarget?.speed,
+                                        watts: assignedExercise.metricTarget?.watts,
+                                      }
+                                    : {
+                                        type: metric,
+                                        value: METRIC_RANGES[metric].min,
+                                      },
+                              })
+                            }
+                            ariaLabel="Metric type"
+                            className="segmented-control--wrap"
+                          />
                         </div>
                         <div className="field">
                           {isCustomMeasure ? (

@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { SegmentedControl } from '../SegmentedControl.tsx'
+import { ToggleSwitch } from '../ToggleSwitch.tsx'
 import { applyRepSequenceToSetsRepsRepetitions } from '../../services/workout-domain.ts'
 import {
   buildRepSequence,
@@ -286,43 +288,30 @@ export function SegmentRepGenerationPanel({ segment, onCommit }: SegmentRepGener
 
   return (
     <div className="rep-generation-panel" onClick={(e) => e.stopPropagation()}>
-      <label className="rep-generation-enable-row">
-        <input
-          type="checkbox"
-          checked={repGenActive}
-          onChange={(e) => handleEnableToggle(e.target.checked)}
-        />
-        <span>Reps per round</span>
-      </label>
+      <ToggleSwitch
+        className="rep-generation-enable-toggle"
+        label="Reps per round"
+        checked={repGenActive}
+        onChange={handleEnableToggle}
+      />
 
       {repGenActive ? (
         <>
-          <div className="rep-generation-pattern-row" role="radiogroup" aria-label="Repetition pattern">
-            {PATTERN_OPTIONS.map(({ id, label }) => {
-              const disabled = id === 'pyramid' && pyramidRadioDisabled
-              return (
-                <label
-                  key={id}
-                  className={`rep-generation-pattern-option${disabled ? ' rep-generation-option-disabled' : ''}`}
-                >
-                  <input
-                    type="radio"
-                    name={`rep-pattern-${segment.id}`}
-                    checked={pattern === id}
-                    disabled={disabled}
-                    aria-disabled={disabled}
-                    title={
-                      disabled
-                        ? 'Pyramid needs an odd number of segment rounds. Change EMOM or For Time rounds first.'
-                        : undefined
-                    }
-                    onChange={() => handlePatternChange(id)}
-                  />
-                  <span>{label}</span>
-                </label>
-              )
-            })}
-          </div>
+          <SegmentedControl<RepSchemePattern>
+            name={`rep-pattern-${segment.id}`}
+            value={pattern}
+            options={PATTERN_OPTIONS.map(({ id, label }) => ({
+              value: id,
+              label,
+              disabled: id === 'pyramid' && pyramidRadioDisabled,
+              title:
+                id === 'pyramid' && pyramidRadioDisabled
+                  ? 'Pyramid needs an odd number of segment rounds. Change EMOM or For Time rounds first.'
+                  : undefined,
+            }))}
+            onChange={(id) => handlePatternChange(id)}
+            ariaLabel="Repetition pattern"
+          />
 
           {!timingRoundsLocked ? (
             <label className="field">
