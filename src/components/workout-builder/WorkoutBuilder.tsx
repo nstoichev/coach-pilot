@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react'
 import { useWorkoutBuilder } from '../../store/index.ts'
-import { getTimerStructure } from '../../services/timer-generator.ts'
 import { getTodayLocalDateString } from '../../services/schedule-utils.ts'
 import { mockWorkouts } from '../../services/mock-workouts.ts'
+import { LoadWorkoutModal } from './LoadWorkoutModal.tsx'
 import { SegmentList } from './SegmentList.tsx'
 import { SegmentTypeModal } from './SegmentTypeModal.tsx'
 import { WorkoutDetailsForm } from './WorkoutDetailsForm.tsx'
@@ -15,6 +15,7 @@ const SAMPLE_WORKOUTS = mockWorkouts.map((workout) => ({
 export const WorkoutBuilder = () => {
   const { state, actions } = useWorkoutBuilder()
   const [isSegmentTypeModalOpen, setIsSegmentTypeModalOpen] = useState(false)
+  const [isLoadWorkoutModalOpen, setIsLoadWorkoutModalOpen] = useState(false)
   const today = useMemo(() => getTodayLocalDateString(), [])
 
   const workoutErrors = useMemo(
@@ -32,23 +33,28 @@ export const WorkoutBuilder = () => {
     (seg) => seg.exercises.length > 0,
   )
 
-  const timerStructure = useMemo(
-    () => getTimerStructure(state.workoutDraft),
-    [state.workoutDraft],
-  )
-
   return (
     <main className="builder-shell">
       <WorkoutDetailsForm
         workoutName={state.workoutDraft.name}
-        segmentCount={state.workoutDraft.segments.length}
         scheduledDate={state.workoutDraft.scheduledDate ?? ''}
         scheduledDateMin={today}
         onScheduledDateChange={actions.setScheduledDate}
         onWorkoutNameChange={actions.setWorkoutName}
         onAddSegment={() => setIsSegmentTypeModalOpen(true)}
-        sampleWorkouts={SAMPLE_WORKOUTS}
-        onLoadSample={actions.loadWorkout}
+        onOpenLoadWorkout={
+          SAMPLE_WORKOUTS.length > 0 ? () => setIsLoadWorkoutModalOpen(true) : undefined
+        }
+      />
+
+      <LoadWorkoutModal
+        isOpen={isLoadWorkoutModalOpen}
+        onClose={() => setIsLoadWorkoutModalOpen(false)}
+        samples={SAMPLE_WORKOUTS}
+        onSelectWorkout={(workout) => {
+          actions.loadWorkout(workout)
+          setIsLoadWorkoutModalOpen(false)
+        }}
       />
 
       <SegmentTypeModal
@@ -74,18 +80,11 @@ export const WorkoutBuilder = () => {
         onReorderExercises={actions.reorderSegmentExercises}
       />
 
-      <section className="panel">
-        <div className="panel-header">
-          <div>
-            <p className="eyebrow">Validation</p>
-            <h2>Current builder status</h2>
-          </div>
-        </div>
-
+      <section className="panel builder-status-panel">
         {workoutErrors.length === 0 ? (
-          <p className="success-text">Workout draft is structurally valid.</p>
+          <p className="success-text builder-status-message">Workout draft is structurally valid.</p>
         ) : (
-          <ul className="validation-list">
+          <ul className="validation-list builder-status-message">
             {workoutErrors.map((error) => (
               <li key={`${error.field}-${error.message}`}>
                 <strong>{error.field}</strong>: {error.message}
@@ -106,19 +105,6 @@ export const WorkoutBuilder = () => {
         </button>
       </div>
 
-      <section className="panel future-features-panel">
-        <div className="panel-header">
-          <div>
-            <p className="eyebrow">Future features</p>
-            <h2>Extension points</h2>
-          </div>
-        </div>
-        <p className="muted-text">
-          The workout domain is ready for Timer Generator, Fatigue System, and workout
-          auto-generation. Placeholder contracts consume this draft; timer structure
-          reports {timerStructure.segments.length} segment{timerStructure.segments.length === 1 ? '' : 's'}.
-        </p>
-      </section>
     </main>
   )
 }

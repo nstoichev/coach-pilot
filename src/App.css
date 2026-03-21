@@ -140,6 +140,12 @@ input[type="number"] {
   margin-top: 1rem;
 }
 
+/* Workout name under scheduled date (single column, full width). */
+.form-grid--workout-details {
+  grid-template-columns: 1fr;
+  width: 100%;
+}
+
 .field {
   display: grid;
   gap: 0.45rem;
@@ -839,11 +845,28 @@ input.range-input {
 }
 
 .panel-add-segment-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
   margin-top: 1rem;
+  width: 100%;
 }
 
-.panel-add-segment-button {
+.panel-add-segment-row .panel-add-segment-button,
+.panel-add-segment-row .panel-load-workout-button {
   width: 100%;
+}
+
+.builder-status-panel {
+  padding-block: 0.85rem;
+}
+
+.builder-status-panel .builder-status-message {
+  margin: 0;
+}
+
+.builder-status-panel .validation-list {
+  margin: 0;
 }
 
 .picker-summary {

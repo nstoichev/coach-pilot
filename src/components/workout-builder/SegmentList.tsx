@@ -30,12 +30,7 @@ export const SegmentList = ({
   onReorderExercises,
 }: SegmentListProps) => {
   if (segments.length === 0) {
-    return (
-      <section className="panel empty-state">
-        <h2>No segments yet</h2>
-        <p>Add your first segment to start building the workout flow.</p>
-      </section>
-    )
+    return null
   }
 
   return (
