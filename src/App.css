@@ -303,20 +303,52 @@ button:hover {
 .board-header {
   align-items: center;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 1rem;
   justify-content: space-between;
 }
 
+.board-header-title-block {
+  flex: 1;
+  min-width: 0;
+}
+
+/* High contrast vs page: light OS theme uses white page bg (index.css). */
 .board-title {
   color: #f8fafc;
-  font-size: 1.5rem;
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.2;
   margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (prefers-color-scheme: light) {
+  .board-title {
+    color: #0f172a;
+  }
 }
 
 .board-actions {
   display: flex;
+  flex-shrink: 0;
   gap: 0.75rem;
+}
+
+@media (max-width: 520px) {
+  .board-header {
+    flex-wrap: wrap;
+  }
+
+  .board-header-title-block {
+    flex-basis: 100%;
+  }
+
+  .board-actions {
+    margin-left: auto;
+  }
 }
 
 .board-content {

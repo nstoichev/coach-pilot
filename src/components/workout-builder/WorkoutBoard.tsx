@@ -23,10 +23,16 @@ export function WorkoutBoard({ workout, onBackToBuild }: WorkoutBoardProps) {
     setCurrentPhase(info)
   }, [])
 
+  const boardWorkoutTitle = workout.name.trim() || 'Untitled workout'
+
   return (
     <main className="board-shell">
       <header className="board-header">
-        <h1 className="board-title">{workout.name}</h1>
+        <div className="board-header-title-block">
+          <h1 className="board-title" title={boardWorkoutTitle}>
+            {boardWorkoutTitle}
+          </h1>
+        </div>
         <div className="board-actions">
           <button
             type="button"
