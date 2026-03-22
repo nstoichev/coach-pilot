@@ -10,6 +10,14 @@ This feature centers on a reusable Workout -> Segment -> Assigned Exercise -> Ex
 
 **Workout Board**: The Workout Board is a read-only view of a Workout (no new entities); it displays the same Workout data in a CrossFit-style layout when the user clicks Done. Timer state (running, stopped, current phase) is UI/session state. The workout timer is a single continuous flow: it runs through each time-measurable segment in order, showing one counter at a time—work phases (EMOM as one countdown per interval/round, AMRAP count down, For Time counts up with Stop, Death by 1:00 countdown per round with Stop) and rest phases (count down). Rest is stored in minutes; the timer converts to seconds for display and countdown. See spec **Workout Timer — Detailed Behavior** for full rules.
 
+**Derived view: required equipment (board)**:
+
+- **Function**: `getWorkoutRequiredEquipment(workout: Workout): string[]` (implemented in `src/services/workout-equipment.ts`).
+- **Input**: A workout snapshot (same structure as the board consumes: ordered segments, each with ordered assignments, each assignment embedding `exercise` including optional `equipment?: string[]`).
+- **Output**: Sorted list of unique equipment **labels** (strings) for UI display. Not persisted on `Workout`; recomputed whenever the board renders.
+- **Rules** (see `research.md` Decision 6): trim each item; omit blanks; union across all assignments; dedupe case-insensitively (first-seen casing wins); sort with `localeCompare` (`sensitivity: 'base'`). Empty result means the UI does not render an equipment section.
+- **Invariants**: Same workout value → same array (deterministic). Pure function, no I/O.
+
 ---
 
 ## Entity: Exercise
@@ -137,7 +145,7 @@ This feature centers on a reusable Workout -> Segment -> Assigned Exercise -> Ex
 
 ### Usage
 
-- supports future equipment aggregation
+- supports **workout-level aggregation** for the Workout Board (`getWorkoutRequiredEquipment`) and future equipment calculator features
 - supports validation and coaching awareness for facility constraints
 
 ---

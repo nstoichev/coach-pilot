@@ -5,7 +5,7 @@ alwaysApply: true
 ---
 # coach-pilot Development Guidelines
 
-Auto-generated from Specify workflow; last updated: 2026-03-13
+Auto-generated from Specify workflow; last updated: 2026-03-22
 
 ## Active Technologies
 
@@ -34,6 +34,7 @@ specs/
 - `npm run dev` — local dev
 - `npm run build` — typecheck + production build
 - `npm run lint` — ESLint
+- `npm run test` — Vitest (domain unit tests, e.g. `workout-equipment`)
 
 ## Code Style
 
@@ -42,6 +43,7 @@ specs/
 
 ## Recent Changes
 
+- Workout Board **Equipment required** list: `getWorkoutRequiredEquipment` in `src/services/workout-equipment.ts`, FR-031 / Contract 6 in `specs/002-fitness-workout-spec/`.
 - Documented segment repetition generation feature in `specs/004-segment-repetition-generation/` (plan, spec, research, data-model, contracts, quickstart).
 
 <!-- MANUAL ADDITIONS START -->

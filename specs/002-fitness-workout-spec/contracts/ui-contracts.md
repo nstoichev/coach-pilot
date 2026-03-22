@@ -142,3 +142,27 @@ All surfaces described in these contracts MUST follow **`.specify/memory/constit
 
 - placeholder services must consume the same Workout -> Segment -> Exercise structure
 - phase-1 UI should expose future readiness without implementing full advanced behavior
+
+---
+
+## Contract 6: Workout Board — Equipment required
+
+**Responsibilities**:
+
+- After the user clicks **Done**, the **Workout Board** shows a read-only workout layout. Below the segment list (the main `boardContent` section), when the workout has at least one non-empty equipment label after aggregation, show a block titled **“Equipment required”** listing all required gear.
+
+**Inputs**:
+
+- Workout snapshot passed to `WorkoutBoard` (same as today).
+- Aggregated list from `getWorkoutRequiredEquipment(workout)` in `src/services/workout-equipment.ts`.
+
+**Outputs**:
+
+- Visual list (e.g. unordered list) of equipment strings, one per line, **sorted** and **deduplicated** per `research.md` Decision 6.
+- When the aggregated list is **empty**, **render nothing** for this block (no heading, no empty state).
+
+**Rules**:
+
+- Board must **not** compute aggregation inline; it calls the service helper (domain logic in `src/services/`).
+- Styling must use **semantic Tailwind tokens** via `src/ui/tw.ts` (e.g. panel/border/text tokens consistent with other board sections). No hardcoded colors or default palette utilities in components.
+- Timer embed and header actions are unchanged; equipment block appears **below** segments, still inside the board shell flow.

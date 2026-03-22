@@ -114,7 +114,7 @@ export const mockWorkoutCindy: Workout = {
     amrapSegment('segment-cindy', 20 * 60, [
       assigned('ae-cindy-1', 'exercise-pull-ups', { repetitions: 5 }),
       assigned('ae-cindy-2', 'exercise-push-ups', { repetitions: 10 }),
-      assigned('ae-cindy-3', 'exercise-air-squats', { repetitions: 15 }),
+      assigned('ae-cindy-3', 'exercise-air-squat', { repetitions: 15 }),
     ]),
   ],
 }
@@ -220,7 +220,7 @@ export const mockWorkoutMurph: Workout = {
         }),
         assigned('ae-murph-2', 'exercise-pull-ups', { repetitions: 100 }),
         assigned('ae-murph-3', 'exercise-push-ups', { repetitions: 200 }),
-        assigned('ae-murph-4', 'exercise-squat', { repetitions: 300 }),
+        assigned('ae-murph-4', 'exercise-air-squat', { repetitions: 300 }),
         assigned('ae-murph-5', 'exercise-run', {
           metricTarget: { type: 'distance', value: 1609 },
         }),

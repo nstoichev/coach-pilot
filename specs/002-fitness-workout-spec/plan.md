@@ -198,6 +198,18 @@ Equipment / Muscle Group
 
 ---
 
+## Addendum: Workout Board — required equipment list
+
+**Scope**: When the user clicks **Done**, the **Workout Board** shows a derived **“Equipment required”** section **below** all segments (see **FR-031**, `contracts/ui-contracts.md` Contract 6, `research.md` Decision 6).
+
+**Implementation**:
+
+- Pure function `getWorkoutRequiredEquipment(workout)` in `src/services/workout-equipment.ts` (trim, case-insensitive dedupe with first-seen casing, `localeCompare` sort).
+- `WorkoutBoard` calls the service and renders the block only when the array is non-empty; styling via new entries in `src/ui/tw.ts` (semantic tokens only).
+- **Vitest** covers aggregation edge cases in `src/services/workout-equipment.test.ts`; `tsconfig.app.json` excludes `**/*.test.ts` from the app typecheck build.
+
+---
+
 ## Testing Strategy
 
 Focus on **domain logic tests** first when a test runner is introduced.
@@ -207,14 +219,15 @@ Priority test areas:
 - workout transformations
 - segment and exercise reorder behavior
 - exercise assignment validation
-- equipment aggregation
+- equipment aggregation (`getWorkoutRequiredEquipment`)
 - future timer metadata compatibility
 
 Phase-1 validation approach:
 
-- manual verification using the scenarios in `quickstart.md`
+- manual verification using the scenarios in `quickstart.md` (including Scenario 7 — board equipment)
 - `npm run lint`
 - `npm run build`
+- `npm run test` (equipment aggregation unit tests)
 
 UI tests remain optional during early development.
 

@@ -95,9 +95,25 @@ Expected result:
 
 ---
 
+## Scenario 7: Workout Board — Equipment required
+
+1. In the Exercise Database, ensure at least two exercises list overlapping equipment (e.g. both use `barbell`) and at least one exercise has no equipment or empty equipment.
+2. In the Workout Builder, add those exercises across one or more segments (valid workout).
+3. Click **Done** to open the Workout Board.
+
+Expected result:
+
+- Below the last segment (and any segment rest lines), a section titled **“Equipment required”** appears **only if** there is at least one equipment label after aggregation.
+- Each distinct item appears **once** (duplicates across exercises or segments are merged; casing-only duplicates are merged—see `research.md` Decision 6).
+- Items are shown in a **stable sorted** order.
+- If every assigned exercise has no equipment (or only blank entries), the equipment section is **not** shown.
+
+---
+
 ## Validation Commands
 
 - `npm run lint`
 - `npm run build`
+- `npm run test` (unit tests for equipment aggregation, when present)
 
-Both commands should complete successfully before implementation is considered ready for review.
+All commands should complete successfully before implementation is considered ready for review.

@@ -19,6 +19,53 @@ export const mockExerciseDatabase: Exercise[] = [
     },
   },
   {
+    id: 'exercise-back-squat',
+    name: 'Back Squat',
+    type: ['strength', 'crossfit'],
+    prescription: {
+      mode: 'sets-reps',
+    },
+    equipment: ['barbell', 'rack'],
+    muscles: {
+      primary: ['quadriceps', 'glutes'],
+      stabilizing: ['core', 'erectors'],
+    },
+    workingWeight: {
+      mode: 'weight',
+      value: 80,
+    },
+  },
+  {
+    id: 'exercise-goblet-squat',
+    name: 'Goblet Squat',
+    type: ['strength', 'crossfit'],
+    prescription: { mode: 'sets-reps' },
+    equipment: ['kettlebell/dumbbell'],
+    muscles: {
+      primary: ['quadriceps', 'glutes'],
+      stabilizing: ['core', 'upper back'],
+    },
+    workingWeight: {
+      mode: 'weight',
+      value: 24,
+    },
+  },
+  {
+    id: 'exercise-overhead-squat',
+    name: 'Overhead Squat',
+    type: ['strength', 'crossfit'],
+    prescription: { mode: 'sets-reps' },
+    equipment: ['barbell'],
+    muscles: {
+      primary: ['quadriceps', 'glutes', 'shoulders'],
+      stabilizing: ['core', 'erectors', 'upper back'],
+    },
+    workingWeight: {
+      mode: 'weight',
+      value: 40,
+    },
+  },
+  {
     id: 'exercise-burpee-over-bar',
     name: 'Burpee Over Bar',
     type: ['crossfit'],
@@ -68,8 +115,8 @@ export const mockExerciseDatabase: Exercise[] = [
     },
   },
   {
-    id: 'exercise-air-squats',
-    name: 'Air Squats',
+    id: 'exercise-air-squat',
+    name: 'Air Squat',
     type: ['crossfit', 'mobility'],
     prescription: { mode: 'sets-reps' },
     equipment: [],
@@ -223,7 +270,7 @@ export const mockExerciseDatabase: Exercise[] = [
       metricOptions: ['calories', 'distance', 'time', 'custom'],
       advancedMetrics: ['speed', 'watts'],
     },
-    equipment: ['track'],
+    equipment: ['track/treadmill'],
     muscles: {
       primary: ['legs'],
       stabilizing: ['core'],
@@ -241,23 +288,11 @@ export const mockExerciseDatabase: Exercise[] = [
     },
   },
   {
-    id: 'exercise-squat',
-    name: 'Squats',
-    type: ['crossfit', 'strength'],
-    prescription: { mode: 'sets-reps' },
-    equipment: ['barbell', 'rack'],
-    muscles: {
-      primary: ['quadriceps', 'glutes'],
-      stabilizing: ['core', 'erectors'],
-    },
-    workingWeight: { mode: 'weight', value: 80 },
-  },
-  {
     id: 'exercise-thrusters',
     name: 'Thrusters',
     type: ['crossfit', 'strength'],
     prescription: { mode: 'sets-reps' },
-    equipment: ['barbell', 'rack'],
+    equipment: ['barbell'],
     muscles: {
       primary: ['quadriceps', 'shoulders'],
       stabilizing: ['core', 'glutes', 'triceps'],
