@@ -7,6 +7,7 @@ import {
   getBoardRestLine,
   isWorkoutTimeMeasurable,
 } from '../../services/workout-board-format.ts'
+import { getWorkoutRequiredEquipment } from '../../services/workout-equipment.ts'
 import { cn } from '../../ui/cn.ts'
 import * as tw from '../../ui/tw.ts'
 import { WorkoutTimer, type TimerPhaseInfo } from './WorkoutTimer.tsx'
@@ -26,6 +27,7 @@ export function WorkoutBoard({ workout, onBackToBuild }: WorkoutBoardProps) {
   }, [])
 
   const boardWorkoutTitle = workout.name.trim() || 'Untitled workout'
+  const requiredEquipment = getWorkoutRequiredEquipment(workout)
 
   return (
     <main className={tw.boardShell}>
@@ -115,6 +117,19 @@ export function WorkoutBoard({ workout, onBackToBuild }: WorkoutBoardProps) {
           )
         })}
       </section>
+
+      {requiredEquipment.length > 0 ? (
+        <section className={tw.boardEquipmentSection} aria-label="Equipment required">
+          <h2 className={tw.boardEquipmentTitle}>Equipment required</h2>
+          <ul className={tw.boardEquipmentList}>
+            {requiredEquipment.map((item) => (
+              <li key={item} className={tw.boardEquipmentItem}>
+                {item}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
     </main>
   )
 }

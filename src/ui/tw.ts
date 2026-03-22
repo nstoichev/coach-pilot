@@ -156,6 +156,19 @@ export const boardExerciseLineWithRepBullet = cn(
   'relative pl-0 before:mr-1 before:inline before:font-semibold before:text-text-muted before:content-["*"]',
 )
 
+/** Below segment list on Workout Board — FR-031 */
+export const boardEquipmentSection = cn(
+  boardSegment,
+  'mt-2 border-dashed',
+)
+
+export const boardEquipmentTitle =
+  'mb-2 mt-0 text-sm font-bold uppercase tracking-wide text-text-primary'
+
+export const boardEquipmentList = 'mb-0 list-none space-y-1 p-0'
+
+export const boardEquipmentItem = 'text-base text-text-secondary'
+
 export const boardRest = 'my-1 text-sm text-text-muted'
 
 export const timerStrip =

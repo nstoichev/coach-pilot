@@ -80,3 +80,21 @@
 **Alternatives considered**:
 
 - **No contracts document**: Rejected because future implementation steps would need to infer UI/state behavior from prose alone.
+
+---
+
+## Decision 6: Workout Board — aggregated equipment list
+
+**Decision**: Derive a single **“Equipment required”** list on the Workout Board from all assigned exercises’ `equipment` arrays. **Normalize** each entry with **trim**; drop empty strings. **Deduplicate** using **case-insensitive** comparison; when two entries differ only by case, **keep the first occurrence’s casing** (stable traversal: segments in order, exercises in order within each segment). **Sort** the final labels with **`localeCompare`** using **`sensitivity: 'base'`** so display order is predictable and case-insensitive. When the aggregated list is **empty**, **omit** the entire equipment block (minimal board; no “None” placeholder).
+
+**Rationale**:
+
+- Matches constitution guidance for **deterministic, testable** aggregation and the domain concept of workout-level required equipment.
+- Case-insensitive dedupe avoids duplicate lines such as “Barbell” and “barbell” from mock or user data.
+- Omitting the section when empty keeps the board clean for bodyweight-only workouts.
+
+**Alternatives considered**:
+
+- **Case-sensitive dedupe**: Rejected for noisy duplicate lines from inconsistent casing.
+- **Always show the section with “No equipment listed”**: Rejected in favor of a sparser layout; screen readers skip the block when there is nothing to gather.
+- **Per-segment equipment**: Rejected for this slice; a single workout-level list matches the user story (“list on the bottom below the segments”).
