@@ -17,6 +17,7 @@ import {
   IconArrowUpSmall,
   IconXSmall,
 } from '../icons.tsx'
+import { ADVANCED_METRIC_RANGES, METRIC_RANGES } from '../../services/metric-ranges.ts'
 import { SegmentExercisePicker } from './SegmentExercisePicker.tsx'
 import { SegmentRepGenerationPanel } from './SegmentRepGenerationPanel.tsx'
 
@@ -79,22 +80,6 @@ const ASSIGNED_SETS_MIN = 0
 const ASSIGNED_SETS_MAX = 10
 const ASSIGNED_REPS_MIN = 1
 const ASSIGNED_REPS_MAX = 50
-
-const METRIC_RANGES: Record<
-  ExerciseMetric,
-  { min: number; max: number; step: number; unit: string }
-> = {
-  calories: { min: 0, max: 500, step: 5, unit: 'kcal' },
-  distance: { min: 0, max: 10000, step: 100, unit: 'm' },
-  speed: { min: 0, max: 50, step: 1, unit: 'km/h' },
-  time: { min: 0, max: 3600, step: 15, unit: 's' },
-  custom: { min: 0, max: 1, step: 1, unit: '' },
-}
-
-const ADVANCED_RANGES: Record<string, { min: number; max: number; step: number; unit: string }> = {
-  speed: { min: 0, max: 50, step: 1, unit: 'km/h' },
-  watts: { min: 0, max: 500, step: 10, unit: 'W' },
-}
 
 function formatMetricValue(metric: ExerciseMetric, value: number, customText?: string): string {
   if (metric === 'custom' && customText) return customText
@@ -449,8 +434,12 @@ export const SegmentEditor = ({
                 assignedExercise.exercise.prescription.mode === 'sets-reps'
               const metricType =
                 assignedExercise.metricTarget?.type ?? metricOptions[0] ?? 'distance'
-                              const metricRange = METRIC_RANGES[metricType]
-              const metricValue = assignedExercise.metricTarget?.value ?? metricRange.min
+              const metricRange = METRIC_RANGES[metricType]
+              const rawMetricValue = assignedExercise.metricTarget?.value ?? metricRange.min
+              const metricValue =
+                metricType === 'custom'
+                  ? rawMetricValue
+                  : Math.min(metricRange.max, Math.max(metricRange.min, rawMetricValue))
               const customText = assignedExercise.metricTarget?.customText ?? ''
               const isMaxAllowed = metricType === 'calories' || metricType === 'distance'
               const isMax = assignedExercise.metricTarget?.isMax ?? false
@@ -696,9 +685,9 @@ export const SegmentEditor = ({
                                     </span>
                                     <input
                                       className="range-input"
-                                      max={ADVANCED_RANGES.speed.max}
-                                      min={ADVANCED_RANGES.speed.min}
-                                      step={ADVANCED_RANGES.speed.step}
+                                      max={ADVANCED_METRIC_RANGES.speed.max}
+                                      min={ADVANCED_METRIC_RANGES.speed.min}
+                                      step={ADVANCED_METRIC_RANGES.speed.step}
                                       type="range"
                                       value={assignedExercise.metricTarget?.speed ?? 0}
                                       onChange={(event) =>
@@ -723,9 +712,9 @@ export const SegmentEditor = ({
                                     </span>
                                     <input
                                       className="range-input"
-                                      max={ADVANCED_RANGES.watts.max}
-                                      min={ADVANCED_RANGES.watts.min}
-                                      step={ADVANCED_RANGES.watts.step}
+                                      max={ADVANCED_METRIC_RANGES.watts.max}
+                                      min={ADVANCED_METRIC_RANGES.watts.min}
+                                      step={ADVANCED_METRIC_RANGES.watts.step}
                                       type="range"
                                       value={assignedExercise.metricTarget?.watts ?? 0}
                                       onChange={(event) =>

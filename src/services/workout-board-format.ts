@@ -98,7 +98,9 @@ export function getBoardExerciseLine(
     }
     const abbrev = type === 'calories' ? 'cal' : type === 'distance' ? 'm' : type === 'time' ? 'min' : type
     if (isMax) {
-      return `Max ${value} ${abbrev} - ${name}`
+      const maxUnit =
+        type === 'time' ? 'time' : type === 'calories' ? 'cal' : type === 'distance' ? 'm' : abbrev
+      return `Max ${maxUnit} - ${name}`
     }
     return `${value} ${abbrev} - ${name}`
   }

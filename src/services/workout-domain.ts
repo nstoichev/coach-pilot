@@ -1,6 +1,7 @@
 import type { Exercise } from '../types/exercise.ts'
 import type { AssignedExercise, Segment } from '../types/segment.ts'
 import type { Workout } from '../types/workout.ts'
+import { METRIC_RANGES } from './metric-ranges.ts'
 import { canAssignExerciseToSegment } from './workout-validation.ts'
 
 export const reorderList = <T>(items: T[], fromIndex: number, toIndex: number): T[] => {
@@ -58,6 +59,15 @@ export const assignExerciseToSegment = (
   // Persist default reps for sets-reps so board shows "1 - Name" even when user never touches the slider.
   if (exercise.prescription.mode === 'sets-reps') {
     assignedExercise.repetitions = 1
+  }
+
+  // Default metric target so validation passes before the user opens sliders (positive mins from METRIC_RANGES).
+  if (exercise.prescription.mode === 'metric' && exercise.prescription.metricOptions.length > 0) {
+    const first = exercise.prescription.metricOptions[0]
+    assignedExercise.metricTarget =
+      first === 'custom'
+        ? { type: 'custom', value: 0, customText: '' }
+        : { type: first, value: METRIC_RANGES[first].min }
   }
 
   return {

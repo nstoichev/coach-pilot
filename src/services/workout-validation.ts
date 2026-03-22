@@ -357,7 +357,10 @@ export const validateAssignedExercise = (
             message: 'Custom measure must be entered (e.g. 1 mile, 10 km).',
           })
         }
-      } else if (assignedExercise.metricTarget.value <= 0) {
+      } else if (
+        !assignedExercise.metricTarget.isMax &&
+        assignedExercise.metricTarget.value <= 0
+      ) {
         errors.push({
           field: 'metricTarget.value',
           message: 'Metric value must be greater than zero.',

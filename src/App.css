@@ -67,7 +67,7 @@ input[type="number"] {
 }
 
 .panel {
-  padding: 1.5rem;
+  padding: 1rem;
 }
 
 .panel-header,
@@ -1160,14 +1160,6 @@ input.range-input {
 
   .exercise-database-grid {
     grid-template-columns: 1fr;
-  }
-
-  .panel-header,
-  .segment-card-header,
-  .exercise-list-item,
-  .exercise-record {
-    align-items: stretch;
-    flex-direction: column;
   }
 
   .segment-card-header-left {
