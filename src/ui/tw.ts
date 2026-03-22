@@ -83,17 +83,18 @@ export const fieldGroupLabel = 'text-sm font-semibold text-text-secondary'
 
 export const rangeInput = 'p-0'
 
-/** Range sliders: token border/background + thumb accent */
-export const rangeSlider = cn(fieldInput, rangeInput, 'w-full accent-action')
+/** Range sliders: same chrome as text fields but flush to edges (no horizontal padding on the track). */
+export const rangeSlider =
+  'w-full rounded-xl border border-primary bg-surface-input px-0 py-0 font-inherit text-text-secondary transition-colors duration-200 ease-in-out accent-action'
 
 export const primaryButton =
-  'rounded-xl border-0 bg-gradient-to-br from-action to-action-hover px-4 py-3 font-inherit font-medium text-action-foreground transition-all duration-200 ease-in-out hover:scale-[1.02] active:scale-[0.98] hover:brightness-110'
+  'rounded-xl border-0 bg-gradient-to-br from-action to-action-hover px-4 py-3 font-inherit font-medium text-action-foreground transition-colors transition-opacity duration-200 ease-in-out hover:opacity-90 active:opacity-80 disabled:opacity-60'
 
 export const dangerButton =
-  'rounded-xl border-0 bg-danger px-4 py-3 font-inherit font-medium text-action-foreground transition-all duration-200 ease-in-out hover:scale-[1.02] active:scale-[0.98] hover:bg-danger-hover'
+  'rounded-xl border-0 bg-danger px-4 py-3 font-inherit font-medium text-action-foreground transition-colors transition-opacity duration-200 ease-in-out hover:bg-danger-hover hover:opacity-95 active:opacity-85 disabled:opacity-60'
 
 export const secondaryButton =
-  'rounded-xl border border-primary bg-surface-tertiary px-4 py-3 font-inherit font-medium text-text-secondary shadow-insetShallow transition-all duration-200 ease-in-out hover:scale-[1.02] active:scale-[0.98] hover:border-primary hover:bg-surface-quaternary'
+  'rounded-xl border border-primary bg-surface-tertiary px-4 py-3 font-inherit font-medium text-text-secondary shadow-insetShallow transition-colors transition-opacity duration-200 ease-in-out hover:border-primary hover:bg-surface-quaternary hover:text-text-primary active:opacity-90 disabled:opacity-60'
 
 export const segmentIconButton = cn(
   secondaryButton,
@@ -104,7 +105,7 @@ export const builderDoneRow = 'mt-2'
 
 export const builderDoneButton = cn(
   primaryButton,
-  'w-full disabled:cursor-not-allowed disabled:opacity-60',
+  'w-full disabled:cursor-not-allowed',
 )
 
 export const boardShell = 'grid gap-6'
@@ -232,10 +233,10 @@ export const searchPicker = 'relative grid w-full gap-2.5'
 export const searchInput = fieldInput
 
 export const searchResults =
-  'max-h-[19rem] overflow-y-auto rounded-[0.85rem] border border-primary bg-surface-elevated p-2 shadow-dropdown'
+  'grid max-h-[19rem] w-full auto-rows-min gap-2 overflow-y-auto rounded-[0.85rem] border border-primary bg-surface-elevated p-2 shadow-dropdown'
 
 export const searchResultItem =
-  'grid w-full cursor-pointer justify-items-start gap-0.5 rounded-lg bg-surface-muted/70 p-2 text-left text-text-secondary transition-colors duration-200 ease-in-out hover:bg-surface-tertiary'
+  'grid w-full min-w-0 cursor-pointer justify-items-start gap-0.5 rounded-lg bg-surface-muted/70 p-3 text-left text-text-secondary transition-colors duration-200 ease-in-out hover:bg-surface-tertiary'
 
 export const searchResultTitle = 'font-semibold text-text-primary'
 
