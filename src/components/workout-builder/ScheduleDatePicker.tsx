@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { format, parseISO } from 'date-fns'
 import { DayPicker } from 'react-day-picker'
 import 'react-day-picker/style.css'
+import * as tw from '../../ui/tw.ts'
 
 type ScheduleDatePickerProps = {
   value: string
@@ -29,8 +30,10 @@ export function ScheduleDatePicker({
   const [month, setMonth] = useState<Date>(selected ?? minDate ?? new Date())
 
   useEffect(() => {
-    if (selected) setMonth(selected)
-  }, [value])
+    if (!selected) return
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- keep calendar month aligned to value
+    setMonth(selected)
+  }, [value, selected])
 
   useEffect(() => {
     if (!isOpen) return
@@ -44,11 +47,11 @@ export function ScheduleDatePicker({
   }, [isOpen])
 
   return (
-    <div className="schedule-date-picker" ref={containerRef}>
-      <div className="schedule-date-picker-input-row">
+    <div className={tw.scheduleDatePicker} ref={containerRef}>
+      <div className={tw.scheduleDatePickerInputRow}>
         <button
           type="button"
-          className="schedule-date-picker-input"
+          className={tw.scheduleDatePickerInput}
           onClick={() => setIsOpen((v) => !v)}
           aria-label={ariaLabel}
           aria-expanded={isOpen}
@@ -58,7 +61,7 @@ export function ScheduleDatePicker({
         </button>
         <button
           type="button"
-          className="schedule-date-picker-trigger"
+          className={tw.scheduleDatePickerTrigger}
           onClick={() => setIsOpen((v) => !v)}
           aria-label="Open date picker"
           aria-expanded={isOpen}
@@ -69,7 +72,11 @@ export function ScheduleDatePicker({
       </div>
 
       {isOpen ? (
-        <div className="schedule-date-picker-popover" role="dialog" aria-label="Choose date">
+        <div
+          className={tw.scheduleDatePickerPopover}
+          role="dialog"
+          aria-label="Choose date"
+        >
           <DayPicker
             mode="single"
             month={month}

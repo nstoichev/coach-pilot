@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { cn } from '../../ui/cn.ts'
+import * as tw from '../../ui/tw.ts'
 import { SegmentedControl } from '../SegmentedControl.tsx'
 import { ToggleSwitch } from '../ToggleSwitch.tsx'
 import { applyRepSequenceToSetsRepsRepetitions } from '../../services/workout-domain.ts'
@@ -52,15 +54,23 @@ function repConfigsEffectivelyEqual(a: RepSchemeConfig, b: RepSchemeConfig): boo
   )
 }
 
-export function SegmentRepGenerationPanel({ segment, onCommit }: SegmentRepGenerationPanelProps) {
-  if (!segmentSupportsRepetitionGeneration(segment)) {
+export function SegmentRepGenerationPanel(props: SegmentRepGenerationPanelProps) {
+  if (!segmentSupportsRepetitionGeneration(props.segment)) {
     return null
   }
+  return <SegmentRepGenerationPanelInner {...props} />
+}
 
+function SegmentRepGenerationPanelInner({ segment, onCommit }: SegmentRepGenerationPanelProps) {
   const segmentRef = useRef(segment)
-  segmentRef.current = segment
   const onCommitRef = useRef(onCommit)
-  onCommitRef.current = onCommit
+
+  useEffect(() => {
+    segmentRef.current = segment
+  }, [segment])
+  useEffect(() => {
+    onCommitRef.current = onCommit
+  }, [onCommit])
 
   /** EMOM / For Time: rounds come from segment timing controls (single source of truth). */
   const timingRoundsLocked = segmentHasTimingLockedRounds(segment)
@@ -93,6 +103,7 @@ export function SegmentRepGenerationPanel({ segment, onCommit }: SegmentRepGener
 
   useEffect(() => {
     if (!repGenActive) return
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- sync form fields from segment when rep-gen is on
     syncFromSegment()
   }, [segment.id, repGenActive, syncFromSegment])
 
@@ -287,9 +298,9 @@ export function SegmentRepGenerationPanel({ segment, onCommit }: SegmentRepGener
   const previewLine = previewSequence?.join('-') ?? ''
 
   return (
-    <div className="rep-generation-panel" onClick={(e) => e.stopPropagation()}>
+    <div className={tw.repGenerationPanel} onClick={(e) => e.stopPropagation()}>
       <ToggleSwitch
-        className="rep-generation-enable-toggle"
+        className={tw.repGenerationEnableToggle}
         label="Reps per round"
         checked={repGenActive}
         onChange={handleEnableToggle}
@@ -298,6 +309,7 @@ export function SegmentRepGenerationPanel({ segment, onCommit }: SegmentRepGener
       {repGenActive ? (
         <>
           <SegmentedControl<RepSchemePattern>
+            className={cn(tw.segmentedControlWrap, 'w-full')}
             name={`rep-pattern-${segment.id}`}
             value={pattern}
             options={PATTERN_OPTIONS.map(({ id, label }) => ({
@@ -314,9 +326,12 @@ export function SegmentRepGenerationPanel({ segment, onCommit }: SegmentRepGener
           />
 
           {!timingRoundsLocked ? (
-            <label className="field">
-              <span>Rounds{pattern === 'pyramid' ? ' (odd only)' : ''}</span>
+            <label className={tw.field}>
+              <span className={tw.fieldSpanLabel}>
+                Rounds{pattern === 'pyramid' ? ' (odd only)' : ''}
+              </span>
               <input
+                className={cn(tw.fieldInput, tw.rangeInput)}
                 type="number"
                 min={1}
                 max={50}
@@ -328,29 +343,33 @@ export function SegmentRepGenerationPanel({ segment, onCommit }: SegmentRepGener
             </label>
           ) : null}
 
-          {pyramidOddHint ? <p className="rep-generation-hint">{pyramidOddHint}</p> : null}
+          {pyramidOddHint ? (
+            <p className={tw.repGenerationHint}>{pyramidOddHint}</p>
+          ) : null}
 
           {pyramidEvenBlocked ? (
-            <p className="field-help">
+            <p className={tw.fieldHelp}>
               Pyramid requires an odd number of rounds. Change segment rounds (EMOM / For Time) or pick
               another pattern.
             </p>
           ) : null}
 
           {pattern === 'linear' ? (
-            <div className="segment-config-grid">
-              <label className="field">
-                <span>Start reps</span>
+            <div className={tw.segmentConfigGrid}>
+              <label className={tw.field}>
+                <span className={tw.fieldSpanLabel}>Start reps</span>
                 <input
+                  className={cn(tw.fieldInput, tw.rangeInput)}
                   type="number"
                   value={startInput}
                   onChange={(e) => setStartInput(e.target.value)}
                   onBlur={handleBlurCommit}
                 />
               </label>
-              <label className="field">
-                <span>End reps</span>
+              <label className={tw.field}>
+                <span className={tw.fieldSpanLabel}>End reps</span>
                 <input
+                  className={cn(tw.fieldInput, tw.rangeInput)}
                   type="number"
                   value={endInput}
                   onChange={(e) => setEndInput(e.target.value)}
@@ -361,19 +380,21 @@ export function SegmentRepGenerationPanel({ segment, onCommit }: SegmentRepGener
           ) : null}
 
           {pattern === 'pyramid' && !pyramidEvenBlocked ? (
-            <div className="segment-config-grid">
-              <label className="field">
-                <span>Start reps</span>
+            <div className={tw.segmentConfigGrid}>
+              <label className={tw.field}>
+                <span className={tw.fieldSpanLabel}>Start reps</span>
                 <input
+                  className={cn(tw.fieldInput, tw.rangeInput)}
                   type="number"
                   value={startInput}
                   onChange={(e) => setStartInput(e.target.value)}
                   onBlur={handleBlurCommit}
                 />
               </label>
-              <label className="field">
-                <span>Peak reps</span>
+              <label className={tw.field}>
+                <span className={tw.fieldSpanLabel}>Peak reps</span>
                 <input
+                  className={cn(tw.fieldInput, tw.rangeInput)}
                   type="number"
                   value={peakInput}
                   onChange={(e) => setPeakInput(e.target.value)}
@@ -384,9 +405,10 @@ export function SegmentRepGenerationPanel({ segment, onCommit }: SegmentRepGener
           ) : null}
 
           {pattern === 'fixed' ? (
-            <label className="field">
-              <span>Reps per round (fixed)</span>
+            <label className={tw.field}>
+              <span className={tw.fieldSpanLabel}>Reps per round (fixed)</span>
               <input
+                className={cn(tw.fieldInput, tw.rangeInput)}
                 type="number"
                 min={1}
                 value={repsInput}
@@ -398,7 +420,7 @@ export function SegmentRepGenerationPanel({ segment, onCommit }: SegmentRepGener
 
           {showPreview ? (
             <p
-              className="rep-generation-sequence-line"
+              className={tw.repGenerationSequenceLine}
               aria-label={`Repetitions per round: ${previewLine}`}
             >
               {previewLine}

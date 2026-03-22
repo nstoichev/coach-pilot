@@ -1,3 +1,5 @@
+import { cn } from '../../ui/cn.ts'
+import * as tw from '../../ui/tw.ts'
 import { ScheduleDatePicker } from './ScheduleDatePicker.tsx'
 
 type WorkoutDetailsFormProps = {
@@ -20,16 +22,16 @@ export const WorkoutDetailsForm = ({
   onAddSegment,
   onOpenLoadWorkout,
 }: WorkoutDetailsFormProps) => (
-  <section className="panel">
-    <div className="panel-header">
+  <section className={tw.panel}>
+    <div className={tw.panelHeader}>
       <div>
-        <h2>Build your workout</h2>
+        <h2 className={tw.panelTitle}>Build your workout</h2>
       </div>
     </div>
 
-    <div className="form-grid form-grid--workout-details">
-      <label className="field">
-        <span>Date</span>
+    <div className={cn(tw.formGrid, tw.formGridWorkoutDetails)}>
+      <label className={tw.field}>
+        <span className={tw.fieldSpanLabel}>Date</span>
         <ScheduleDatePicker
           value={scheduledDate}
           min={scheduledDateMin}
@@ -37,9 +39,10 @@ export const WorkoutDetailsForm = ({
           ariaLabel="Date (today or future)"
         />
       </label>
-      <label className="field">
-        <span>Name</span>
+      <label className={tw.field}>
+        <span className={tw.fieldSpanLabel}>Name</span>
         <input
+          className={tw.fieldInput}
           value={workoutName}
           onChange={(event) => onWorkoutNameChange(event.target.value)}
           placeholder="Lower Body Strength"
@@ -47,14 +50,18 @@ export const WorkoutDetailsForm = ({
       </label>
     </div>
 
-    <div className="panel-add-segment-row">
-      <button className="primary-button panel-add-segment-button" onClick={onAddSegment} type="button">
+    <div className={tw.panelAddSegmentRow}>
+      <button
+        className={tw.panelAddSegmentButton}
+        onClick={onAddSegment}
+        type="button"
+      >
         Add Segment
       </button>
       {onOpenLoadWorkout ? (
         <button
           type="button"
-          className="secondary-button panel-load-workout-button"
+          className={tw.panelLoadWorkoutButton}
           onClick={onOpenLoadWorkout}
         >
           Load template

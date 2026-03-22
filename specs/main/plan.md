@@ -33,6 +33,8 @@
 
 [Gates determined based on constitution file]
 
+- **UI styling system**: All feature UI MUST comply with `.specify/memory/constitution.md` — **Tailwind only**, **semantic tokens** in `tailwind.config.js`, no default palette utilities or hardcoded colors in components unless a constitution-approved exception exists.
+
 ## Project Structure
 
 ### Documentation (this feature)

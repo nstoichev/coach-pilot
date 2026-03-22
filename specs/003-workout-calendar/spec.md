@@ -98,6 +98,10 @@ As a user, I can open a calendar page and see at a glance which days have a work
 - **FR-009**: The system MUST support opening a scheduled workout from the calendar (e.g. by clicking the day or an indicator) so the user can view or execute it.
 - **FR-010**: Completion state MUST be persisted so that the calendar can reliably show completed vs not completed across sessions.
 
+### Non-functional requirements (UI)
+
+- Calendar indicators (scheduled vs completed, dots, checkmarks, day-cell treatments) MUST use the project **semantic design tokens** only (Tailwind utilities from `tailwind.config.js`), as defined in `.specify/memory/constitution.md`. **No** default Tailwind palette utilities (e.g. `gray-*`, `blue-*`) and **no** hardcoded colors in components.
+
 ### Key Entities
 
 - **Workout (existing)**: Extended or linked to a calendar date; remains the core entity for structure (segments, exercises, etc.).

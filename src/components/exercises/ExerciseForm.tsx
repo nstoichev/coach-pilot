@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { TRAINING_TYPES } from '../../types/domain.ts'
 import type { Exercise } from '../../types/exercise.ts'
+import { cn } from '../../ui/cn.ts'
+import * as tw from '../../ui/tw.ts'
 import { ToggleSwitch } from '../ToggleSwitch.tsx'
 
 type ExerciseFormProps = {
@@ -25,151 +27,159 @@ export const ExerciseForm = ({
   const [draft, setDraft] = useState(initialDraft)
 
   return (
-    <section className="panel">
-    <div className="panel-header">
-      <div>
-        <p className="eyebrow">Exercise Database</p>
-        <h2>{submitLabel === 'Save Exercise' ? 'Edit exercise' : 'Create exercise'}</h2>
+    <section className={tw.panel}>
+      <div className={tw.panelHeader}>
+        <div>
+          <p className={tw.eyebrow}>Exercise Database</p>
+          <h2 className={tw.panelTitle}>
+            {submitLabel === 'Save Exercise' ? 'Edit exercise' : 'Create exercise'}
+          </h2>
+        </div>
       </div>
-    </div>
 
-    <div className="form-grid">
-      <label className="field">
-        <span>Exercise name</span>
-        <input
-          value={draft.name}
-          onChange={(event) => setDraft({ ...draft, name: event.target.value })}
-          placeholder="Romanian Deadlift"
-        />
-      </label>
+      <div className={tw.formGrid}>
+        <label className={tw.field}>
+          <span className={tw.fieldSpanLabel}>Exercise name</span>
+          <input
+            className={tw.fieldInput}
+            value={draft.name}
+            onChange={(event) => setDraft({ ...draft, name: event.target.value })}
+            placeholder="Romanian Deadlift"
+          />
+        </label>
 
-      <label className="field">
-        <span>Equipment (comma separated)</span>
-        <input
-          value={draft.equipment?.join(', ') ?? ''}
-          onChange={(event) =>
-            setDraft({
-              ...draft,
-              equipment: parseCsv(event.target.value),
-            })
-          }
-          placeholder="barbell, plates"
-        />
-      </label>
-
-      <label className="field">
-        <span>Primary muscles (comma separated)</span>
-        <input
-          value={draft.muscles?.primary.join(', ') ?? ''}
-          onChange={(event) =>
-            setDraft({
-              ...draft,
-              muscles: {
-                primary: parseCsv(event.target.value),
-                stabilizing: draft.muscles?.stabilizing ?? [],
-              },
-            })
-          }
-          placeholder="hamstrings, glutes"
-        />
-      </label>
-
-      <label className="field">
-        <span>Stabilizing muscles (comma separated)</span>
-        <input
-          value={draft.muscles?.stabilizing.join(', ') ?? ''}
-          onChange={(event) =>
-            setDraft({
-              ...draft,
-              muscles: {
-                primary: draft.muscles?.primary ?? [],
-                stabilizing: parseCsv(event.target.value),
-              },
-            })
-          }
-          placeholder="core, lats"
-        />
-      </label>
-    </div>
-
-    <div className="field-group">
-      <span className="field-group-label">Training type</span>
-      <div className="toggle-switch-row toggle-switch-row--inline">
-        {TRAINING_TYPES.map((type) => (
-          <ToggleSwitch
-            key={type}
-            label={type.charAt(0).toUpperCase() + type.slice(1)}
-            checked={draft.type.includes(type)}
-            onChange={(on) =>
+        <label className={tw.field}>
+          <span className={tw.fieldSpanLabel}>Equipment (comma separated)</span>
+          <input
+            className={tw.fieldInput}
+            value={draft.equipment?.join(', ') ?? ''}
+            onChange={(event) =>
               setDraft({
                 ...draft,
-                type: on
-                  ? draft.type.includes(type)
-                    ? draft.type
-                    : [...draft.type, type]
-                  : draft.type.filter((t) => t !== type),
+                equipment: parseCsv(event.target.value),
               })
             }
+            placeholder="barbell, plates"
           />
-        ))}
+        </label>
+
+        <label className={tw.field}>
+          <span className={tw.fieldSpanLabel}>Primary muscles (comma separated)</span>
+          <input
+            className={tw.fieldInput}
+            value={draft.muscles?.primary.join(', ') ?? ''}
+            onChange={(event) =>
+              setDraft({
+                ...draft,
+                muscles: {
+                  primary: parseCsv(event.target.value),
+                  stabilizing: draft.muscles?.stabilizing ?? [],
+                },
+              })
+            }
+            placeholder="hamstrings, glutes"
+          />
+        </label>
+
+        <label className={tw.field}>
+          <span className={tw.fieldSpanLabel}>Stabilizing muscles (comma separated)</span>
+          <input
+            className={tw.fieldInput}
+            value={draft.muscles?.stabilizing.join(', ') ?? ''}
+            onChange={(event) =>
+              setDraft({
+                ...draft,
+                muscles: {
+                  primary: draft.muscles?.primary ?? [],
+                  stabilizing: parseCsv(event.target.value),
+                },
+              })
+            }
+            placeholder="core, lats"
+          />
+        </label>
       </div>
-    </div>
 
-    <div className="form-grid">
-      <label className="field">
-        <span>Working weight mode</span>
-        <select
-          value={draft.workingWeight?.mode ?? ''}
-          onChange={(event) => {
-            const nextMode = event.target.value
+      <div className={tw.fieldGroup}>
+        <span className={tw.fieldGroupLabel}>Training type</span>
+        <div className={cn(tw.toggleSwitchRow, tw.toggleSwitchRowInline)}>
+          {TRAINING_TYPES.map((type) => (
+            <ToggleSwitch
+              key={type}
+              label={type.charAt(0).toUpperCase() + type.slice(1)}
+              checked={draft.type.includes(type)}
+              onChange={(on) =>
+                setDraft({
+                  ...draft,
+                  type: on
+                    ? draft.type.includes(type)
+                      ? draft.type
+                      : [...draft.type, type]
+                    : draft.type.filter((t) => t !== type),
+                })
+              }
+            />
+          ))}
+        </div>
+      </div>
 
-            setDraft({
-              ...draft,
-              workingWeight: nextMode
-                ? {
-                    mode: nextMode as 'weight' | 'repMax',
-                    value: draft.workingWeight?.value ?? 0,
-                  }
-                : undefined,
-            })
-          }}
-        >
-          <option value="">None</option>
-          <option value="weight">Weight</option>
-          <option value="repMax">Rep Max</option>
-        </select>
-      </label>
+      <div className={tw.formGrid}>
+        <label className={tw.field}>
+          <span className={tw.fieldSpanLabel}>Working weight mode</span>
+          <select
+            className={tw.fieldInputSelect}
+            value={draft.workingWeight?.mode ?? ''}
+            onChange={(event) => {
+              const nextMode = event.target.value
 
-      <label className="field">
-        <span>Working weight value</span>
-        <input
-          min={0}
-          type="number"
-          value={draft.workingWeight?.value ?? ''}
-          onChange={(event) =>
-            setDraft({
-              ...draft,
-              workingWeight: draft.workingWeight
-                ? {
-                    ...draft.workingWeight,
-                    value: Number(event.target.value),
-                  }
-                : undefined,
-            })
-          }
-          placeholder="Optional"
-        />
-      </label>
-    </div>
+              setDraft({
+                ...draft,
+                workingWeight: nextMode
+                  ? {
+                      mode: nextMode as 'weight' | 'repMax',
+                      value: draft.workingWeight?.value ?? 0,
+                    }
+                  : undefined,
+              })
+            }}
+          >
+            <option value="">None</option>
+            <option value="weight">Weight</option>
+            <option value="repMax">Rep Max</option>
+          </select>
+        </label>
 
-    <div className="inline-actions">
-      <button type="button" className="primary-button" onClick={() => onSubmit(draft)}>
-        {submitLabel}
-      </button>
-      <button type="button" onClick={onCancel}>
-        Reset
-      </button>
-    </div>
-  </section>
+        <label className={tw.field}>
+          <span className={tw.fieldSpanLabel}>Working weight value</span>
+          <input
+            className={cn(tw.fieldInput, tw.rangeInput)}
+            min={0}
+            type="number"
+            value={draft.workingWeight?.value ?? ''}
+            onChange={(event) =>
+              setDraft({
+                ...draft,
+                workingWeight: draft.workingWeight
+                  ? {
+                      ...draft.workingWeight,
+                      value: Number(event.target.value),
+                    }
+                  : undefined,
+              })
+            }
+            placeholder="Optional"
+          />
+        </label>
+      </div>
+
+      <div className={tw.inlineActions}>
+        <button type="button" className={tw.primaryButton} onClick={() => onSubmit(draft)}>
+          {submitLabel}
+        </button>
+        <button type="button" className={tw.secondaryButton} onClick={onCancel}>
+          Reset
+        </button>
+      </div>
+    </section>
   )
 }

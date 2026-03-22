@@ -95,6 +95,10 @@
 - **FR-006**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]
 - **FR-007**: System MUST retain user data for [NEEDS CLARIFICATION: retention period not specified]
 
+### Non-functional requirements (UI) *(include when the feature has a user interface)*
+
+- Styling MUST follow the project constitution’s **UI styling system** (e.g. Coach Pilot: `.specify/memory/constitution.md` — **Tailwind only**, **semantic tokens** in `tailwind.config.js`, interaction rules for hover/active/transitions).
+
 ### Key Entities *(include if feature involves data)*
 
 - **[Entity 1]**: [What it represents, key attributes without implementation]

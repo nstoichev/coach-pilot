@@ -22,6 +22,7 @@ The implementation extends the existing Workout model (or adds a scheduling laye
 - **Storage**: Extend in-memory/context state for phase 1; workout records include `scheduledDate` (date-only) and optional `completedAt` (or equivalent) for completion state. Persistence (e.g. Supabase) can be added later.
 - **Dependencies**: Consider a small date utility (e.g. date-fns or native Intl) for “today” and past-date checks; calendar UI can be custom or a lightweight calendar component.
 - **Target**: Web (desktop first); calendar must be usable on small screens for future mobile.
+- **UI**: Calendar and date-picker surfaces MUST follow the **UI styling system** in `.specify/memory/constitution.md` (Tailwind + semantic tokens from `tailwind.config.js` only).
 
 ---
 
@@ -31,6 +32,7 @@ The implementation extends the existing Workout model (or adds a scheduling laye
 - **Simplicity**: Date picker and calendar are straightforward UI additions; logic for “past vs today” is simple and testable. Pass.
 - **Modularity**: Calendar/scheduling can be a separate module (store slice, services, components) that consumes the existing workout domain. Pass.
 - **Deterministic logic**: “Is this date in the past?” and “Does this day have a workout?” are deterministic and testable. Pass.
+- **UI styling system**: Scheduled vs completed indicators and all new calendar UI MUST use **semantic design tokens** only, per the constitution. Pass.
 
 ---
 

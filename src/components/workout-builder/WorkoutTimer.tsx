@@ -2,6 +2,8 @@ import { useEffect, useRef, useState, useMemo } from 'react'
 import type { Workout } from '../../types/workout.ts'
 import { getTimerStructure } from '../../services/timer-generator.ts'
 import { formatSecondsAsClock } from '../../services/workout-domain.ts'
+import { cn } from '../../ui/cn.ts'
+import * as tw from '../../ui/tw.ts'
 
 export type TimerPhaseInfo = { phaseType: 'work' | 'rest'; segmentId: string }
 
@@ -168,9 +170,15 @@ export function WorkoutTimer({
   const remainingSecondsRef = useRef(remainingSeconds)
   const elapsedSecondsRef = useRef(elapsedSeconds)
 
-  phaseIndexRef.current = phaseIndex
-  remainingSecondsRef.current = remainingSeconds
-  elapsedSecondsRef.current = elapsedSeconds
+  useEffect(() => {
+    phaseIndexRef.current = phaseIndex
+  }, [phaseIndex])
+  useEffect(() => {
+    remainingSecondsRef.current = remainingSeconds
+  }, [remainingSeconds])
+  useEffect(() => {
+    elapsedSecondsRef.current = elapsedSeconds
+  }, [elapsedSeconds])
 
   const currentPhase = phases[phaseIndex]
   const isComplete = phaseIndex >= phases.length
@@ -190,9 +198,11 @@ export function WorkoutTimer({
     const p = phases[phaseIndex]
     if (!p) return
     const { remaining, elapsed } = getInitialCounter(p)
+    /* eslint-disable react-hooks/set-state-in-effect -- timer phase transition resets counters */
     setRemainingSeconds(remaining)
     setElapsedSeconds(elapsed)
     setShowingFinish(false)
+    /* eslint-enable react-hooks/set-state-in-effect */
     remainingSecondsRef.current = remaining
     elapsedSecondsRef.current = elapsed
   }, [phaseIndex, phases])
@@ -294,9 +304,9 @@ export function WorkoutTimer({
 
   if (phases.length === 0) {
     return (
-      <main className="board-shell">
-        <p className="muted-text">No time-measurable segments.</p>
-        <button type="button" className="primary-button" onClick={onStopTimer}>
+      <main className={tw.boardShell}>
+        <p className={tw.mutedText}>No time-measurable segments.</p>
+        <button type="button" className={tw.primaryButton} onClick={onStopTimer}>
           Back to board
         </button>
       </main>
@@ -305,13 +315,13 @@ export function WorkoutTimer({
 
   if (isComplete && !embedded) {
     return (
-      <main className="board-shell">
-        <h2 className="board-title">Workout complete</h2>
-        <div className="board-actions">
-          <button type="button" className="secondary-button" onClick={onBackToBuild}>
+      <main className={tw.boardShell}>
+        <h2 className={tw.boardTitle}>Workout complete</h2>
+        <div className={tw.boardActions}>
+          <button type="button" className={tw.secondaryButton} onClick={onBackToBuild}>
             Back to build
           </button>
-          <button type="button" className="primary-button" onClick={onStopTimer}>
+          <button type="button" className={tw.primaryButton} onClick={onStopTimer}>
             Back to board
           </button>
         </div>
@@ -345,32 +355,34 @@ export function WorkoutTimer({
 
   const timerContent = (
     <>
-      <header className={`timer-strip-header ${isRest ? 'timer-strip-rest' : 'timer-strip-work'}`}>
-        <h2 className="timer-strip-label">{label}</h2>
+      <header className={tw.timerStripHeader}>
+        <h2 className={isRest ? tw.timerStripLabelRest : tw.timerStripLabelWork}>
+          {label}
+        </h2>
         {!embedded && (
           <button
             type="button"
-            className="secondary-button"
+            className={tw.secondaryButton}
             onClick={onBackToBuild}
           >
             Back to build
           </button>
         )}
       </header>
-      <div className="timer-display">
+      <div className={cn(tw.timerDisplay, !embedded && tw.timerDisplayLarge)}>
         {isComplete ? (
-          <p className="timer-time timer-finish">Done</p>
+          <p className={cn(tw.timerTime, tw.timerFinish)}>Done</p>
         ) : showingFinish ? (
-          <p className="timer-time timer-finish">Finish</p>
+          <p className={cn(tw.timerTime, tw.timerFinish)}>Finish</p>
         ) : (
-          <p className="timer-time">{displayTime}</p>
+          <p className={tw.timerTime}>{displayTime}</p>
         )}
       </div>
       {isWork && (isForTime || isDeathBy) && !showingFinish && (
-        <div className="timer-actions">
+        <div className={tw.timerActions}>
           <button
             type="button"
-            className="primary-button timer-stop-button"
+            className={cn(tw.primaryButton, tw.timerStopButton)}
             onClick={isDeathBy ? handleDeathByStop : handleForTimeStop}
           >
             Stop
@@ -379,7 +391,7 @@ export function WorkoutTimer({
       )}
       <button
         type="button"
-        className="secondary-button"
+        className={tw.secondaryButton}
         onClick={onStopTimer}
       >
         {embedded ? 'Exit timer' : 'Back to board'}
@@ -388,11 +400,11 @@ export function WorkoutTimer({
   )
 
   if (embedded) {
-    return <section className="timer-strip">{timerContent}</section>
+    return <section className={tw.timerStrip}>{timerContent}</section>
   }
 
   return (
-    <main className="board-shell timer-view">
+    <main className={cn(tw.boardShell, tw.timerView)}>
       {timerContent}
     </main>
   )

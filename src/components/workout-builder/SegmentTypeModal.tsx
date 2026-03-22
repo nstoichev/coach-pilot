@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { SegmentType } from '../../types/domain.ts'
+import { cn } from '../../ui/cn.ts'
+import * as tw from '../../ui/tw.ts'
 
 type SegmentTypeModalProps = {
   isOpen: boolean
@@ -43,10 +45,10 @@ export const SegmentTypeModal = ({
   }, [query])
 
   useEffect(() => {
-    if (isOpen) {
-      setQuery('')
-      inputRef.current?.focus()
-    }
+    if (!isOpen) return
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional modal open reset
+    setQuery('')
+    inputRef.current?.focus()
   }, [isOpen])
 
   if (!isOpen) {
@@ -60,51 +62,51 @@ export const SegmentTypeModal = ({
   }
 
   return (
-    <div className="modal-overlay" role="presentation" onClick={onClose}>
+    <div className={tw.modalOverlay} role="presentation" onClick={onClose}>
       <div
         aria-modal="true"
-        className="modal-panel"
+        className={tw.modalPanel}
         role="dialog"
         onClick={(event) => event.stopPropagation()}
       >
-        <div className="panel-header">
+        <div className={tw.panelHeader}>
           <div>
-            <p className="eyebrow">Segment Type</p>
-            <h2>Select a segment template</h2>
+            <p className={tw.eyebrow}>Segment Type</p>
+            <h2 className={tw.panelTitle}>Select a segment template</h2>
           </div>
-          <button type="button" onClick={onClose}>
+          <button type="button" className={tw.secondaryButton} onClick={onClose}>
             Cancel
           </button>
         </div>
 
-        <div className="search-picker">
-          <p className="muted-text picker-summary">
+        <div className={tw.searchPicker}>
+          <p className={cn(tw.mutedText, tw.pickerSummary)}>
             Search or type to find a format, then click to add.
           </p>
           <input
             aria-label="Search segment format"
-            className="search-input"
+            className={tw.searchInput}
             placeholder="Search segment format (e.g. Tabata, EMOM)"
             ref={inputRef}
             value={query}
             onChange={(event) => setQuery(event.target.value)}
           />
-          <div className="search-results">
+          <div className={tw.searchResults}>
             {options.length > 0 ? (
               options.map((option) => (
                 <button
                   key={option.type}
-                  className="search-result-item"
+                  className={tw.searchResultItem}
                   type="button"
                   onMouseDown={() => handleSelect(option.type)}
                 >
-                  <strong>{option.title}</strong>
+                  <strong className={tw.searchResultTitle}>{option.title}</strong>
                 </button>
               ))
             ) : (
-              <div className="empty-state bordered">
-                <strong>No matching format.</strong>
-                <p>Try another search term.</p>
+              <div className={cn(tw.emptyState, tw.bordered)}>
+                <strong className={tw.searchResultTitle}>No matching format.</strong>
+                <p className={tw.mutedText}>Try another search term.</p>
               </div>
             )}
           </div>

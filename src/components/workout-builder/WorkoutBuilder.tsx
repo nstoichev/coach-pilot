@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react'
 import { useWorkoutBuilder } from '../../store/index.ts'
 import { getTodayLocalDateString } from '../../services/schedule-utils.ts'
 import { mockWorkouts } from '../../services/mock-workouts.ts'
+import { cn } from '../../ui/cn.ts'
+import * as tw from '../../ui/tw.ts'
 import { LoadWorkoutModal } from './LoadWorkoutModal.tsx'
 import { SegmentList } from './SegmentList.tsx'
 import { SegmentTypeModal } from './SegmentTypeModal.tsx'
@@ -34,7 +36,7 @@ export const WorkoutBuilder = () => {
   )
 
   return (
-    <main className="builder-shell">
+    <main className={tw.builderShell}>
       <WorkoutDetailsForm
         workoutName={state.workoutDraft.name}
         scheduledDate={state.workoutDraft.scheduledDate ?? ''}
@@ -80,13 +82,18 @@ export const WorkoutBuilder = () => {
         onReorderExercises={actions.reorderSegmentExercises}
       />
 
-      <section className="panel builder-status-panel">
+      <section className={cn(tw.panel, tw.builderStatusPanel)}>
         {workoutErrors.length === 0 ? (
-          <p className="success-text builder-status-message">Workout draft is structurally valid.</p>
+          <p className={cn(tw.successText, tw.builderStatusMessage)}>
+            Workout draft is structurally valid.
+          </p>
         ) : (
-          <ul className="validation-list builder-status-message">
+          <ul className={cn(tw.validationList, tw.builderStatusMessage)}>
             {workoutErrors.map((error) => (
-              <li key={`${error.field}-${error.message}`}>
+              <li
+                key={`${error.field}-${error.message}`}
+                className={tw.validationListItem}
+              >
                 <strong>{error.field}</strong>: {error.message}
               </li>
             ))}
@@ -94,17 +101,16 @@ export const WorkoutBuilder = () => {
         )}
       </section>
 
-      <div className="builder-done-row">
+      <div className={tw.builderDoneRow}>
         <button
           type="button"
-          className="primary-button builder-done-button"
+          className={tw.builderDoneButton}
           disabled={workoutErrors.length > 0 || !hasAtLeastOneExerciseInAnySegment}
           onClick={() => actions.showWorkoutBoard(JSON.parse(JSON.stringify(state.workoutDraft)))}
         >
           Done
         </button>
       </div>
-
     </main>
   )
 }

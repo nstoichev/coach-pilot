@@ -25,7 +25,7 @@ Implementation lives in a **pure TypeScript** module (deterministic generation +
 - **Target Platform**: Web (desktop first).
 - **Project Type**: Single SPA (coach-pilot).
 - **Performance Goals**: Trivial (O(rounds)); rounds bounded by existing segment UI (e.g. ≤ 50).
-- **Constraints**: Corrections **on blur only**; no fractional reps; pyramid odd-rounds strict.
+- **Constraints**: Corrections **on blur only**; no fractional reps; pyramid odd-rounds strict. **UI**: Preview/totals and repetition panel MUST use **Tailwind + semantic tokens** from `tailwind.config.js` only (see `.specify/memory/constitution.md`).
 - **Scale/Scope**: One segment panel section + generator service; no backend required for v1.
 
 ---
@@ -41,6 +41,8 @@ Implementation lives in a **pure TypeScript** module (deterministic generation +
 - **Progressive Complexity**: Builds on existing Segment / AssignedExercise model without replacing `segmentType`. Pass.
 
 **Post-design re-check**: [data-model.md](./data-model.md) and [research.md](./research.md) preserve a single `rounds` source when `segment.rounds` exists; no unresolved NEEDS CLARIFICATION. Pass.
+
+- **UI styling system**: Builder UI for repetition generation MUST comply with the constitution (semantic tokens, interaction rules). Pass.
 
 ---
 

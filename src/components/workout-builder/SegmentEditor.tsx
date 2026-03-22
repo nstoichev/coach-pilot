@@ -1,4 +1,6 @@
 import { useMemo, useState } from 'react'
+import { cn } from '../../ui/cn.ts'
+import * as tw from '../../ui/tw.ts'
 import type { ExerciseMetric } from '../../types/domain.ts'
 import {
   formatSecondsAsClock,
@@ -126,19 +128,17 @@ export const SegmentEditor = ({
       : getGeneratedSegmentName(segment)
 
   const hasExercises = segment.exercises.length > 0
-  const segmentCardClass = [
-    'segment-card',
-    isSelected ? 'segment-card-selected' : '',
-    hasExercises ? 'segment-card-has-exercises' : 'segment-card-empty',
-  ]
-    .filter(Boolean)
-    .join(' ')
+  const segmentCardClass = cn(
+    tw.segmentCardBase,
+    isSelected && tw.segmentCardSelected,
+    hasExercises ? tw.segmentCardHasExercises : tw.segmentCardEmpty,
+  )
 
   return (
     <article className={segmentCardClass} onClick={onSelect}>
-      <div className="segment-card-header">
-        <div className="segment-card-header-left">
-          <span className="segment-type-badge">
+      <div className={tw.segmentCardHeader}>
+        <div className={tw.segmentCardHeaderLeft}>
+          <span className={tw.segmentTypeBadge}>
             {segment.segmentType === 'deathBy'
               ? 'Death by'
               : segment.segmentType === 'chipper'
@@ -148,8 +148,9 @@ export const SegmentEditor = ({
                   : segment.segmentType}
           </span>
           {segment.segmentType === 'custom' ? (
-            <div className="segment-name-field">
+            <div className={tw.segmentNameField}>
               <input
+                className={tw.fieldInput}
                 aria-label="Segment name"
                 value={segment.name}
                 onChange={(event) =>
@@ -164,24 +165,34 @@ export const SegmentEditor = ({
             </div>
           ) : segment.segmentType === 'emom' &&
             (segment.intervalSeconds ?? 60) !== 60 ? (
-            <span className="segment-generated-name">
-              E<span className="emom-interval">{formatSecondsAsClock(segment.intervalSeconds ?? 60)}</span>OM {segment.rounds ?? 10}
+            <span className={tw.segmentGeneratedName}>
+              E<span className={tw.emomInterval}>{formatSecondsAsClock(segment.intervalSeconds ?? 60)}</span>OM {segment.rounds ?? 10}
             </span>
           ) : (
-            <span className="segment-generated-name">{displayName}</span>
+            <span className={tw.segmentGeneratedName}>{displayName}</span>
           )}
         </div>
 
-        <div className="stacked-actions" onClick={(event) => event.stopPropagation()}>
-          <button type="button" aria-label="Move segment up" onClick={onMoveUp}>
+        <div className={tw.stackedActions} onClick={(event) => event.stopPropagation()}>
+          <button
+            type="button"
+            className={tw.segmentIconButton}
+            aria-label="Move segment up"
+            onClick={onMoveUp}
+          >
             <IconArrowUp />
           </button>
-          <button type="button" aria-label="Move segment down" onClick={onMoveDown}>
+          <button
+            type="button"
+            className={tw.segmentIconButton}
+            aria-label="Move segment down"
+            onClick={onMoveDown}
+          >
             <IconArrowDown />
           </button>
           <button
             type="button"
-            className="danger-button"
+            className={tw.dangerButton}
             aria-label="Remove segment"
             onClick={onRemove}
           >
@@ -190,13 +201,13 @@ export const SegmentEditor = ({
         </div>
       </div>
 
-      <div className="segment-card-body" onClick={(event) => event.stopPropagation()}>
+      <div className={tw.segmentCardBody} onClick={(event) => event.stopPropagation()}>
         {segment.segmentType === 'emom' ? (
-          <div className="segment-config-stack">
-            <label className="field">
+          <div className={tw.segmentConfigStack}>
+            <label className={tw.field}>
               <span>Interval {formatSecondsAsClock(segment.intervalSeconds ?? 60)}</span>
               <input
-                className="range-input"
+                className={tw.rangeSlider}
                 max={EMOM_INTERVAL_MAX_SECONDS}
                 min={EMOM_INTERVAL_MIN_SECONDS}
                 step={EMOM_INTERVAL_STEP_SECONDS}
@@ -211,10 +222,10 @@ export const SegmentEditor = ({
               />
             </label>
 
-            <label className="field">
+            <label className={tw.field}>
               <span>Sets {segment.rounds ?? EMOM_ROUNDS_DEFAULT}</span>
               <input
-                className="range-input"
+                className={tw.rangeSlider}
                 max={EMOM_ROUNDS_MAX}
                 min={EMOM_ROUNDS_MIN}
                 step={1}
@@ -232,13 +243,13 @@ export const SegmentEditor = ({
         ) : null}
 
         {segment.segmentType === 'amrap' ? (
-          <div className="segment-config-stack">
-            <label className="field">
+          <div className={tw.segmentConfigStack}>
+            <label className={tw.field}>
               <span>
                 Duration {formatSecondsAsClock(segment.durationSeconds ?? AMRAP_DURATION_DEFAULT_SECONDS)}
               </span>
               <input
-                className="range-input"
+                className={tw.rangeSlider}
                 max={AMRAP_DURATION_MAX_SECONDS}
                 min={AMRAP_DURATION_MIN_SECONDS}
                 step={AMRAP_DURATION_STEP_SECONDS}
@@ -256,13 +267,13 @@ export const SegmentEditor = ({
         ) : null}
 
         {segment.segmentType === 'forTime' ? (
-          <div className="segment-config-stack">
-            <label className="field">
+          <div className={tw.segmentConfigStack}>
+            <label className={tw.field}>
               <span>
                 Time cap {formatSecondsAsClock(segment.timeCapSeconds ?? TIMECAP_DEFAULT_SECONDS)}
               </span>
               <input
-                className="range-input"
+                className={tw.rangeSlider}
                 max={TIMECAP_MAX_SECONDS}
                 min={TIMECAP_MIN_SECONDS}
                 step={TIMECAP_STEP_SECONDS}
@@ -276,10 +287,10 @@ export const SegmentEditor = ({
                 }
               />
             </label>
-            <label className="field">
+            <label className={tw.field}>
               <span>Rounds {segment.rounds ?? FORTIME_ROUNDS_DEFAULT}</span>
               <input
-                className="range-input"
+                className={tw.rangeSlider}
                 max={FORTIME_ROUNDS_MAX}
                 min={FORTIME_ROUNDS_MIN}
                 step={1}
@@ -297,13 +308,13 @@ export const SegmentEditor = ({
         ) : null}
 
         {segment.segmentType === 'chipper' ? (
-          <div className="segment-config-stack">
-            <label className="field">
+          <div className={tw.segmentConfigStack}>
+            <label className={tw.field}>
               <span>
                 Time cap {formatSecondsAsClock(segment.timeCapSeconds ?? TIMECAP_DEFAULT_SECONDS)}
               </span>
               <input
-                className="range-input"
+                className={tw.rangeSlider}
                 max={TIMECAP_MAX_SECONDS}
                 min={TIMECAP_MIN_SECONDS}
                 step={TIMECAP_STEP_SECONDS}
@@ -321,11 +332,11 @@ export const SegmentEditor = ({
         ) : null}
 
         {segment.segmentType === 'tabata' ? (
-          <div className="segment-config-stack">
-            <label className="field">
+          <div className={tw.segmentConfigStack}>
+            <label className={tw.field}>
               <span>Work {formatSecondsAsClock(segment.workSeconds ?? 20)}</span>
               <input
-                className="range-input"
+                className={tw.rangeSlider}
                 max={TABATA_WORK_MAX}
                 min={TABATA_WORK_MIN}
                 step={1}
@@ -339,10 +350,10 @@ export const SegmentEditor = ({
                 }
               />
             </label>
-            <label className="field">
+            <label className={tw.field}>
               <span>Rest {formatSecondsAsClock(segment.restSeconds ?? 10)}</span>
               <input
-                className="range-input"
+                className={tw.rangeSlider}
                 max={TABATA_REST_MAX}
                 min={TABATA_REST_MIN}
                 step={1}
@@ -356,10 +367,10 @@ export const SegmentEditor = ({
                 }
               />
             </label>
-            <label className="field">
+            <label className={tw.field}>
               <span>Rounds {segment.rounds ?? TABATA_ROUNDS_DEFAULT}</span>
               <input
-                className="range-input"
+                className={tw.rangeSlider}
                 max={TABATA_ROUNDS_MAX}
                 min={TABATA_ROUNDS_MIN}
                 step={1}
@@ -377,13 +388,13 @@ export const SegmentEditor = ({
         ) : null}
 
         {!isLastSegment ? (
-          <div className="segment-config-grid">
-            <label className="field">
+          <div className={tw.segmentConfigGrid}>
+            <label className={tw.field}>
               <span>
                 Rest after segment {formatSecondsAsClock(restMinutesToSeconds(segment.restInterval ?? 0))}
               </span>
               <input
-                className="range-input"
+                className={tw.rangeSlider}
                 max={REST_MAX_MINUTES}
                 min={REST_MIN_MINUTES}
                 step={REST_STEP_MINUTES}
@@ -402,16 +413,16 @@ export const SegmentEditor = ({
 
         <SegmentRepGenerationPanel segment={segment} onCommit={handleSegmentChange} />
 
-        <div className="segment-add-exercise-row" onClick={(event) => event.stopPropagation()}>
+        <div className={tw.segmentAddExerciseRow} onClick={(event) => event.stopPropagation()}>
           {segment.segmentType === 'tabata' &&
           segment.exercises.length >= (segment.rounds ?? TABATA_ROUNDS_DEFAULT) ? (
-            <p className="muted-text">
+            <p className={tw.mutedText}>
               Max {segment.rounds ?? TABATA_ROUNDS_DEFAULT} exercises (one per round).
             </p>
           ) : (
             <button
               type="button"
-              className="primary-button segment-add-exercise-button"
+              className={tw.segmentAddExerciseButton}
               onClick={() => setIsExerciseModalOpen(true)}
               disabled={
                 segment.segmentType === 'tabata' &&
@@ -424,7 +435,7 @@ export const SegmentEditor = ({
         </div>
 
         {segment.exercises.length > 0 ? (
-          <ul className="exercise-list">
+          <ul className={tw.exerciseList}>
             {segment.exercises.map((assignedExercise, index) => {
               const metricOptions =
                 assignedExercise.exercise.prescription.mode === 'metric'
@@ -448,15 +459,16 @@ export const SegmentEditor = ({
               return (
                 <li
                   key={`${segment.id}-${assignedExercise.id}-${index}`}
-                  className="exercise-list-item exercise-list-item-stacked"
+                  className={tw.exerciseListItemStacked}
                 >
-                  <div className="exercise-item-header">
-                    <div className="exercise-item-title">
+                  <div className={tw.exerciseItemHeader}>
+                    <div className={tw.exerciseItemTitle}>
                       <strong>{assignedExercise.exercise.name}</strong>
                     </div>
-                    <div className="inline-actions">
+                    <div className={tw.inlineActions}>
                       <button
                         type="button"
+                        className={tw.segmentIconButton}
                         aria-label="Move exercise up"
                         onClick={() => onMoveExerciseUp(index)}
                       >
@@ -464,6 +476,7 @@ export const SegmentEditor = ({
                       </button>
                       <button
                         type="button"
+                        className={tw.segmentIconButton}
                         aria-label="Move exercise down"
                         onClick={() => onMoveExerciseDown(index)}
                       >
@@ -471,7 +484,7 @@ export const SegmentEditor = ({
                       </button>
                       <button
                         type="button"
-                        className="danger-button"
+                        className={tw.dangerButton}
                         aria-label="Remove exercise"
                         onClick={() => onRemoveExercise(index)}
                       >
@@ -483,16 +496,16 @@ export const SegmentEditor = ({
                   {segment.segmentType !== 'deathBy' &&
                   segment.segmentType !== 'tabata' &&
                   !(isSegmentRepGenActive(segment) && isSetsReps) && (
-                  <div className="prescription-stack">
+                  <div className={tw.prescriptionStack}>
                         {isSetsReps ? (
                           <>
                             {segment.segmentType === 'custom' && !assignedExercise.isMaxRepetitions ? (
-                              <label className="field">
+                              <label className={tw.field}>
                                 <span>
                                   Sets {assignedExercise.sets ?? 0}
                                 </span>
                                 <input
-                                  className="range-input"
+                                  className={tw.rangeSlider}
                                   max={ASSIGNED_SETS_MAX}
                                   min={ASSIGNED_SETS_MIN}
                                   step={1}
@@ -508,8 +521,8 @@ export const SegmentEditor = ({
                                 />
                               </label>
                             ) : null}
-                        <div className="field">
-                          <div className="field-label-row">
+                        <div className={tw.field}>
+                          <div className={tw.fieldLabelRow}>
                             <span>
                               Reps{' '}
                               {assignedExercise.isMaxRepetitions
@@ -530,7 +543,7 @@ export const SegmentEditor = ({
 
                           {!assignedExercise.isMaxRepetitions ? (
                             <input
-                              className="range-input"
+                              className={tw.rangeSlider}
                               max={ASSIGNED_REPS_MAX}
                               min={ASSIGNED_REPS_MIN}
                               step={1}
@@ -549,7 +562,7 @@ export const SegmentEditor = ({
                       </>
                     ) : (
                       <>
-                        <div className="field">
+                        <div className={tw.field}>
                           <span>Measure</span>
                           <SegmentedControl<ExerciseMetric>
                             name={`measure-${assignedExercise.id}`}
@@ -582,14 +595,15 @@ export const SegmentEditor = ({
                               })
                             }
                             ariaLabel="Metric type"
-                            className="segmented-control--wrap"
+                            className={cn(tw.segmentedControlWrap, 'w-full')}
                           />
                         </div>
-                        <div className="field">
+                        <div className={tw.field}>
                           {isCustomMeasure ? (
                             <>
                               <span>Custom value</span>
                               <input
+                                className={tw.fieldInput}
                                 type="text"
                                 value={customText}
                                 onChange={(e) =>
@@ -612,7 +626,7 @@ export const SegmentEditor = ({
                             </>
                           ) : (
                             <>
-                              <div className="field-label-row">
+                              <div className={tw.fieldLabelRow}>
                                 <span>
                                   Value {isMax ? 'Max' : formatMetricValue(metricType, metricValue)}
                                 </span>
@@ -638,7 +652,7 @@ export const SegmentEditor = ({
 
                               {!isMax ? (
                                 <input
-                                  className="range-input"
+                                  className={tw.rangeSlider}
                                   max={metricRange.max}
                                   min={metricRange.min}
                                   step={metricRange.step}
@@ -663,10 +677,10 @@ export const SegmentEditor = ({
                         </div>
                         {assignedExercise.exercise.prescription.mode === 'metric' &&
                           assignedExercise.exercise.prescription.advancedMetrics?.length ? (
-                          <div className="advanced-settings-block">
+                          <div className={tw.advancedSettingsBlock}>
                             <button
                               type="button"
-                              className="advanced-settings-trigger"
+                              className={tw.advancedSettingsTrigger}
                               onClick={() =>
                                 setExpandedAdvancedByAssignmentId((prev) => ({
                                   ...prev,
@@ -677,14 +691,14 @@ export const SegmentEditor = ({
                               {expandedAdvancedByAssignmentId[assignedExercise.id] ? 'Hide advanced settings' : 'Advanced settings'}
                             </button>
                             {expandedAdvancedByAssignmentId[assignedExercise.id] ? (
-                              <div className="segment-config-stack">
+                              <div className={tw.segmentConfigStack}>
                                 {assignedExercise.exercise.prescription.advancedMetrics?.includes('speed') ? (
-                                  <label className="field">
+                                  <label className={tw.field}>
                                     <span>
                                       Speed {assignedExercise.metricTarget?.speed ?? 0} km/h
                                     </span>
                                     <input
-                                      className="range-input"
+                                      className={tw.rangeSlider}
                                       max={ADVANCED_METRIC_RANGES.speed.max}
                                       min={ADVANCED_METRIC_RANGES.speed.min}
                                       step={ADVANCED_METRIC_RANGES.speed.step}
@@ -706,12 +720,12 @@ export const SegmentEditor = ({
                                   </label>
                                 ) : null}
                                 {assignedExercise.exercise.prescription.advancedMetrics?.includes('watts') ? (
-                                  <label className="field">
+                                  <label className={tw.field}>
                                     <span>
                                       Watts {assignedExercise.metricTarget?.watts ?? 0} W
                                     </span>
                                     <input
-                                      className="range-input"
+                                      className={tw.rangeSlider}
                                       max={ADVANCED_METRIC_RANGES.watts.max}
                                       min={ADVANCED_METRIC_RANGES.watts.min}
                                       step={ADVANCED_METRIC_RANGES.watts.step}
@@ -746,8 +760,8 @@ export const SegmentEditor = ({
           </ul>
         ) : null}
 
-        <div className="segment-footer">
-          <span className="muted-text">
+        <div className={tw.segmentFooter}>
+          <span className={tw.mutedText}>
             Total time:{' '}
             {estimatedDuration !== undefined ? formatSecondsAsClock(estimatedDuration) : 'Not measurable'}
           </span>
@@ -756,22 +770,26 @@ export const SegmentEditor = ({
 
       {isExerciseModalOpen ? (
         <div
-          className="modal-overlay"
+          className={tw.modalOverlay}
           role="presentation"
           onClick={() => setIsExerciseModalOpen(false)}
         >
           <div
             aria-modal="true"
-            className="modal-panel"
+            className={tw.modalPanel}
             role="dialog"
             onClick={(event) => event.stopPropagation()}
           >
-            <div className="panel-header">
+            <div className={tw.panelHeader}>
               <div>
-                <p className="eyebrow">Segment Exercise</p>
-                <h2>Add exercise</h2>
+                <p className={tw.eyebrow}>Segment Exercise</p>
+                <h2 className={tw.panelTitle}>Add exercise</h2>
               </div>
-              <button type="button" onClick={() => setIsExerciseModalOpen(false)}>
+              <button
+                type="button"
+                className={tw.secondaryButton}
+                onClick={() => setIsExerciseModalOpen(false)}
+              >
                 Close
               </button>
             </div>

@@ -14,7 +14,7 @@ function correctLinearEnd(start: number, end: number, rounds: number): { start: 
   if (steps <= 0) {
     return { start, end: start }
   }
-  let diff = end - start
+  const diff = end - start
   if (Math.abs(diff) < steps) {
     const step = diff >= 0 ? 1 : -1
     return { start, end: start + step * steps }
@@ -32,7 +32,7 @@ function correctPyramidPeak(start: number, peak: number, rounds: number): { star
   if (steps <= 0) {
     return { start, peak: start }
   }
-  let diff = peak - start
+  const diff = peak - start
   if (Math.abs(diff) < steps) {
     const step = diff >= 0 ? 1 : -1
     return { start, peak: start + step * steps }
@@ -53,7 +53,7 @@ function correctPyramidPeak(start: number, peak: number, rounds: number): { star
  */
 export function correctRepSchemeConfig(config: RepSchemeConfig): RepSchemeConfig {
   const pattern = config.pattern
-  let rounds = clampInt(Number(config.rounds), 1, 50)
+  const rounds = clampInt(Number(config.rounds), 1, 50)
 
   if (pattern === 'fixed') {
     let reps = Math.round(Number(config.reps ?? 10))

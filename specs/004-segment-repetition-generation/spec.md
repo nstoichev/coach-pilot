@@ -217,6 +217,12 @@ peak = start + step * steps
 
 ---
 
+## Non-functional requirements (UI)
+
+- Preview, totals, and any repetition-generation panel styling (contrast, spacing, typography) MUST use **semantic Tailwind design tokens** only from `tailwind.config.js`, per `.specify/memory/constitution.md` — **no** raw palette utilities or hardcoded colors in components.
+
+---
+
 ## Functional Requirements
 
 - **FR-RG-001**: The system SHALL support repetition patterns `linear`, `pyramid`, and `fixed` for in-scope segments only.

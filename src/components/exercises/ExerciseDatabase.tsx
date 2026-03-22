@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { getExerciseDeleteGuardMessage } from '../../services/index.ts'
 import { useWorkoutBuilder } from '../../store/index.ts'
 import type { Exercise } from '../../types/exercise.ts'
+import * as tw from '../../ui/tw.ts'
 import { ExerciseForm } from './ExerciseForm.tsx'
 import { ExerciseListItem } from './ExerciseListItem.tsx'
 
@@ -44,7 +45,7 @@ export const ExerciseDatabase = () => {
   }
 
   return (
-    <section className="exercise-database-grid">
+    <section className={tw.exerciseDatabaseGrid}>
       <ExerciseForm
         key={selectedExercise?.id ?? 'new-exercise'}
         initialDraft={selectedExercise ?? createDraftExercise()}
@@ -53,28 +54,31 @@ export const ExerciseDatabase = () => {
         submitLabel={submitLabel}
       />
 
-      <section className="panel">
-        <div className="panel-header">
+      <section className={tw.panel}>
+        <div className={tw.panelHeader}>
           <div>
-            <p className="eyebrow">Exercise Database</p>
-            <h2>Mock database records</h2>
+            <p className={tw.eyebrow}>Exercise Database</p>
+            <h2 className={tw.panelTitle}>Mock database records</h2>
           </div>
           <button
             type="button"
+            className={tw.secondaryButton}
             onClick={() => actions.selectExercise(undefined)}
           >
             New Exercise
           </button>
         </div>
 
-        <p className="muted-text">
+        <p className={tw.mutedText}>
           This is an in-memory mock database for now. Use it to create and edit exercise records
           before a real backend is added.
         </p>
 
-        {state.deleteGuardMessage ? <p className="warning-text">{state.deleteGuardMessage}</p> : null}
+        {state.deleteGuardMessage ? (
+          <p className={tw.warningText}>{state.deleteGuardMessage}</p>
+        ) : null}
 
-        <div className="exercise-record-list">
+        <div className={tw.segmentList}>
           {state.exercises.map((exercise) => {
             const deleteMessage = getExerciseDeleteGuardMessage(state.workoutDraft, exercise.id)
 
@@ -92,9 +96,12 @@ export const ExerciseDatabase = () => {
         </div>
 
         {exerciseErrors.length > 0 ? (
-          <ul className="validation-list">
+          <ul className={tw.validationList}>
             {exerciseErrors.map((error) => (
-              <li key={`${error.field}-${error.message}`}>
+              <li
+                key={`${error.field}-${error.message}`}
+                className={tw.validationListItem}
+              >
                 <strong>{error.field}</strong>: {error.message}
               </li>
             ))}

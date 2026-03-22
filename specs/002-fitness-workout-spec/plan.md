@@ -57,6 +57,7 @@ Constraints:
 - Single-user local prototype is acceptable in phase 1
 - Current repository still contains starter Vite UI and only a partial `src/types/exercise.ts`
 - No dedicated test runner is configured yet; build and lint remain the required automated checks for this phase
+- **UI**: All product styling MUST follow the **UI styling system** in `.specify/memory/constitution.md` — Tailwind utility classes and **semantic tokens** defined in `tailwind.config.js` only (no default palette utilities, no inline styles, no hardcoded colors in components).
 
 ---
 
@@ -70,6 +71,7 @@ Verify that the implementation respects the project constitution.
 - **Logic separation**: Pass. Validation, ordering, and future timer/fatigue logic live in `src/services/` and shared state lives in `src/store/`, not inside UI components.
 - **Modularity**: Pass. Workout Builder, Exercise Database, Timer Generator, and Fatigue System are treated as separate modules with explicit boundaries.
 - **Deterministic behavior**: Pass. Segment ordering, exercise assignment validation, and future timer/fatigue contracts are designed as deterministic functions and service contracts.
+- **UI styling system**: Pass. This plan assumes new and touched UI uses **Tailwind + semantic tokens** per the constitution; global or legacy stylesheets may exist for resets or migration only — they are not the preferred styling surface.
 
 No constitution violations are introduced by this plan.
 
@@ -145,8 +147,8 @@ src/
     segment.ts
     workout.ts
   App.tsx
-  App.css
-  index.css
+  App.css          # legacy / migration; prefer token-backed Tailwind in components per constitution
+  index.css        # entry / base layer only; product chrome via semantic utilities
   main.tsx
 ```
 
@@ -163,6 +165,8 @@ Centralized local state for exercises, workouts, validation state, and UI action
 
 `types/`  
 Canonical TypeScript contracts that represent the source of truth.
+
+**Styling**: Product UI MUST use **Tailwind** with **design tokens** from `tailwind.config.js` (see constitution). `App.css` / `index.css` are not the primary place for feature styling; use them only for unavoidable base/global rules until migration is complete.
 
 ---
 

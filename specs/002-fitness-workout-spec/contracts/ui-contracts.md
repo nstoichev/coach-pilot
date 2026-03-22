@@ -6,6 +6,17 @@ This document defines the interface contracts between the Workout Builder UI, Ex
 
 ---
 
+## Design system compliance
+
+All surfaces described in these contracts MUST follow **`.specify/memory/constitution.md`** — **UI styling system (Tailwind + semantic tokens)**:
+
+- **Surfaces** (backgrounds, panels, cards): use only **semantic tokens** from `tailwind.config.js` (e.g. `surface-*`, `text-*`, `border-*`).
+- **Interactive controls**: MUST define **hover** and **active** states, use **`duration-200`** + **`ease-in-out`** transitions, and provide **immediate visual feedback** (including disabled/loading/success/error affordances).
+- **Validation and status feedback**: errors and warnings use **danger** tokens; success and OK paths use **success** tokens; muted copy uses **text-muted** (or equivalent token).
+- **No** inline `style` for presentation, **no** hardcoded hex/rgb/hsl in components, **no** default Tailwind palette utilities (`gray-*`, `blue-*`, etc.).
+
+---
+
 ## Contract 1: Workout Builder Surface
 
 **Responsibilities**:

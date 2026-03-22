@@ -1,4 +1,6 @@
 import type { Exercise } from '../../types/exercise.ts'
+import { cn } from '../../ui/cn.ts'
+import * as tw from '../../ui/tw.ts'
 
 type ExerciseListItemProps = {
   exercise: Exercise
@@ -15,41 +17,43 @@ export const ExerciseListItem = ({
   onEdit,
   onDelete,
 }: ExerciseListItemProps) => (
-  <article className={`exercise-record${isSelected ? ' exercise-record-selected' : ''}`}>
-    <div className="exercise-record-copy">
-      <div className="panel-header">
+  <article
+    className={cn(tw.exerciseRecord, isSelected && tw.exerciseRecordSelected)}
+  >
+    <div className={tw.exerciseRecordCopy}>
+      <div className={tw.panelHeader}>
         <div>
-          <h3>{exercise.name}</h3>
-          <p className="muted-text">{exercise.type.join(', ')}</p>
+          <h3 className={tw.panelTitle}>{exercise.name}</h3>
+          <p className={tw.mutedText}>{exercise.type.join(', ')}</p>
         </div>
       </div>
 
-      <p className="muted-text">
+      <p className={tw.mutedText}>
         Equipment: {exercise.equipment?.join(', ') || 'None'}
       </p>
-      <p className="muted-text">
+      <p className={tw.mutedText}>
         Primary muscles: {exercise.muscles?.primary.join(', ') || 'None'}
       </p>
-      <p className="muted-text">
+      <p className={tw.mutedText}>
         Stabilizing muscles: {exercise.muscles?.stabilizing.join(', ') || 'None'}
       </p>
-      <p className="muted-text">
+      <p className={tw.mutedText}>
         Working weight:{' '}
         {exercise.workingWeight
           ? `${exercise.workingWeight.mode} (${exercise.workingWeight.value})`
           : 'Not set'}
       </p>
 
-      {deleteMessage ? <p className="warning-text">{deleteMessage}</p> : null}
+      {deleteMessage ? <p className={tw.warningText}>{deleteMessage}</p> : null}
     </div>
 
-    <div className="stacked-actions">
-      <button type="button" onClick={onEdit}>
+    <div className={tw.stackedActions}>
+      <button type="button" className={tw.secondaryButton} onClick={onEdit}>
         Edit
       </button>
       <button
         type="button"
-        className="danger-button"
+        className={tw.dangerButton}
         onClick={onDelete}
         title={deleteMessage ?? 'Delete exercise'}
       >

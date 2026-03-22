@@ -7,6 +7,8 @@ import {
   getBoardRestLine,
   isWorkoutTimeMeasurable,
 } from '../../services/workout-board-format.ts'
+import { cn } from '../../ui/cn.ts'
+import * as tw from '../../ui/tw.ts'
 import { WorkoutTimer, type TimerPhaseInfo } from './WorkoutTimer.tsx'
 
 type WorkoutBoardProps = {
@@ -26,17 +28,17 @@ export function WorkoutBoard({ workout, onBackToBuild }: WorkoutBoardProps) {
   const boardWorkoutTitle = workout.name.trim() || 'Untitled workout'
 
   return (
-    <main className="board-shell">
-      <header className="board-header">
-        <div className="board-header-title-block">
-          <h1 className="board-title" title={boardWorkoutTitle}>
+    <main className={tw.boardShell}>
+      <header className={tw.boardHeader}>
+        <div className={tw.boardHeaderTitleBlock}>
+          <h1 className={tw.boardTitle} title={boardWorkoutTitle}>
             {boardWorkoutTitle}
           </h1>
         </div>
-        <div className="board-actions">
+        <div className={tw.boardActions}>
           <button
             type="button"
-            className="secondary-button"
+            className={tw.secondaryButton}
             onClick={onBackToBuild}
           >
             Back to build
@@ -44,7 +46,7 @@ export function WorkoutBoard({ workout, onBackToBuild }: WorkoutBoardProps) {
           {timeMeasurable && !timerRunning && (
             <button
               type="button"
-              className="primary-button"
+              className={tw.primaryButton}
               onClick={() => setTimerRunning(true)}
             >
               Start
@@ -66,26 +68,33 @@ export function WorkoutBoard({ workout, onBackToBuild }: WorkoutBoardProps) {
         />
       )}
 
-      <section className="board-content">
+      <section className={tw.boardContent}>
         {workout.segments.map((segment, index) => {
           const isLastSegment = index === workout.segments.length - 1
           const repSeqSummary = getBoardRepSequenceSummary(segment)
+          const workHighlight =
+            currentPhase?.phaseType === 'work' && currentPhase.segmentId === segment.id
+          const restHighlight =
+            currentPhase?.phaseType === 'rest' && currentPhase.segmentId === segment.id
           return (
-            <div key={segment.id} className="board-segment-wrapper">
+            <div key={segment.id} className={tw.boardSegmentWrapper}>
               <div
-                className={`board-segment${currentPhase?.phaseType === 'work' && currentPhase.segmentId === segment.id ? ' board-segment-active' : ''}`}
+                className={cn(tw.boardSegment, workHighlight && tw.boardSegmentActive)}
               >
-                <h2 className="board-segment-title">
+                <h2 className={tw.boardSegmentTitle}>
                   {getBoardSegmentTitle(segment)}
                 </h2>
                 {repSeqSummary ? (
-                  <p className="board-rep-sequence-line">{repSeqSummary}</p>
+                  <p className={tw.boardRepSequenceLine}>{repSeqSummary}</p>
                 ) : null}
-                <ul
-                  className={`board-exercise-list${repSeqSummary ? ' board-exercise-list--rep-sequence' : ''}`}
-                >
+                <ul className={tw.boardExerciseList}>
                   {segment.exercises.map((assigned) => (
-                    <li key={assigned.id} className="board-exercise-line">
+                    <li
+                      key={assigned.id}
+                      className={
+                        repSeqSummary ? tw.boardExerciseLineWithRepBullet : tw.boardExerciseLine
+                      }
+                    >
                       {getBoardExerciseLine(assigned, segment)}
                     </li>
                   ))}
@@ -93,7 +102,10 @@ export function WorkoutBoard({ workout, onBackToBuild }: WorkoutBoardProps) {
               </div>
               {!isLastSegment && getBoardRestLine(segment) && (
                 <div
-                  className={`board-rest-separator${currentPhase?.phaseType === 'rest' && currentPhase.segmentId === segment.id ? ' board-rest-separator-active' : ''}`}
+                  className={cn(
+                    tw.boardRestSeparator,
+                    restHighlight && tw.boardRestSeparatorActive,
+                  )}
                   aria-label="Rest period"
                 >
                   {getBoardRestLine(segment)}

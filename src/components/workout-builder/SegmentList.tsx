@@ -1,5 +1,6 @@
 import type { AssignedExercise, Segment } from '../../types/segment.ts'
 import type { Exercise } from '../../types/exercise.ts'
+import * as tw from '../../ui/tw.ts'
 import { SegmentEditor } from './SegmentEditor.tsx'
 
 type SegmentListProps = {
@@ -34,15 +35,15 @@ export const SegmentList = ({
   }
 
   return (
-    <section className="panel">
-      <div className="panel-header">
+    <section className={tw.panel}>
+      <div className={tw.panelHeader}>
         <div>
-          <p className="eyebrow">Segments</p>
-          <h2>Workout flow</h2>
+          <p className={tw.eyebrow}>Segments</p>
+          <h2 className={tw.panelTitle}>Workout flow</h2>
         </div>
       </div>
 
-      <div className="segment-list">
+      <div className={tw.segmentList}>
         {segments.map((segment, index) => (
           <SegmentEditor
             key={segment.id}

@@ -25,7 +25,8 @@ export type WorkoutGeneratorResult = {
  * Placeholder: does not generate workouts yet.
  * Returns a stub indicating the contract is ready for future implementation.
  */
-export function generateWorkout(_constraints: WorkoutGeneratorConstraints): WorkoutGeneratorResult {
+export function generateWorkout(constraints: WorkoutGeneratorConstraints): WorkoutGeneratorResult {
+  void constraints
   return {
     status: 'placeholder',
     message: 'Workout auto-generation not implemented; constraints contract is ready for future integration.',

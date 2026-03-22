@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Exercise } from '../../types/exercise.ts'
+import { cn } from '../../ui/cn.ts'
+import * as tw from '../../ui/tw.ts'
 
 type SegmentExercisePickerProps = {
   availableExercises: Exercise[]
@@ -35,23 +37,25 @@ export const SegmentExercisePicker = ({
 
   if (availableExercises.length === 0) {
     return (
-      <div className="empty-state bordered">
-        <strong>No exercises available yet.</strong>
-        <p>Load or create exercise data before assigning movements to a segment.</p>
+      <div className={cn(tw.emptyState, tw.bordered)}>
+        <strong className={tw.searchResultTitle}>No exercises available yet.</strong>
+        <p className={tw.mutedText}>
+          Load or create exercise data before assigning movements to a segment.
+        </p>
       </div>
     )
   }
 
   return (
-    <div className="exercise-picker">
-      <p className="muted-text picker-summary">
+    <div className={tw.exercisePicker}>
+      <p className={cn(tw.mutedText, tw.pickerSummary)}>
         Search the mock exercise database and click an exercise to add it.
       </p>
 
-      <div className="search-picker">
+      <div className={tw.searchPicker}>
         <input
           aria-label="Search exercises"
-          className="search-input"
+          className={tw.searchInput}
           placeholder="Search exercises"
           ref={inputRef}
           value={query}
@@ -63,12 +67,12 @@ export const SegmentExercisePicker = ({
         />
 
         {isFocused ? (
-          <div className="search-results">
+          <div className={tw.searchResults}>
             {options.length > 0 ? (
               options.map((exercise) => (
                 <button
                   key={exercise.id}
-                  className="search-result-item"
+                  className={tw.searchResultItem}
                   type="button"
                   onMouseDown={() => {
                     onAssignExercise(exercise.id)
@@ -76,14 +80,14 @@ export const SegmentExercisePicker = ({
                     setIsFocused(false)
                   }}
                 >
-                  <strong>{exercise.name}</strong>
-                  <span>{exercise.type.join(', ')}</span>
+                  <strong className={tw.searchResultTitle}>{exercise.name}</strong>
+                  <span className={tw.searchResultMeta}>{exercise.type.join(', ')}</span>
                 </button>
               ))
             ) : (
-              <div className="empty-state bordered">
-                <strong>No matching exercises.</strong>
-                <p>Try another search term.</p>
+              <div className={cn(tw.emptyState, tw.bordered)}>
+                <strong className={tw.searchResultTitle}>No matching exercises.</strong>
+                <p className={tw.mutedText}>Try another search term.</p>
               </div>
             )}
           </div>

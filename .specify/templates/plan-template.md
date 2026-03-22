@@ -33,6 +33,8 @@
 
 [Gates determined based on constitution file]
 
+- **UI styling system** *(when the feature includes UI)*: Confirm compliance with the project constitution — e.g. Coach Pilot `.specify/memory/constitution.md` requires **Tailwind** with **semantic tokens** from `tailwind.config.js` (no default palette utilities, no hardcoded colors in components, unless a constitution-approved exception exists).
+
 ## Project Structure
 
 ### Documentation (this feature)

@@ -84,7 +84,7 @@ Tasks:
 
 - [X] T012 [US3] Render read-only preview list (e.g. “Round *n*: *reps*”) from `segment.repSequence` when `buildRepSequence` succeeds in `src/components/workout-builder/SegmentEditor.tsx` (or `src/components/workout-builder/SegmentRepGenerationPanel.tsx`).
 - [X] T013 [US3] Compute and display `totalRepsPerExercise` and `segmentTotalReps` per [spec.md](./spec.md) using `segment.exercises` filtered to `prescription.mode === 'sets-reps'` in `src/components/workout-builder/SegmentEditor.tsx` (or helper in `src/services/repetition-generation.ts`).
-- [X] T014 [P] [US3] Add minimal styles for preview/totals (contrast, spacing) in `src/App.css`.
+- [X] T014 [P] [US3] Add minimal styling for preview/totals (contrast, spacing) using **Tailwind semantic token utilities** from `tailwind.config.js` in the repetition-generation UI, per `.specify/memory/constitution.md` (not ad-hoc `App.css` rules unless constitution-approved).
 
 **Checkpoint**: User sees preview + totals without exposed formulas.
 
@@ -135,7 +135,7 @@ Phase 1 → Phase 2 → Phase 3 (US1) → Phase 4 (US2) → Phase 5 (US3) → Ph
 ## Parallel execution examples
 
 - **After Phase 2**: T005 can follow T003; T004 parallel with T003 if barrel file has no circular dependency.
-- **Phase 5**: T014 [P] can run alongside T012–T013 if CSS is separate from logic edits.
+- **Phase 5**: T014 [P] can run alongside T012–T013 if presentation edits are separate from logic edits.
 
 ---
 

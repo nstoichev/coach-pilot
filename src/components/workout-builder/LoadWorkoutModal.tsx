@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Workout } from '../../types/workout.ts'
+import { cn } from '../../ui/cn.ts'
+import * as tw from '../../ui/tw.ts'
 
 export type LoadWorkoutSample = { label: string; workout: Workout }
 
@@ -31,10 +33,11 @@ export const LoadWorkoutModal = ({
   }, [query, samples])
 
   useEffect(() => {
-    if (isOpen) {
-      setQuery('')
-      inputRef.current?.focus()
-    }
+    if (!isOpen) return
+    // Reset search when opening; focus is tied to the same user gesture as open.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional modal open reset
+    setQuery('')
+    inputRef.current?.focus()
   }, [isOpen])
 
   if (!isOpen) {
@@ -48,51 +51,51 @@ export const LoadWorkoutModal = ({
   }
 
   return (
-    <div className="modal-overlay" role="presentation" onClick={onClose}>
+    <div className={tw.modalOverlay} role="presentation" onClick={onClose}>
       <div
         aria-modal="true"
-        className="modal-panel"
+        className={tw.modalPanel}
         role="dialog"
         onClick={(event) => event.stopPropagation()}
       >
-        <div className="panel-header">
+        <div className={tw.panelHeader}>
           <div>
-            <p className="eyebrow">Sample templates</p>
-            <h2>Load template</h2>
+            <p className={tw.eyebrow}>Sample templates</p>
+            <h2 className={tw.panelTitle}>Load template</h2>
           </div>
-          <button type="button" onClick={onClose}>
+          <button type="button" className={tw.secondaryButton} onClick={onClose}>
             Cancel
           </button>
         </div>
 
-        <div className="search-picker">
-          <p className="muted-text picker-summary">
+        <div className={tw.searchPicker}>
+          <p className={cn(tw.mutedText, tw.pickerSummary)}>
             Search by name, then click a template to load it into the builder.
           </p>
           <input
             aria-label="Search sample templates"
-            className="search-input"
+            className={tw.searchInput}
             placeholder="Search templates (e.g. Fran, Murph)"
             ref={inputRef}
             value={query}
             onChange={(event) => setQuery(event.target.value)}
           />
-          <div className="search-results">
+          <div className={tw.searchResults}>
             {options.length > 0 ? (
               options.map((sample) => (
                 <button
                   key={sample.workout.id}
-                  className="search-result-item"
+                  className={tw.searchResultItem}
                   type="button"
                   onMouseDown={() => handleSelect(sample.workout)}
                 >
-                  <strong>{sample.label}</strong>
+                  <strong className={tw.searchResultTitle}>{sample.label}</strong>
                 </button>
               ))
             ) : (
-              <div className="empty-state bordered">
-                <strong>No matching template.</strong>
-                <p>Try another search term.</p>
+              <div className={cn(tw.emptyState, tw.bordered)}>
+                <strong className={tw.searchResultTitle}>No matching template.</strong>
+                <p className={tw.mutedText}>Try another search term.</p>
               </div>
             )}
           </div>

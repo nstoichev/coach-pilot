@@ -158,7 +158,7 @@ Tasks:
 - [x] T043 [US4] On Workout Board, add "Back to build" (or "Edit workout") that clears board view and returns to builder; same files as T038 and WorkoutBoard.
 - [x] T044 [US4] When workout has any For Time segment, timer UI must display "Stop" (or equivalent) and record completion on user action; same files as T042.
 - [x] T045 [US4] Add validation rule: any segment with zero exercises must produce a validation error (e.g. "Segment must have at least one exercise") so Done stays disabled. Implement in `src/services/workout-validation.ts` (e.g. in `validateSegment` or `validateWorkout`); ensure `WorkoutBuilder` Done button remains gated by `state.validationErrors` (already includes segment-level errors).
-- [x] T046 [US4] Apply distinct segment card visual states: segments with no exercises use incomplete/warning styling; segments with at least one exercise use active/success styling. Add CSS classes (e.g. `segment-card-empty`, `segment-card-has-exercises`) in `src/App.css` and apply them in `src/components/workout-builder/SegmentEditor.tsx` (or segment list) based on `segment.exercises.length`.
+- [x] T046 [US4] Apply distinct segment card visual states: segments with no exercises use incomplete/warning styling; segments with at least one exercise use active/success styling. Implement with **Tailwind utility classes** using **semantic tokens** from `tailwind.config.js` on the segment card UI in `src/components/workout-builder/SegmentEditor.tsx` (or segment list) based on `segment.exercises.length`, per **FR-028** and `.specify/memory/constitution.md` (no ad-hoc CSS classes unless constitution-approved).
 - [x] T047 [US4] Align workout timer with spec **Workout Timer — Detailed Behavior**: single continuous flow; one counter only (no "Not set" on start, no "elapsed / total" display); labels "Work: M:SS" and "Rest: M:SS"; work phases count down (EMOM/AMRAP) or count up (For Time); rest phases count down; auto-advance through all segments and rest in order; For Time shows Stop button and "Finish" on completion; workout complete when all phases done. Rest in minutes converted to seconds. Implement in `src/components/workout-builder/WorkoutTimer.tsx` and any timer/segment sequencing logic.
 - [x] T048 [US4] EMOM timer per-interval countdown: in `buildPhases` in `src/components/workout-builder/WorkoutTimer.tsx`, expand EMOM segments into one work phase per round, each with `durationSeconds = intervalSeconds` (from timer structure / workout segment), so the user sees a countdown per interval (e.g. "E0:15MOM 3" → three "Work: 0:15" countdowns). Rest after the segment runs only after all EMOM rounds complete. Document in spec **Workout Timer — Detailed Behavior** (EMOM bullet and example).
 - [ ] T049 [US4] Add **Death by** segment type: add `deathBy` to `SEGMENT_TYPES` in `src/types/domain.ts`. No new segment fields required (no interval/rounds/sets; performance-dependent).
@@ -214,7 +214,7 @@ Independent Test: Click "Add segment"; modal shows search input and list of segm
 
 Tasks:
 
-- [x] T063 [US1] Replace segment-type grid with search-and-select in `src/components/workout-builder/SegmentTypeModal.tsx`: add search input (placeholder e.g. "Search segment format (e.g. Tabata, EMOM)"), filter segment options by query (title, type, optional search terms); show filtered options in a list below using same classes as exercise picker (`search-picker`, `search-input`, `search-results`, `search-result-item`). On option click, call `onSelectSegmentType` and close modal. Auto-focus search when modal opens; clear query on open. Document in spec FR-013.
+- [x] T063 [US1] Replace segment-type grid with search-and-select in `src/components/workout-builder/SegmentTypeModal.tsx`: add search input (placeholder e.g. "Search segment format (e.g. Tabata, EMOM)"), filter segment options by query (title, type, optional search terms); show filtered options in a list below using the **same token-based picker pattern** as the exercise picker (semantic Tailwind utilities from `tailwind.config.js`, not raw palette names). On option click, call `onSelectSegmentType` and close modal. Auto-focus search when modal opens; clear query on open. Document in spec FR-013.
 
 Checkpoint: Add segment modal uses search + list; user can search and select a format like Add exercise.
 
@@ -226,8 +226,8 @@ Purpose: Finish presentation, documentation, and shared exports needed across th
 
 Tasks:
 
-- [x] T032 [P] Update the main application layout and builder styles in `src/App.css`
-- [ ] T033 [P] Update global styling defaults for the Coach Pilot shell in `src/index.css`
+- [x] T032 [P] Update the main application layout and builder chrome using **semantic Tailwind token utilities** per `.specify/memory/constitution.md` (primary implementation in components; `src/App.css` only for approved global/migration needs).
+- [ ] T033 [P] Align global shell defaults (e.g. `src/index.css`) with the design system: **base layer / resets only** where required; product appearance via **token-backed Tailwind** in components, not ad-hoc global class rules.
 - [ ] T034 [P] Document architecture, data flow, and extension guidance in `README.md`
 - [x] T035 Update workout builder exports in `src/components/workout-builder/index.ts`
 - [ ] T036 Update shared service exports in `src/services/index.ts`
@@ -300,8 +300,8 @@ Parallel User Story 4 tasks (where independent):
 
 Parallel polish tasks:
 
-- T032 `src/App.css`
-- T033 `src/index.css`
+- T032 layout/builder — token utilities (see task; `App.css` only if constitution-approved)
+- T033 global shell — base/reset in `index.css`; tokens in components
 - T034 `README.md`
 
 ---

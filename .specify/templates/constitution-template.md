@@ -34,6 +34,12 @@
 [SECTION_2_CONTENT]
 <!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
 
+## Frontend UI styling *(optional — recommended for web apps)*
+
+<!-- Example (Coach Pilot): Add a subsection that mandates Tailwind CSS as the only product styling method, semantic design tokens in tailwind.config.js, and rules for states (success/danger/disabled) and interactions (hover, active, duration-200, ease-in-out). -->
+
+[FRONTEND_UI_STYLING_RULES_OR_REMOVE_SECTION]
+
 ## [SECTION_3_NAME]
 <!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
 
