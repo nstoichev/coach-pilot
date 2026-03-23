@@ -1,4 +1,5 @@
 import { useWorkoutBuilder } from './store/index.ts'
+import { cn } from './ui/cn.ts'
 import * as tw from './ui/tw.ts'
 import { WorkoutBuilder } from './components/workout-builder/index.ts'
 import { WorkoutBoard } from './components/workout-builder/WorkoutBoard.tsx'
@@ -8,7 +9,7 @@ function App() {
 
   if (state.showWorkoutBoard && state.workoutBoardSnapshot) {
     return (
-      <div className={tw.pageShell}>
+      <div className={cn(tw.pageShell, tw.pageShellFill)}>
         <WorkoutBoard
           workout={state.workoutBoardSnapshot}
           onBackToBuild={actions.hideWorkoutBoard}

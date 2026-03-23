@@ -36,14 +36,13 @@ export const WorkoutBuilder = () => {
   )
 
   return (
-    <main className={tw.builderShell}>
+    <main className={cn(tw.builderShell, tw.builderMainWithStickyFooter)}>
       <WorkoutDetailsForm
         workoutName={state.workoutDraft.name}
         scheduledDate={state.workoutDraft.scheduledDate ?? ''}
         scheduledDateMin={today}
         onScheduledDateChange={actions.setScheduledDate}
         onWorkoutNameChange={actions.setWorkoutName}
-        onAddSegment={() => setIsSegmentTypeModalOpen(true)}
         onOpenLoadWorkout={
           SAMPLE_WORKOUTS.length > 0 ? () => setIsLoadWorkoutModalOpen(true) : undefined
         }
@@ -101,15 +100,24 @@ export const WorkoutBuilder = () => {
         )}
       </section>
 
-      <div className={tw.builderDoneRow}>
-        <button
-          type="button"
-          className={tw.builderDoneButton}
-          disabled={workoutErrors.length > 0 || !hasAtLeastOneExerciseInAnySegment}
-          onClick={() => actions.showWorkoutBoard(JSON.parse(JSON.stringify(state.workoutDraft)))}
-        >
-          Done
-        </button>
+      <div className={tw.builderStickyActionsBar}>
+        <div className={tw.builderStickyActionsStack}>
+          <button
+            type="button"
+            className={tw.builderStickyAddSegmentButton}
+            onClick={() => setIsSegmentTypeModalOpen(true)}
+          >
+            Add Segment
+          </button>
+          <button
+            type="button"
+            className={tw.builderStickyDoneButton}
+            disabled={workoutErrors.length > 0 || !hasAtLeastOneExerciseInAnySegment}
+            onClick={() => actions.showWorkoutBoard(JSON.parse(JSON.stringify(state.workoutDraft)))}
+          >
+            Done
+          </button>
+        </div>
       </div>
     </main>
   )

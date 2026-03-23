@@ -84,3 +84,20 @@ export const IconXSmall = (props: IconProps) => (
   </svg>
 )
 
+/** Trash / bin — builder remove actions */
+export const IconTrashSmall = (props: IconProps) => (
+  <svg
+    aria-hidden="true"
+    width="14"
+    height="14"
+    viewBox="0 0 16 16"
+    xmlns="http://www.w3.org/2000/svg"
+    {...props}
+  >
+    <path
+      d="M6.75 2.5a.75.75 0 01.75-.75h1a.75.75 0 01.75.75V3h3.25a.75.75 0 010 1.5h-.45l-.58 7.62A1.75 1.75 0 019.67 14H6.33a1.75 1.75 0 01-1.75-1.88L4 4.5H3.5a.75.75 0 010-1.5H6.75V2.5zm.75 1.5h1V3.25h-1V4zm-2.4 1.5l.52 7h5.26l.52-7H5.1zM7 7.25a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0V8a.75.75 0 01.75-.75zm3 0a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0V8a.75.75 0 01.75-.75z"
+      fill="currentColor"
+    />
+  </svg>
+)
+

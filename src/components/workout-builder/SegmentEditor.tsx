@@ -17,7 +17,7 @@ import {
   IconArrowDownSmall,
   IconArrowUp,
   IconArrowUpSmall,
-  IconXSmall,
+  IconTrashSmall,
 } from '../icons.tsx'
 import { ADVANCED_METRIC_RANGES, METRIC_RANGES } from '../../services/metric-ranges.ts'
 import { SegmentExercisePicker } from './SegmentExercisePicker.tsx'
@@ -173,10 +173,10 @@ export const SegmentEditor = ({
           )}
         </div>
 
-        <div className={tw.stackedActions} onClick={(event) => event.stopPropagation()}>
+        <div className={tw.builderSegmentedActionGroup} onClick={(event) => event.stopPropagation()}>
           <button
             type="button"
-            className={tw.segmentIconButton}
+            className={tw.builderSegmentedActionFace}
             aria-label="Move segment up"
             onClick={onMoveUp}
           >
@@ -184,7 +184,7 @@ export const SegmentEditor = ({
           </button>
           <button
             type="button"
-            className={tw.segmentIconButton}
+            className={tw.builderSegmentedActionFace}
             aria-label="Move segment down"
             onClick={onMoveDown}
           >
@@ -192,11 +192,11 @@ export const SegmentEditor = ({
           </button>
           <button
             type="button"
-            className={tw.dangerButton}
+            className={tw.builderSegmentedActionFace}
             aria-label="Remove segment"
             onClick={onRemove}
           >
-            <IconXSmall />
+            <IconTrashSmall />
           </button>
         </div>
       </div>
@@ -465,10 +465,10 @@ export const SegmentEditor = ({
                     <div className={tw.exerciseItemTitle}>
                       <strong>{assignedExercise.exercise.name}</strong>
                     </div>
-                    <div className={tw.inlineActions}>
+                    <div className={tw.builderSegmentedActionGroup}>
                       <button
                         type="button"
-                        className={tw.segmentIconButton}
+                        className={tw.builderSegmentedActionFace}
                         aria-label="Move exercise up"
                         onClick={() => onMoveExerciseUp(index)}
                       >
@@ -476,7 +476,7 @@ export const SegmentEditor = ({
                       </button>
                       <button
                         type="button"
-                        className={tw.segmentIconButton}
+                        className={tw.builderSegmentedActionFace}
                         aria-label="Move exercise down"
                         onClick={() => onMoveExerciseDown(index)}
                       >
@@ -484,11 +484,11 @@ export const SegmentEditor = ({
                       </button>
                       <button
                         type="button"
-                        className={tw.dangerButton}
+                        className={tw.builderSegmentedActionFace}
                         aria-label="Remove exercise"
                         onClick={() => onRemoveExercise(index)}
                       >
-                        <IconXSmall />
+                        <IconTrashSmall />
                       </button>
                     </div>
                   </div>

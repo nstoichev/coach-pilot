@@ -5,13 +5,16 @@ import { cn } from './cn.ts'
 
 export const pageShell = 'w-full'
 
+/** Fills #root content area below padding (use with board so main can flex-1 without 100dvh + padding overflow) */
+export const pageShellFill = 'flex min-h-0 flex-1 flex-col'
+
 export const builderShell = 'grid gap-6'
 
 export const exerciseDatabaseGrid =
   'grid gap-6 [grid-template-columns:minmax(280px,1fr)_minmax(360px,1.3fr)] max-[720px]:grid-cols-1'
 
 export const modalOverlay =
-  'fixed inset-0 z-20 flex items-center justify-center bg-overlay p-6'
+  'fixed inset-0 z-50 flex items-center justify-center bg-overlay p-6'
 
 export const modalPanel =
   'w-full max-w-[760px] rounded-2xl border border-primary bg-surface-elevated p-6 shadow-modal'
@@ -63,6 +66,15 @@ export const formGrid =
 
 export const formGridWorkoutDetails = 'w-full grid-cols-1'
 
+/** Segments block: no panel chrome; cards supply their own surfaces */
+export const segmentListSection = 'w-full'
+
+/** Side inset for “Segments” / “Workout flow” headings only */
+export const segmentListSectionHeader = cn(
+  panelHeader,
+  'px-3 max-[720px]:px-2',
+)
+
 export const segmentList = 'grid gap-4'
 
 export const segmentCardBody = 'grid gap-4'
@@ -96,34 +108,102 @@ export const dangerButton =
 export const secondaryButton =
   'rounded-xl border border-primary bg-surface-tertiary px-4 py-3 font-inherit font-medium text-text-secondary shadow-insetShallow transition-colors transition-opacity duration-200 ease-in-out hover:border-primary hover:bg-surface-quaternary hover:text-text-primary active:opacity-90 disabled:opacity-60'
 
-export const segmentIconButton = cn(
+/**
+ * Flush icon group — same chrome as `SegmentedControl` (measure / rep pattern radios).
+ * Parent: `builderSegmentedActionGroup`; children: `builderSegmentedActionFace`.
+ */
+export const builderSegmentedActionGroup =
+  'inline-flex shrink-0 overflow-hidden rounded-lg border border-primary-strong bg-surface-secondary shadow-insetShallow [&>button:first-child]:border-l-0'
+
+export const builderSegmentedActionFace =
+  'flex min-h-[2.25rem] min-w-[2.5rem] flex-1 items-center justify-center border-l border-primary bg-surface-muted/55 px-2 py-1.5 text-text-muted transition-all duration-200 ease-in-out hover:bg-surface-quaternary/65 hover:text-text-secondary focus-visible:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-surface-muted/55'
+
+/**
+ * Stacked Add segment + Done — fixed to viewport bottom (below #root padding visually).
+ * z-10 keeps all modals (`modalOverlay` z-50) above this bar.
+ */
+export const builderStickyActionsBar =
+  'pointer-events-auto fixed inset-x-0 bottom-0 z-10 border-t border-primary bg-surface-primary/95 pt-4 pb-[max(1rem,env(safe-area-inset-bottom,0px))] backdrop-blur-sm'
+
+/** Horizontal inset matches `#root` padding so buttons align with builder content */
+export const builderStickyActionsStack =
+  'mx-auto flex w-full max-w-[1200px] flex-col gap-3 px-8 max-[720px]:px-4'
+
+/** Outlined / neutral — pairs with primary Done */
+export const builderStickyAddSegmentButton = cn(
   secondaryButton,
-  'inline-flex items-center justify-center px-2.5 py-2',
+  'w-full py-3.5 font-semibold',
 )
 
-export const builderDoneRow = 'mt-2'
-
-export const builderDoneButton = cn(
+export const builderStickyDoneButton = cn(
   primaryButton,
-  'w-full disabled:cursor-not-allowed',
+  'w-full py-3.5 font-semibold disabled:cursor-not-allowed',
 )
+
+/** Space below builder content so it isn’t hidden under fixed Add / Done bar */
+export const builderMainWithStickyFooter =
+  'pb-[max(11rem,calc(env(safe-area-inset-bottom,0px)+10rem))]'
 
 export const boardShell = 'grid gap-6'
 
-export const boardHeader =
-  'flex flex-nowrap items-center justify-between gap-4 max-[520px]:flex-wrap'
+/** Board column: header, segments, optional equipment / start footer (page scroll) */
+export const boardMainLayout =
+  'relative flex min-h-0 flex-1 flex-col gap-6'
 
-export const boardHeaderTitleBlock = 'min-w-0 flex-1 max-[520px]:basis-full'
+export const boardOrderHeader = 'shrink-0'
+
+/** Segment list is content-sized; page scrolls. Extra bottom pad when fixed timer dock is on `main`. */
+export const boardMainWithTimerDock = 'pb-[min(42vh,17.5rem)]'
+
+export const boardOrderEquipment = 'shrink-0'
+
+export const boardOrderFooter = 'shrink-0'
+
+/** Fixed timer shell: light frosted blur; work/rest use neutral shell — phase color only on timer digits (`timerDockTime*`). */
+export const boardTimerDock =
+  'pointer-events-auto fixed inset-x-0 bottom-0 z-40 border-t border-primary/40 p-0 pb-[max(0px,env(safe-area-inset-bottom))] backdrop-blur-[5px]'
+
+/** Complete / between phases — neutral glass */
+export const boardTimerDockPhaseNeutral =
+  'bg-surface-primary/30 text-text-secondary [&_.timer-dock-round]:text-text-muted'
+
+/** Work phase — same neutral glass as idle; countdown color via `timerDockTimeWork` on the readout */
+export const boardTimerDockPhaseWork = boardTimerDockPhaseNeutral
+
+/** Rest phase — same neutral glass; countdown color via `timerDockTimeRest` */
+export const boardTimerDockPhaseRest = boardTimerDockPhaseNeutral
+
+export const boardTimerDockInner =
+  'mx-auto w-full max-w-lg overflow-hidden bg-transparent shadow-none'
+
+/** Horizontal inset aligns with dock header / Complete block */
+export const boardTimerDockDisplay = 'px-5'
+
+/** Embedded dock: counter + Complete — extra vertical padding around the primary button */
+export const timerEmbeddedUserCompleteStack = 'flex w-full flex-col gap-4 pb-5 pt-2'
+
+export const timerEmbeddedCompleteButton = cn(
+  primaryButton,
+  'w-full rounded-xl py-3.5 text-base font-semibold',
+)
+
+export const boardTimerDockActions = 'border-0 bg-transparent p-0'
+
+export const boardHeader =
+  'flex flex-nowrap items-center justify-between gap-3'
+
+export const boardHeaderTitleBlock = 'min-w-0 flex-1'
 
 export const boardTitle =
   'm-0 truncate text-xl font-bold leading-tight text-text-primary'
 
-export const boardActions =
-  'flex shrink-0 flex-wrap gap-3 max-[520px]:ml-auto'
+export const boardActions = 'flex shrink-0 gap-3'
 
-export const boardContent = 'grid gap-6'
+/** Segment list: no row stretch when scroll area is taller than content (flex-1 parent) */
+export const boardContent = 'grid content-start items-start gap-6'
 
-export const boardSegmentWrapper = 'grid gap-0'
+/** Card + rest in one row group; gap matches boardContent so rest↔segment spacing is uniform */
+export const boardSegmentWrapper = 'grid content-start items-start gap-6'
 
 export const boardSegment =
   'rounded-2xl border border-primary bg-surface-panel px-5 py-4'
@@ -133,8 +213,13 @@ export const boardSegmentActive = cn(
   'border-danger-border bg-danger-surface shadow-[0_0_0_2px] shadow-danger-glow',
 )
 
+/** Timer has passed this segment (read-only / done) */
+export const boardSegmentCompleted = cn(
+  'opacity-[0.55] saturate-[0.65] border-primary/25 bg-surface-secondary/70',
+)
+
 export const boardRestSeparator =
-  'mt-2 rounded-lg border border-primary bg-surface-tertiary px-4 py-2 text-center text-sm font-semibold text-text-secondary'
+  'rounded-lg border border-primary bg-surface-tertiary px-4 py-2 text-center text-sm font-semibold text-text-secondary'
 
 export const boardRestSeparatorActive = cn(
   boardRestSeparator,
@@ -148,6 +233,12 @@ export const boardRepSequenceLine =
 
 export const boardExerciseList = 'mb-2 list-none p-0'
 
+/** Full-width Done inside segment card (For Time / Chipper / Death by) */
+export const boardSegmentDoneButton = cn(
+  primaryButton,
+  'mt-4 w-full',
+)
+
 export const boardExerciseLine =
   'my-1 py-0 pl-2 text-base text-text-secondary'
 
@@ -156,11 +247,8 @@ export const boardExerciseLineWithRepBullet = cn(
   'relative pl-0 before:mr-1 before:inline before:font-semibold before:text-text-muted before:content-["*"]',
 )
 
-/** Below segment list on Workout Board — FR-031 */
-export const boardEquipmentSection = cn(
-  boardSegment,
-  'mt-2 border-dashed',
-)
+/** Below segment list on Workout Board — FR-031 (vertical gap from `boardMainLayout`) */
+export const boardEquipmentSection = cn(boardSegment, 'border-dashed')
 
 export const boardEquipmentTitle =
   'mb-2 mt-0 text-sm font-bold uppercase tracking-wide text-text-primary'
@@ -177,6 +265,10 @@ export const timerStrip =
 export const timerStripHeader =
   'flex flex-wrap items-center justify-between gap-3 border-b border-primary pb-3'
 
+/** Embedded dock: centered Work / Rest / complete title */
+export const timerStripHeaderDocked =
+  'flex w-full flex-wrap items-center justify-center border-b-0 pb-3 pt-4'
+
 export const timerStripWork = ''
 
 export const timerStripRest = ''
@@ -185,12 +277,37 @@ export const timerStripLabelWork = 'm-0 text-lg font-semibold text-accent'
 
 export const timerStripLabelRest = 'm-0 text-lg font-semibold text-success-foreground'
 
-export const timerDisplay =
-  'flex flex-col items-center gap-2 py-4 text-center'
+/** Embedded dock labels — centered, slightly larger than strip labels */
+export const timerDockLabelWork =
+  'm-0 w-full text-center text-xl font-semibold text-danger-light'
 
-export const timerDisplayLarge = 'py-6'
+export const timerDockLabelRest =
+  'm-0 w-full text-center text-xl font-semibold text-success-foreground'
+
+export const timerDockLabelComplete =
+  'm-0 w-full text-center text-xl font-semibold text-success-foreground'
+
+export const timerDisplay =
+  'flex w-full max-w-full flex-col items-center gap-2 py-4 text-center'
+
+export const timerDisplayLarge = 'gap-2 py-4'
 
 export const timerTime = 'm-0 text-4xl font-semibold tabular-nums text-text-primary'
+
+/** Primary timer readout — size/weight only; color via `timerTimeLargeInk` or `timerDockTime*` (`cn` does not merge Tailwind). */
+export const timerTimeLarge =
+  'm-0 block w-full max-w-full text-center text-[min(100px,24vw)] font-bold tabular-nums tracking-tight leading-none max-[400px]:text-[min(4.5rem,22vw)]'
+
+/** Full-page timer / fallback digit color */
+export const timerTimeLargeInk = 'text-text-primary'
+
+/** Embedded dock: main countdown — solid phase hues */
+export const timerDockTimeWork = 'text-danger-light'
+
+export const timerDockTimeRest = 'text-success-foreground'
+
+export const timerRoundLine =
+  'timer-dock-round m-0 text-sm font-semibold uppercase tracking-wide text-text-muted'
 
 export const timerFinish = 'text-success-foreground'
 
@@ -199,7 +316,56 @@ export const timerActions =
 
 export const timerStopButton = cn(primaryButton, 'min-w-[8rem]')
 
+/** Timer footer: split row + optional full-width row (e.g. Done) */
+export const timerBottomBar =
+  'flex w-full flex-col gap-2 border-t border-primary pt-0 mt-0'
+
+/** Footer inside fixed dock (top border on parent `boardTimerDockActions`) */
+export const timerBottomBarDocked = 'flex w-full flex-col gap-0 border-0 pt-0 mt-0'
+
+export const timerBarButton =
+  '!rounded-none min-h-[3rem] min-w-[5.5rem] flex-1 px-3 py-2.5 text-sm max-[380px]:min-w-[calc(50%-0.25rem)]'
+
+/** Play/pause | stop — flush, no gap; vertical rule via `divide-x` */
+export const timerBarSplitRow =
+  'grid w-full grid-cols-2 gap-0 divide-x divide-primary'
+
+/**
+ * Split control: `cn()` only concatenates — `secondaryButton` includes `rounded-xl`, so `!rounded-none`
+ * is required to actually remove radius.
+ */
+export const timerBarSplitButton = cn(
+  secondaryButton,
+  'flex min-h-[4.75rem] w-full flex-col items-center justify-center gap-1.5 !rounded-none border-0 px-2 py-3 text-center shadow-none',
+)
+
+export const timerBarSplitCaption =
+  'text-center text-[0.7rem] font-semibold uppercase tracking-wide text-text-secondary'
+
+/** Full-width control when workout complete (restart) */
+export const timerBarRestartButton = cn(
+  secondaryButton,
+  'flex min-h-[4.75rem] w-full flex-col items-center justify-center gap-1.5 !rounded-none border-0 px-3 py-3 text-center shadow-none',
+)
+
+/** Embedded dock after complete — readable on glass, not phase-tinted */
+export const timerBarRestartButtonEmbedded = cn(
+  secondaryButton,
+  'flex min-h-[4.75rem] w-full flex-col items-center justify-center gap-1.5 !rounded-none border-0 bg-surface-tertiary/70 px-3 py-3 text-center text-text-primary shadow-none backdrop-blur-md hover:bg-surface-quaternary/80',
+)
+
+export const timerBarRestartCaption = 'text-center text-sm font-semibold text-text-secondary'
+
+export const timerBarRestartCaptionEmbedded =
+  'text-center text-sm font-semibold text-text-primary'
+
 export const timerView = ''
+
+/** Board: primary Start before timer session (footer) */
+export const boardTimerStartFooter =
+  'sticky bottom-0 z-10 mt-4 border-t border-primary bg-surface-primary/95 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-4 backdrop-blur-sm'
+
+export const boardTimerStartButton = cn(primaryButton, 'w-full max-w-md justify-self-center')
 
 export const segmentConfigGrid =
   'grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-4'
@@ -227,13 +393,6 @@ export const stackedActions =
 export const segmentAddExerciseRow = 'flex items-center gap-3'
 
 export const segmentAddExerciseButton = cn(primaryButton, 'w-full')
-
-export const panelAddSegmentRow =
-  'mt-4 flex w-full flex-col gap-3 max-[720px]:justify-stretch'
-
-export const panelAddSegmentButton = cn(primaryButton, 'w-full')
-
-export const panelLoadWorkoutButton = cn(secondaryButton, 'w-full')
 
 export const builderStatusPanel = 'py-3.5'
 

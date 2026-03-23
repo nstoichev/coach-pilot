@@ -35,8 +35,8 @@ export const SegmentList = ({
   }
 
   return (
-    <section className={tw.panel}>
-      <div className={tw.panelHeader}>
+    <section className={tw.segmentListSection}>
+      <div className={tw.segmentListSectionHeader}>
         <div>
           <p className={tw.eyebrow}>Segments</p>
           <h2 className={tw.panelTitle}>Workout flow</h2>
