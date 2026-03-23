@@ -54,6 +54,137 @@ function TimerRestartIcon() {
   )
 }
 
+const TIMER_VIEWBOX_SIZE = 120
+const TIMER_STROKE_WIDTH = 8
+const TIMER_RADIUS = (TIMER_VIEWBOX_SIZE - TIMER_STROKE_WIDTH) / 2
+const FULL_CIRCLE_DEGREES = 359.999
+const EPSILON = 0.0001
+
+type TimerRingSegment =
+  | { type: 'none' }
+  | { type: 'full' }
+  | { type: 'arc'; startAngle: number; sweepAngle: number }
+
+function clamp01(value: number): number {
+  if (value <= 0) return 0
+  if (value >= 1) return 1
+  return value
+}
+
+function polarToCartesian(angleDegrees: number) {
+  const radians = ((angleDegrees - 90) * Math.PI) / 180
+  const center = TIMER_VIEWBOX_SIZE / 2
+  return {
+    x: center + TIMER_RADIUS * Math.cos(radians),
+    y: center + TIMER_RADIUS * Math.sin(radians),
+  }
+}
+
+function describeArc(startAngle: number, sweepAngle: number): string {
+  const safeSweep = Math.min(Math.max(sweepAngle, 0), FULL_CIRCLE_DEGREES)
+  const start = polarToCartesian(startAngle)
+  const end = polarToCartesian(startAngle + safeSweep)
+  const largeArcFlag = safeSweep > 180 ? 1 : 0
+  return `M ${start.x} ${start.y} A ${TIMER_RADIUS} ${TIMER_RADIUS} 0 ${largeArcFlag} 1 ${end.x} ${end.y}`
+}
+
+function getCountdownRing(totalSeconds: number, remainingSeconds: number, tickProgress: number): TimerRingSegment {
+  if (totalSeconds <= 0) return { type: 'none' }
+  const animatedRemaining = Math.max(remainingSeconds - tickProgress, 0)
+  const completion = clamp01((totalSeconds - animatedRemaining) / totalSeconds)
+  if (completion <= EPSILON) return { type: 'none' }
+  if (completion >= 1 - EPSILON) return { type: 'full' }
+  return { type: 'arc', startAngle: 0, sweepAngle: FULL_CIRCLE_DEGREES * completion }
+}
+
+function getStopwatchRing(elapsedSeconds: number, tickProgress: number): TimerRingSegment {
+  const animatedElapsed = Math.max(elapsedSeconds + tickProgress, 0)
+  const cycleNumber = Math.floor(animatedElapsed)
+  const cycleProgress = animatedElapsed - cycleNumber
+  const isFillCycle = cycleNumber % 2 === 0
+
+  if (isFillCycle) {
+    if (cycleProgress <= EPSILON) return { type: 'none' }
+    return { type: 'arc', startAngle: 0, sweepAngle: FULL_CIRCLE_DEGREES * cycleProgress }
+  }
+
+  const remainingSweep = 1 - cycleProgress
+  if (remainingSweep <= EPSILON) return { type: 'none' }
+  if (remainingSweep >= 1 - EPSILON) return { type: 'full' }
+  return {
+    type: 'arc',
+    startAngle: FULL_CIRCLE_DEGREES * cycleProgress,
+    sweepAngle: FULL_CIRCLE_DEGREES * remainingSweep,
+  }
+}
+
+type TimerCircleProps = {
+  displayText: string
+  valueClassName: string
+  roundText: string | null
+  embedded: boolean
+  progressToneClassName: string
+  ring: TimerRingSegment
+}
+
+function TimerCircle({
+  displayText,
+  valueClassName,
+  roundText,
+  embedded,
+  progressToneClassName,
+  ring,
+}: TimerCircleProps) {
+  const center = TIMER_VIEWBOX_SIZE / 2
+  const progressArcPath =
+    ring.type === 'arc' ? describeArc(ring.startAngle, ring.sweepAngle) : null
+
+  return (
+    <div className={cn(tw.timerCircle, embedded && tw.timerCircleEmbedded)}>
+      <svg
+        className={tw.timerCircleSvg}
+        viewBox={`0 0 ${TIMER_VIEWBOX_SIZE} ${TIMER_VIEWBOX_SIZE}`}
+        aria-hidden
+      >
+        <circle
+          className={tw.timerCircleTrack}
+          cx={center}
+          cy={center}
+          r={TIMER_RADIUS}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={TIMER_STROKE_WIDTH}
+        />
+        {ring.type === 'full' ? (
+          <circle
+            className={progressToneClassName}
+            cx={center}
+            cy={center}
+            r={TIMER_RADIUS}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={TIMER_STROKE_WIDTH}
+            strokeLinecap="round"
+          />
+        ) : progressArcPath ? (
+          <path
+            className={progressToneClassName}
+            d={progressArcPath}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={TIMER_STROKE_WIDTH}
+            strokeLinecap="round"
+          />
+        ) : null}
+      </svg>
+      <div className={cn(tw.timerCircleInner, embedded && tw.timerCircleInnerEmbedded)}>
+        {roundText ? <p className={tw.timerRoundLine}>{roundText}</p> : null}
+        <p className={valueClassName}>{displayText}</p>
+      </div>
+    </div>
+  )
+}
+
 export type TimerPhaseInfo = { phaseType: 'work' | 'rest'; segmentId: string }
 
 export type WorkoutTimerHandle = {
@@ -282,6 +413,8 @@ export const WorkoutTimer = forwardRef<WorkoutTimerHandle, WorkoutTimerProps>(
   const [showingFinish, setShowingFinish] = useState(false)
   const [isPaused, setIsPaused] = useState(false)
   const [deathByRound, setDeathByRound] = useState(1)
+  const [animationNow, setAnimationNow] = useState(0)
+  const [tickStartedAtMs, setTickStartedAtMs] = useState(0)
   const phaseIndexRef = useRef(phaseIndex)
   const remainingSecondsRef = useRef(remainingSeconds)
   const elapsedSecondsRef = useRef(elapsedSeconds)
@@ -298,6 +431,19 @@ export const WorkoutTimer = forwardRef<WorkoutTimerHandle, WorkoutTimerProps>(
 
   const currentPhase = phases[phaseIndex]
   const isComplete = phaseIndex >= phases.length
+
+  useEffect(() => {
+    if (!currentPhase || showingFinish || isPaused || isComplete) return
+
+    let frameId = 0
+    const update = () => {
+      setAnimationNow(performance.now())
+      frameId = requestAnimationFrame(update)
+    }
+
+    frameId = requestAnimationFrame(update)
+    return () => cancelAnimationFrame(frameId)
+  }, [currentPhase, showingFinish, isPaused, isComplete])
 
   // Notify parent of current phase (dock tint); clear when complete
   useEffect(() => {
@@ -318,7 +464,7 @@ export const WorkoutTimer = forwardRef<WorkoutTimerHandle, WorkoutTimerProps>(
     const p = phases[phaseIndex]
     if (!p) return
     const { remaining, elapsed } = getInitialCounter(p)
-    /* eslint-disable react-hooks/set-state-in-effect -- timer phase transition resets counters */
+    /* eslint-disable react-hooks/set-state-in-effect -- phase transitions intentionally reset timer state */
     setRemainingSeconds(remaining)
     setElapsedSeconds(elapsed)
     setShowingFinish(false)
@@ -328,6 +474,7 @@ export const WorkoutTimer = forwardRef<WorkoutTimerHandle, WorkoutTimerProps>(
     /* eslint-enable react-hooks/set-state-in-effect */
     remainingSecondsRef.current = remaining
     elapsedSecondsRef.current = elapsed
+    setTickStartedAtMs(performance.now())
   }, [phaseIndex, phases])
 
   // Single interval: paused = no tick; showingFinish = no tick
@@ -343,6 +490,7 @@ export const WorkoutTimer = forwardRef<WorkoutTimerHandle, WorkoutTimerProps>(
         const nextIdx = idx + 1
         const nextPhase = phases[nextIdx]
         const { remaining, elapsed } = getInitialCounter(nextPhase)
+        setTickStartedAtMs(performance.now())
         setPhaseIndex((i) => i + 1)
         setRemainingSeconds(remaining)
         setElapsedSeconds(elapsed)
@@ -357,6 +505,7 @@ export const WorkoutTimer = forwardRef<WorkoutTimerHandle, WorkoutTimerProps>(
           return
         }
         const next = r - 1
+        setTickStartedAtMs(performance.now())
         remainingSecondsRef.current = next
         setRemainingSeconds(next)
         return
@@ -366,6 +515,7 @@ export const WorkoutTimer = forwardRef<WorkoutTimerHandle, WorkoutTimerProps>(
         const cap = phase.timeCapSeconds ?? 0
         const e = elapsedSecondsRef.current
         const next = e + 1
+        setTickStartedAtMs(performance.now())
         elapsedSecondsRef.current = next
         setElapsedSeconds(next)
         if (cap > 0 && next >= cap) setShowingFinish(true)
@@ -376,12 +526,14 @@ export const WorkoutTimer = forwardRef<WorkoutTimerHandle, WorkoutTimerProps>(
       if (phase.isDeathBy) {
         const r = remainingSecondsRef.current
         if (r <= 1) {
+          setTickStartedAtMs(performance.now())
           remainingSecondsRef.current = 60
           setRemainingSeconds(60)
           setDeathByRound((n) => n + 1)
           return
         }
         const next = r - 1
+        setTickStartedAtMs(performance.now())
         remainingSecondsRef.current = next
         setRemainingSeconds(next)
         return
@@ -394,6 +546,7 @@ export const WorkoutTimer = forwardRef<WorkoutTimerHandle, WorkoutTimerProps>(
         return
       }
       const next = r - 1
+      setTickStartedAtMs(performance.now())
       remainingSecondsRef.current = next
       setRemainingSeconds(next)
     }, 1000)
@@ -424,6 +577,13 @@ export const WorkoutTimer = forwardRef<WorkoutTimerHandle, WorkoutTimerProps>(
     setElapsedSeconds(elapsed)
     remainingSecondsRef.current = remaining
     elapsedSecondsRef.current = elapsed
+  }
+
+  function handleTogglePaused() {
+    if (isPaused) {
+      setTickStartedAtMs(performance.now())
+    }
+    setIsPaused((paused) => !paused)
   }
 
   useImperativeHandle(
@@ -538,6 +698,40 @@ export const WorkoutTimer = forwardRef<WorkoutTimerHandle, WorkoutTimerProps>(
 
   const displayTime = formatSecondsAsClock(counterValue)
   const roundText = roundLineText(currentPhase, deathByRound)
+  const timerTextClassName =
+    isComplete || showingFinish
+      ? cn(tw.timerTimeLarge, tw.timerFinish)
+      : cn(
+          tw.timerTimeLarge,
+          dockTinted && isWork && tw.timerDockTimeWork,
+          dockTinted && isRest && tw.timerDockTimeRest,
+          (!dockTinted || (!isWork && !isRest)) && tw.timerTimeLargeInk,
+        )
+
+  const timerDisplayText = isComplete ? 'Done' : showingFinish ? 'Finish' : displayTime
+  const tickProgress =
+    currentPhase && !showingFinish && !isPaused && !isComplete
+      ? clamp01((animationNow - tickStartedAtMs) / 1000)
+      : 0
+  const totalCountdownSeconds = currentPhase
+    ? currentPhase.type === 'rest'
+      ? currentPhase.restSeconds
+      : currentPhase.isForTime
+        ? 0
+        : (currentPhase.durationSeconds ?? 0)
+    : 0
+  const timerRing =
+    isComplete || showingFinish
+      ? ({ type: 'full' } satisfies TimerRingSegment)
+      : isForTime
+        ? getStopwatchRing(elapsedSeconds, tickProgress)
+        : getCountdownRing(totalCountdownSeconds, remainingSeconds, tickProgress)
+  const progressToneClassName =
+    isComplete || showingFinish
+      ? tw.timerCircleProgressComplete
+      : isRest
+        ? tw.timerCircleProgressRest
+        : tw.timerCircleProgressWork
 
   const footerBarClass = embedded ? tw.timerBottomBarDocked : tw.timerBottomBar
 
@@ -546,25 +740,24 @@ export const WorkoutTimer = forwardRef<WorkoutTimerHandle, WorkoutTimerProps>(
 
   const timerHeaderAndDisplay = hideStripHeaderForEmbeddedUserComplete ? (
     showingFinish ? (
-      <div className={cn(tw.timerDisplay, tw.timerDisplayLarge)}>
-        {roundText ? <p className={tw.timerRoundLine}>{roundText}</p> : null}
-        <p className={cn(tw.timerTimeLarge, tw.timerFinish)}>Finish</p>
-      </div>
+      <TimerCircle
+        displayText={timerDisplayText}
+        valueClassName={timerTextClassName}
+        roundText={roundText}
+        embedded={embedded}
+        progressToneClassName={progressToneClassName}
+        ring={timerRing}
+      />
     ) : (
       <div className={tw.timerEmbeddedUserCompleteStack}>
-        <div className={cn(tw.timerDisplay, tw.timerDisplayLarge)}>
-          {roundText ? <p className={tw.timerRoundLine}>{roundText}</p> : null}
-          <p
-            className={cn(
-              tw.timerTimeLarge,
-              dockTinted && isWork && tw.timerDockTimeWork,
-              dockTinted && isRest && tw.timerDockTimeRest,
-              (!dockTinted || (!isWork && !isRest)) && tw.timerTimeLargeInk,
-            )}
-          >
-            {displayTime}
-          </p>
-        </div>
+        <TimerCircle
+          displayText={timerDisplayText}
+          valueClassName={timerTextClassName}
+          roundText={roundText}
+          embedded={embedded}
+          progressToneClassName={progressToneClassName}
+          ring={timerRing}
+        />
         <button
           type="button"
           className={tw.timerEmbeddedCompleteButton}
@@ -587,25 +780,14 @@ export const WorkoutTimer = forwardRef<WorkoutTimerHandle, WorkoutTimerProps>(
           </button>
         )}
       </header>
-      <div className={cn(tw.timerDisplay, tw.timerDisplayLarge)}>
-        {roundText ? <p className={tw.timerRoundLine}>{roundText}</p> : null}
-        {isComplete ? (
-          <p className={cn(tw.timerTimeLarge, tw.timerFinish)}>Done</p>
-        ) : showingFinish ? (
-          <p className={cn(tw.timerTimeLarge, tw.timerFinish)}>Finish</p>
-        ) : (
-          <p
-            className={cn(
-              tw.timerTimeLarge,
-              dockTinted && isWork && tw.timerDockTimeWork,
-              dockTinted && isRest && tw.timerDockTimeRest,
-              (!dockTinted || (!isWork && !isRest)) && tw.timerTimeLargeInk,
-            )}
-          >
-            {displayTime}
-          </p>
-        )}
-      </div>
+      <TimerCircle
+        displayText={timerDisplayText}
+        valueClassName={timerTextClassName}
+        roundText={roundText}
+        embedded={embedded}
+        progressToneClassName={progressToneClassName}
+        ring={timerRing}
+      />
     </>
   )
 
@@ -616,7 +798,7 @@ export const WorkoutTimer = forwardRef<WorkoutTimerHandle, WorkoutTimerProps>(
           type="button"
           className={tw.timerBarSplitButton}
           disabled={showingFinish}
-          onClick={() => setIsPaused((p) => !p)}
+          onClick={handleTogglePaused}
           aria-label={isPaused ? 'Play' : 'Pause'}
         >
           {isPaused ? <TimerPlayIcon /> : <TimerPauseIcon />}

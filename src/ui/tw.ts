@@ -292,6 +292,29 @@ export const timerDisplay =
 
 export const timerDisplayLarge = 'gap-2 py-4'
 
+export const timerCircle =
+  'relative mx-auto grid aspect-square w-full max-w-[18rem] place-items-center'
+
+export const timerCircleEmbedded = 'max-w-[13rem]'
+
+export const timerCircleSvg = 'absolute inset-0 h-full w-full overflow-visible'
+
+export const timerCircleTrack = 'text-primary/30'
+
+export const timerCircleProgressWork =
+  'text-danger-light drop-shadow-[0_0_10px_rgba(248,113,113,0.4)]'
+
+export const timerCircleProgressRest =
+  'text-success-foreground drop-shadow-[0_0_10px_rgba(74,222,128,0.35)]'
+
+export const timerCircleProgressComplete =
+  'text-success-foreground drop-shadow-[0_0_14px_rgba(74,222,128,0.45)]'
+
+export const timerCircleInner =
+  'relative z-[1] flex h-[calc(100%-1.5rem)] w-[calc(100%-1.5rem)] flex-col items-center justify-center rounded-full border border-primary/40 bg-surface-primary/55 px-4 py-5 text-center shadow-insetShallow backdrop-blur-md'
+
+export const timerCircleInnerEmbedded = 'h-[calc(100%-1.2rem)] w-[calc(100%-1.2rem)]'
+
 export const timerTime = 'm-0 text-4xl font-semibold tabular-nums text-text-primary'
 
 /** Primary timer readout — size/weight only; color via `timerTimeLargeInk` or `timerDockTime*` (`cn` does not merge Tailwind). */
