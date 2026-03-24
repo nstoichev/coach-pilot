@@ -192,7 +192,7 @@ export const SegmentEditor = ({
           </button>
           <button
             type="button"
-            className={tw.builderSegmentedActionFace}
+            className={tw.builderSegmentedRemoveFace}
             aria-label="Remove segment"
             onClick={onRemove}
           >
@@ -484,7 +484,7 @@ export const SegmentEditor = ({
                       </button>
                       <button
                         type="button"
-                        className={tw.builderSegmentedActionFace}
+                        className={tw.builderSegmentedRemoveFace}
                         aria-label="Remove exercise"
                         onClick={() => onRemoveExercise(index)}
                       >
@@ -595,7 +595,8 @@ export const SegmentEditor = ({
                               })
                             }
                             ariaLabel="Metric type"
-                            className={cn(tw.segmentedControlWrap, 'w-full')}
+                            twoColumnMobile
+                            className="w-full"
                           />
                         </div>
                         <div className={tw.field}>

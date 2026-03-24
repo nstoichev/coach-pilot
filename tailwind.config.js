@@ -149,9 +149,9 @@ export default {
           strong: 'rgba(100, 116, 139, 0.45)',
         },
         action: {
-          DEFAULT: '#2563eb',
-          hover: '#3b82f6',
-          foreground: '#eff6ff',
+          DEFAULT: '#D1FF00',
+          hover: '#9ECC00',
+          foreground: '#0a0f06',
         },
         success: {
           DEFAULT: '#22c55e',
@@ -172,10 +172,10 @@ export default {
           surface: 'rgba(30, 23, 23, 0.95)',
         },
         accent: {
-          DEFAULT: '#38bdf8',
-          soft: 'rgba(56, 189, 248, 0.35)',
-          foreground: '#bae6fd',
-          tint: 'rgba(14, 165, 233, 0.16)',
+          DEFAULT: '#D1FF00',
+          soft: 'rgba(209, 255, 0, 0.35)',
+          foreground: '#0a0f06',
+          tint: 'rgba(209, 255, 0, 0.14)',
         },
         warning: {
           border: 'rgba(251, 191, 36, 0.5)',
@@ -184,8 +184,8 @@ export default {
         },
         overlay: 'rgba(2, 6, 23, 0.68)',
         rdp: {
-          accent: '#2563eb',
-          accentMuted: 'rgba(37, 99, 235, 0.25)',
+          accent: '#D1FF00',
+          accentMuted: 'rgba(209, 255, 0, 0.22)',
         },
       },
       boxShadow: {

@@ -7,8 +7,8 @@ type IconProps = Omit<SvgProps, 'viewBox' | 'xmlns'>
 export const IconArrowUp = (props: IconProps) => (
   <svg
     aria-hidden="true"
-    width="16"
-    height="16"
+    width="20"
+    height="20"
     viewBox="0 0 16 16"
     xmlns="http://www.w3.org/2000/svg"
     {...props}
@@ -23,8 +23,8 @@ export const IconArrowUp = (props: IconProps) => (
 export const IconArrowDown = (props: IconProps) => (
   <svg
     aria-hidden="true"
-    width="16"
-    height="16"
+    width="20"
+    height="20"
     viewBox="0 0 16 16"
     xmlns="http://www.w3.org/2000/svg"
     {...props}
@@ -39,8 +39,8 @@ export const IconArrowDown = (props: IconProps) => (
 export const IconArrowUpSmall = (props: IconProps) => (
   <svg
     aria-hidden="true"
-    width="14"
-    height="14"
+    width="18"
+    height="18"
     viewBox="0 0 16 16"
     xmlns="http://www.w3.org/2000/svg"
     {...props}
@@ -55,8 +55,8 @@ export const IconArrowUpSmall = (props: IconProps) => (
 export const IconArrowDownSmall = (props: IconProps) => (
   <svg
     aria-hidden="true"
-    width="14"
-    height="14"
+    width="18"
+    height="18"
     viewBox="0 0 16 16"
     xmlns="http://www.w3.org/2000/svg"
     {...props}
@@ -88,8 +88,8 @@ export const IconXSmall = (props: IconProps) => (
 export const IconTrashSmall = (props: IconProps) => (
   <svg
     aria-hidden="true"
-    width="14"
-    height="14"
+    width="18"
+    height="18"
     viewBox="0 0 16 16"
     xmlns="http://www.w3.org/2000/svg"
     {...props}

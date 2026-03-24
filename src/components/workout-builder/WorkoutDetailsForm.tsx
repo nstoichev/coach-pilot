@@ -28,7 +28,7 @@ export const WorkoutDetailsForm = ({
       {onOpenLoadWorkout ? (
         <button
           type="button"
-          className={tw.secondaryButton}
+          className={tw.outlineActionButton}
           onClick={onOpenLoadWorkout}
         >
           Load template

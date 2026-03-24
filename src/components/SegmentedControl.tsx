@@ -14,10 +14,17 @@ type SegmentedControlProps<T extends string> = {
   onChange: (value: T) => void
   ariaLabel?: string
   className?: string
+  /** Below `md`: 2-column grid for long option lists (e.g. exercise measure). */
+  twoColumnMobile?: boolean
 }
 
 const faceBase =
-  'flex min-h-[3.6rem] w-full min-w-0 flex-1 items-center justify-center border-l border-primary bg-surface-muted/55 px-3 py-1.5 text-base font-semibold text-text-muted transition-all duration-200 ease-in-out peer-focus-visible:z-10 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:-outline-offset-2 peer-focus-visible:outline-accent peer-checked:bg-surface-primary peer-checked:text-text-primary peer-checked:shadow-insetSegment peer-disabled:opacity-40'
+  'flex min-h-[3.6rem] w-full min-w-0 flex-1 items-center justify-center border-l border-primary bg-surface-muted/55 px-3 py-1.5 text-base font-semibold uppercase tracking-wide text-text-muted transition-all duration-200 ease-in-out peer-focus-visible:z-10 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:-outline-offset-2 peer-focus-visible:outline-accent peer-checked:bg-surface-primary peer-checked:text-text-primary peer-checked:shadow-insetSegment peer-disabled:opacity-40'
+
+const faceBaseGridMobile = cn(
+  faceBase,
+  'max-md:border-t max-md:border-primary md:border-t-0',
+)
 
 /**
  * Single-choice control: flush segments, selected segment looks pressed (inset).
@@ -30,11 +37,18 @@ export function SegmentedControl<T extends string>({
   onChange,
   ariaLabel,
   className,
+  twoColumnMobile = false,
 }: SegmentedControlProps<T>) {
   return (
     <div
       className={cn(
-        'inline-flex overflow-hidden rounded-lg border border-primary-strong bg-surface-secondary shadow-insetShallow [&>label:first-child>span]:border-l-0',
+        'overflow-hidden rounded-lg border border-primary-strong bg-surface-secondary shadow-insetShallow',
+        twoColumnMobile
+          ? cn(
+              'grid w-full grid-cols-2 md:inline-flex md:w-auto',
+              'max-md:[&>label:nth-child(odd)>span]:border-l-0 max-md:[&>label:nth-child(-n+2)>span]:border-t-0 md:[&>label>span]:border-t-0 md:[&>label:first-child>span]:border-l-0',
+            )
+          : 'inline-flex [&>label:first-child>span]:border-l-0',
         className,
       )}
       role="radiogroup"
@@ -44,7 +58,8 @@ export function SegmentedControl<T extends string>({
         <label
           key={opt.value}
           className={cn(
-            'relative flex min-w-0 flex-1 cursor-pointer',
+            'relative flex min-w-0 cursor-pointer',
+            twoColumnMobile ? 'w-full md:flex-1' : 'flex-1',
             opt.disabled ? 'cursor-not-allowed' : 'hover:[&_span]:bg-surface-quaternary/65 hover:[&_span]:text-text-secondary',
           )}
         >
@@ -60,7 +75,7 @@ export function SegmentedControl<T extends string>({
               if (!opt.disabled) onChange(opt.value)
             }}
           />
-          <span className={faceBase}>{opt.label}</span>
+          <span className={twoColumnMobile ? faceBaseGridMobile : faceBase}>{opt.label}</span>
         </label>
       ))}
     </div>

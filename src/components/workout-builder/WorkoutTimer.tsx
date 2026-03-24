@@ -654,7 +654,7 @@ export const WorkoutTimer = forwardRef<WorkoutTimerHandle, WorkoutTimerProps>(
       <main className={tw.boardShell}>
         <h2 className={tw.boardTitle}>Workout complete</h2>
         <footer className={tw.timerBottomBar}>
-          <button type="button" className={cn(tw.secondaryButton, tw.timerBarButton)} onClick={onBackToBuild}>
+          <button type="button" className={cn(tw.outlineActionButton, tw.timerBarButton)} onClick={onBackToBuild}>
             Back to build
           </button>
           <button type="button" className={cn(tw.primaryButton, tw.timerBarButton)} onClick={onStopTimer}>
@@ -700,7 +700,7 @@ export const WorkoutTimer = forwardRef<WorkoutTimerHandle, WorkoutTimerProps>(
   const roundText = roundLineText(currentPhase, deathByRound)
   const timerTextClassName =
     isComplete || showingFinish
-      ? cn(tw.timerTimeLarge, tw.timerFinish)
+      ? cn(tw.timerTimeLargeFinish, tw.timerFinish)
       : cn(
           tw.timerTimeLarge,
           dockTinted && isWork && tw.timerDockTimeWork,
@@ -738,26 +738,23 @@ export const WorkoutTimer = forwardRef<WorkoutTimerHandle, WorkoutTimerProps>(
   const hideStripHeaderForEmbeddedUserComplete =
     embedded && isUserCompleteWorkPhase && !isComplete
 
-  const timerHeaderAndDisplay = hideStripHeaderForEmbeddedUserComplete ? (
+  const timerCircleEl = (
+    <TimerCircle
+      displayText={timerDisplayText}
+      valueClassName={timerTextClassName}
+      roundText={roundText}
+      embedded={embedded}
+      progressToneClassName={progressToneClassName}
+      ring={timerRing}
+    />
+  )
+
+  const embeddedTimerCenter = hideStripHeaderForEmbeddedUserComplete ? (
     showingFinish ? (
-      <TimerCircle
-        displayText={timerDisplayText}
-        valueClassName={timerTextClassName}
-        roundText={roundText}
-        embedded={embedded}
-        progressToneClassName={progressToneClassName}
-        ring={timerRing}
-      />
+      timerCircleEl
     ) : (
       <div className={tw.timerEmbeddedUserCompleteStack}>
-        <TimerCircle
-          displayText={timerDisplayText}
-          valueClassName={timerTextClassName}
-          roundText={roundText}
-          embedded={embedded}
-          progressToneClassName={progressToneClassName}
-          ring={timerRing}
-        />
+        {timerCircleEl}
         <button
           type="button"
           className={tw.timerEmbeddedCompleteButton}
@@ -769,25 +766,18 @@ export const WorkoutTimer = forwardRef<WorkoutTimerHandle, WorkoutTimerProps>(
       </div>
     )
   ) : (
+    timerCircleEl
+  )
+
+  const timerHeaderAndDisplay = (
     <>
-      <header className={embedded ? tw.timerStripHeaderDocked : tw.timerStripHeader}>
-        <h2 className={embedded ? embeddedDockLabelClass : isRest ? tw.timerStripLabelRest : tw.timerStripLabelWork}>
-          {label}
-        </h2>
-        {!embedded && (
-          <button type="button" className={tw.secondaryButton} onClick={onBackToBuild}>
-            Back to build
-          </button>
-        )}
+      <header className={tw.timerStripHeader}>
+        <h2 className={isRest ? tw.timerStripLabelRest : tw.timerStripLabelWork}>{label}</h2>
+        <button type="button" className={tw.outlineActionButton} onClick={onBackToBuild}>
+          Back to build
+        </button>
       </header>
-      <TimerCircle
-        displayText={timerDisplayText}
-        valueClassName={timerTextClassName}
-        roundText={roundText}
-        embedded={embedded}
-        progressToneClassName={progressToneClassName}
-        ring={timerRing}
-      />
+      {timerCircleEl}
     </>
   )
 
@@ -851,7 +841,12 @@ export const WorkoutTimer = forwardRef<WorkoutTimerHandle, WorkoutTimerProps>(
   if (embedded) {
     return (
       <div className={tw.boardTimerDockInner}>
-        <div className={tw.boardTimerDockDisplay}>{timerHeaderAndDisplay}</div>
+        {!hideStripHeaderForEmbeddedUserComplete ? (
+          <header className={cn(tw.boardTimerDockHeader, tw.timerStripHeaderDocked)}>
+            <h2 className={embeddedDockLabelClass}>{label}</h2>
+          </header>
+        ) : null}
+        <div className={tw.boardTimerDockCenter}>{embeddedTimerCenter}</div>
         <div className={tw.boardTimerDockActions}>{controlFooter}</div>
       </div>
     )

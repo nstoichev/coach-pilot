@@ -39,6 +39,7 @@ export function WorkoutBoard({ workout, onBackToBuild }: WorkoutBoardProps) {
 
   const boardWorkoutTitle = workout.name.trim() || 'Untitled workout'
   const requiredEquipment = getWorkoutRequiredEquipment(workout)
+  const showStartBar = timeMeasurable && !timerRunning
 
   return (
     <main
@@ -46,6 +47,7 @@ export function WorkoutBoard({ workout, onBackToBuild }: WorkoutBoardProps) {
         tw.boardMainLayout,
         'w-full',
         timerRunning && tw.boardMainWithTimerDock,
+        showStartBar && tw.boardMainWithTimerStart,
       )}
     >
       <header className={cn(tw.boardHeader, tw.boardOrderHeader)}>
@@ -57,7 +59,7 @@ export function WorkoutBoard({ workout, onBackToBuild }: WorkoutBoardProps) {
         <div className={tw.boardActions}>
           <button
             type="button"
-            className={tw.secondaryButton}
+            className={tw.outlineActionButton}
             onClick={onBackToBuild}
           >
             Back to build
@@ -131,9 +133,9 @@ export function WorkoutBoard({ workout, onBackToBuild }: WorkoutBoardProps) {
         </section>
       ) : null}
 
-      {timeMeasurable && !timerRunning ? (
-        <footer className={cn(tw.boardTimerStartFooter, tw.boardOrderFooter)}>
-          <div className="mx-auto flex w-full max-w-md justify-center px-1">
+      {showStartBar ? (
+        <footer className={tw.boardTimerStartBar} aria-label="Start workout">
+          <div className={tw.boardTimerStartStack}>
             <button
               type="button"
               className={tw.boardTimerStartButton}
