@@ -3,6 +3,14 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    font-size: 62.5%;
+  }
+
+  body {
+    font-size: 1.6rem;
+  }
+
   *,
   *::before,
   *::after {
@@ -21,7 +29,8 @@
   }
 
   /* Padding lives inside the min-height box so children can fill 100dvh without page scroll. */
+  /* Explicit text-base so descendants inherit ≥1.6rem even if a parent omits font-size. */
   #root {
-    @apply mx-auto flex min-h-dvh max-w-[1200px] flex-col p-8 max-[720px]:p-4;
+    @apply mx-auto flex min-h-dvh max-w-[1200px] flex-col p-8 max-[720px]:p-4 text-base;
   }
 }

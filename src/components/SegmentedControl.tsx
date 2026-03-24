@@ -17,7 +17,7 @@ type SegmentedControlProps<T extends string> = {
 }
 
 const faceBase =
-  'flex min-h-[2.25rem] w-full min-w-0 flex-1 items-center justify-center border-l border-primary bg-surface-muted/55 px-3 py-1.5 text-sm font-semibold text-text-muted transition-all duration-200 ease-in-out peer-focus-visible:z-10 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:-outline-offset-2 peer-focus-visible:outline-accent peer-checked:bg-surface-primary peer-checked:text-text-primary peer-checked:shadow-insetSegment peer-disabled:opacity-40'
+  'flex min-h-[3.6rem] w-full min-w-0 flex-1 items-center justify-center border-l border-primary bg-surface-muted/55 px-3 py-1.5 text-base font-semibold text-text-muted transition-all duration-200 ease-in-out peer-focus-visible:z-10 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:-outline-offset-2 peer-focus-visible:outline-accent peer-checked:bg-surface-primary peer-checked:text-text-primary peer-checked:shadow-insetSegment peer-disabled:opacity-40'
 
 /**
  * Single-choice control: flush segments, selected segment looks pressed (inset).
