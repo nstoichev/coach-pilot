@@ -7,8 +7,18 @@
 // })
 
 
+// import { defineConfig } from 'vite'
+
+// export default defineConfig({
+//   base: '/coach-pilot/',
+// })
+
+
 import { defineConfig } from 'vite'
 
 export default defineConfig({
   base: '/coach-pilot/',
+  build: {
+    outDir: 'docs'
+  }
 })
