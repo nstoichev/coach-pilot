@@ -311,4 +311,78 @@ export const mockExerciseDatabase: Exercise[] = [
     },
     workingWeight: { mode: 'weight', value: 9 },
   },
+  {
+    id: 'exercise-db-hang-clean',
+    name: 'DB Hang Clean',
+    type: ['crossfit', 'strength'],
+    prescription: { mode: 'sets-reps' },
+    equipment: ['kettlebell/dumbbell'],
+    muscles: {
+      primary: ['glutes', 'hamstrings', 'back'],
+      stabilizing: ['core', 'shoulders'],
+    },
+    workingWeight: { mode: 'weight', value: 22.5 },
+  },
+  {
+    id: 'exercise-bike',
+    name: 'Bike',
+    type: ['crossfit'],
+    prescription: {
+      mode: 'metric',
+      metricOptions: ['calories', 'distance', 'time', 'custom'],
+      advancedMetrics: ['speed', 'watts'],
+    },
+    equipment: ['bike'],
+    muscles: {
+      primary: ['legs'],
+      stabilizing: ['core'],
+    },
+  },
+  {
+    id: 'exercise-db-push-press',
+    name: 'DB Push Press',
+    type: ['crossfit', 'strength'],
+    prescription: { mode: 'sets-reps' },
+    equipment: ['kettlebell/dumbbell'],
+    muscles: {
+      primary: ['shoulders', 'quadriceps', 'glutes'],
+      stabilizing: ['core', 'triceps'],
+    },
+    workingWeight: { mode: 'weight', value: 22.5 },
+  },
+  {
+    id: 'exercise-push-press',
+    name: 'Push Press',
+    type: ['crossfit', 'strength'],
+    prescription: { mode: 'sets-reps' },
+    equipment: ['barbell'],
+    muscles: {
+      primary: ['shoulders', 'quadriceps', 'glutes'],
+      stabilizing: ['core', 'triceps'],
+    },
+    workingWeight: { mode: 'weight', value: 40 },
+  },
+  {
+    id: 'exercise-knees-to-elbows',
+    name: 'Knees to Elbows',
+    type: ['crossfit'],
+    prescription: { mode: 'sets-reps' },
+    equipment: ['pull-up bar'],
+    muscles: {
+      primary: ['core', 'lats'],
+      stabilizing: ['shoulders', 'hip flexors'],
+    },
+  },
+  {
+    id: 'exercise-db-step-up',
+    name: 'DB Step Up',
+    type: ['crossfit', 'strength'],
+    prescription: { mode: 'sets-reps' },
+    equipment: ['kettlebell/dumbbell', 'box'],
+    muscles: {
+      primary: ['quadriceps', 'glutes'],
+      stabilizing: ['core', 'hamstrings'],
+    },
+    workingWeight: { mode: 'weight', value: 22.5 },
+  },
 ]

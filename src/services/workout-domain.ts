@@ -211,12 +211,13 @@ export const getGeneratedSegmentName = (segment: Segment): string => {
 }
 
 export const formatSecondsAsClock = (totalSeconds?: number): string => {
-  if (!totalSeconds || totalSeconds <= 0) {
+  if (totalSeconds == null || Number.isNaN(totalSeconds) || totalSeconds < 0) {
     return 'Not set'
   }
 
-  const minutes = Math.floor(totalSeconds / 60)
-  const seconds = totalSeconds % 60
+  const clamped = Math.floor(totalSeconds)
+  const minutes = Math.floor(clamped / 60)
+  const seconds = clamped % 60
 
   return `${minutes}:${seconds.toString().padStart(2, '0')}`
 }

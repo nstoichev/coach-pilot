@@ -1,8 +1,129 @@
+/**
+ * With `html { font-size: 62.5% }`, 1rem = 10px (browser default 16px).
+ * Tailwind’s defaults assume 1rem ≈ 16px. Scale rem-based theme tokens by 1.6 so
+ * utilities (e.g. `text-base`, `p-4`, `gap-8`) match the previous visual size.
+ */
+const ROOT_REM_SCALE = 1.6
+
+const scaledSpacing = (() => {
+  const baseRem = {
+    0.5: 0.125,
+    1: 0.25,
+    1.5: 0.375,
+    2: 0.5,
+    2.5: 0.625,
+    3: 0.75,
+    3.5: 0.875,
+    4: 1,
+    5: 1.25,
+    6: 1.5,
+    7: 1.75,
+    8: 2,
+    9: 2.25,
+    10: 2.5,
+    11: 2.75,
+    12: 3,
+    14: 3.5,
+    16: 4,
+    20: 5,
+    24: 6,
+    28: 7,
+    32: 8,
+    36: 9,
+    40: 10,
+    44: 11,
+    48: 12,
+    52: 13,
+    56: 14,
+    60: 15,
+    64: 16,
+    72: 18,
+    80: 20,
+    96: 24,
+  }
+  return {
+    px: '1px',
+    0: '0px',
+    ...Object.fromEntries(
+      Object.entries(baseRem).map(([key, rem]) => [key, `${rem * ROOT_REM_SCALE}rem`]),
+    ),
+  }
+})()
+
+const R = ROOT_REM_SCALE
+
+/** Body copy on the root font grid (1rem = 10px): `text-base` / minimum UI text = 1.6rem (16px). */
+const MIN_TEXT_REM = '1.6rem'
+const MIN_TEXT_LH = '2.4rem'
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
+      spacing: scaledSpacing,
+      fontSize: {
+        xs: [MIN_TEXT_REM, { lineHeight: MIN_TEXT_LH }],
+        sm: [MIN_TEXT_REM, { lineHeight: MIN_TEXT_LH }],
+        base: [MIN_TEXT_REM, { lineHeight: MIN_TEXT_LH }],
+        lg: [`${1.125 * R}rem`, { lineHeight: `${1.75 * R}rem` }],
+        xl: [`${1.25 * R}rem`, { lineHeight: `${1.75 * R}rem` }],
+        '2xl': [`${1.5 * R}rem`, { lineHeight: `${2 * R}rem` }],
+        '3xl': [`${1.875 * R}rem`, { lineHeight: `${2.25 * R}rem` }],
+        '4xl': [`${2.25 * R}rem`, { lineHeight: `${2.5 * R}rem` }],
+        '5xl': [`${3 * R}rem`, { lineHeight: '1' }],
+        '6xl': [`${3.75 * R}rem`, { lineHeight: '1' }],
+        '7xl': [`${4.5 * R}rem`, { lineHeight: '1' }],
+        '8xl': [`${6 * R}rem`, { lineHeight: '1' }],
+        '9xl': [`${8 * R}rem`, { lineHeight: '1' }],
+      },
+      lineHeight: {
+        3: `${0.75 * R}rem`,
+        4: `${1 * R}rem`,
+        5: `${1.25 * R}rem`,
+        6: `${1.5 * R}rem`,
+        7: `${1.75 * R}rem`,
+        8: `${2 * R}rem`,
+        9: `${2.25 * R}rem`,
+        10: `${2.5 * R}rem`,
+      },
+      borderRadius: {
+        sm: `${0.125 * R}rem`,
+        DEFAULT: `${0.25 * R}rem`,
+        md: `${0.375 * R}rem`,
+        lg: `${0.5 * R}rem`,
+        xl: `${0.75 * R}rem`,
+        '2xl': `${1 * R}rem`,
+        '3xl': `${1.5 * R}rem`,
+      },
+      maxWidth: {
+        xs: `${20 * R}rem`,
+        sm: `${24 * R}rem`,
+        md: `${28 * R}rem`,
+        lg: `${32 * R}rem`,
+        xl: `${36 * R}rem`,
+        '2xl': `${42 * R}rem`,
+        '3xl': `${48 * R}rem`,
+        '4xl': `${56 * R}rem`,
+        '5xl': `${64 * R}rem`,
+        '6xl': `${72 * R}rem`,
+        '7xl': `${80 * R}rem`,
+      },
+      columns: {
+        '3xs': `${16 * R}rem`,
+        '2xs': `${18 * R}rem`,
+        xs: `${20 * R}rem`,
+        sm: `${24 * R}rem`,
+        md: `${28 * R}rem`,
+        lg: `${32 * R}rem`,
+        xl: `${36 * R}rem`,
+        '2xl': `${42 * R}rem`,
+        '3xl': `${48 * R}rem`,
+        '4xl': `${56 * R}rem`,
+        '5xl': `${64 * R}rem`,
+        '6xl': `${72 * R}rem`,
+        '7xl': `${80 * R}rem`,
+      },
       colors: {
         surface: {
           primary: '#020617',

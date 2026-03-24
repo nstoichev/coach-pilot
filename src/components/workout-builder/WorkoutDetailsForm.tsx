@@ -8,7 +8,6 @@ type WorkoutDetailsFormProps = {
   scheduledDateMin: string
   onScheduledDateChange: (date: string) => void
   onWorkoutNameChange: (name: string) => void
-  onAddSegment: () => void
   /** Opens the same-style modal as Add segment / Add exercise. */
   onOpenLoadWorkout?: () => void
 }
@@ -19,7 +18,6 @@ export const WorkoutDetailsForm = ({
   scheduledDateMin,
   onScheduledDateChange,
   onWorkoutNameChange,
-  onAddSegment,
   onOpenLoadWorkout,
 }: WorkoutDetailsFormProps) => (
   <section className={tw.panel}>
@@ -27,6 +25,15 @@ export const WorkoutDetailsForm = ({
       <div>
         <h2 className={tw.panelTitle}>Build your workout</h2>
       </div>
+      {onOpenLoadWorkout ? (
+        <button
+          type="button"
+          className={tw.secondaryButton}
+          onClick={onOpenLoadWorkout}
+        >
+          Load template
+        </button>
+      ) : null}
     </div>
 
     <div className={cn(tw.formGrid, tw.formGridWorkoutDetails)}>
@@ -48,25 +55,6 @@ export const WorkoutDetailsForm = ({
           placeholder="Lower Body Strength"
         />
       </label>
-    </div>
-
-    <div className={tw.panelAddSegmentRow}>
-      <button
-        className={tw.panelAddSegmentButton}
-        onClick={onAddSegment}
-        type="button"
-      >
-        Add Segment
-      </button>
-      {onOpenLoadWorkout ? (
-        <button
-          type="button"
-          className={tw.panelLoadWorkoutButton}
-          onClick={onOpenLoadWorkout}
-        >
-          Load template
-        </button>
-      ) : null}
     </div>
   </section>
 )

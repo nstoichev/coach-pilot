@@ -206,6 +206,29 @@ export const mockWorkoutKaren: Workout = {
   ],
 }
 
+/** 5 rounds for time: burpees, DB hang clean, bike cals, DB push press, K2E, DB step-ups */
+export const mockWorkoutNikiConditioning: Workout = {
+  id: 'workout-niki-conditioning',
+  name: 'Niki conditioning',
+  segments: [
+    forTimeSegment(
+      'segment-niki-conditioning',
+      [
+        assigned('ae-niki-1', 'exercise-burpee', { repetitions: 10 }),
+        assigned('ae-niki-2', 'exercise-db-hang-clean', { repetitions: 12 }),
+        assigned('ae-niki-3', 'exercise-bike', {
+          metricTarget: { type: 'calories', value: 15 },
+        }),
+        assigned('ae-niki-4', 'exercise-db-push-press', { repetitions: 12 }),
+        assigned('ae-niki-5', 'exercise-knees-to-elbows', { repetitions: 10 }),
+        assigned('ae-niki-6', 'exercise-db-step-up', { repetitions: 12 }),
+      ],
+      32 * 60,
+      5,
+    ),
+  ],
+}
+
 /** 1 mile run – 100/200/300 – 1 mile run (chipper) */
 export const mockWorkoutMurph: Workout = {
   id: 'workout-murph',
@@ -238,5 +261,6 @@ export const mockWorkouts: Workout[] = [
   mockWorkoutDiane,
   mockWorkoutAnnie,
   mockWorkoutKaren,
+  mockWorkoutNikiConditioning,
   mockWorkoutMurph,
 ]
